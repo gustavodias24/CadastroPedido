@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+
+
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        tools:context=".MainActivity">
+
+        <EditText
+            android:id="@+id/edtLoja"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Loja ( vendedor )"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Data"
+            android:inputType="date" />
+
+        <EditText
+            android:id="@+id/edtAgente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="ID Agente"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/edtEstabelecimento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Nome estabelecimento"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtComprador"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Nome completo comprador"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="e-mail"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/edtTelefone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Telefone com DDD"
+            android:inputType="phone" />
+
+        <EditText
+            android:id="@+id/edtCnpj"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="CNPJ"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtEstadual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Inscrição Estadual"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtFormaPagamento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Forma de Pagamento"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtEndereco"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Endereço Completo"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtEnderecoEntrega"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Endereço Entrega"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtObsEntrega"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Observação / Entrega"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/btn_produtos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PRODUTOS"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+
+
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"
+        tools:context=".MainActivity">
+
+        <AutoCompleteTextView
+            android:id="@+id/edtNomeProduto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Produto"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtSKU"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="SKU"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtValor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Valor"
+            android:inputType="text" />
+
+        <TextView
+            android:id="@+id/textEstoque"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Esse produto tem X no estoque."
+            android:visibility="gone" />
+
+        <EditText
+            android:id="@+id/edtQTD"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Quantidade"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/edtValorTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:editable="false"
+            android:ems="10"
+            android:focusable="false"
+            android:hint="Valor Total por Item"
+            android:inputType="none" />
+
+        <EditText
+            android:id="@+id/edtDesconto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Desconto %"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/edtValorTotalDesconto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:editable="false"
+            android:ems="10"
+            android:focusable="false"
+            android:hint="Valor Total Final"
+            android:inputType="none" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerProdutos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/text_valor_total"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Total Compra: R$ 0,00"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_calcular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Calcular"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_add_produtos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="adicionar produto"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_enviar_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="enviar por e-mail"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+</ScrollView>
