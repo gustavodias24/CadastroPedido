@@ -15,32 +15,33 @@
         android:padding="8dp"
         tools:context=".MainActivity">
 
-        <LinearLayout
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteFiltro"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:ems="10"
+            android:hint="Filtrar Produto"
+            android:inputType="text" />
 
-            <AutoCompleteTextView
-                android:id="@+id/autoCompleteFiltro"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:hint="Filtrar Produto"
-                android:inputType="text" />
+        <ImageButton
+            android:id="@+id/btn_search"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#000000"
+            android:padding="13dp"
+            android:scaleType="fitCenter"
+            android:src="@raw/searchicon"
+            app:tint="@color/white" />
 
-            <ImageButton
-                android:id="@+id/btn_search"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_weight="7"
-                android:backgroundTint="#000000"
-                android:padding="13dp"
-                android:scaleType="fitCenter"
-                android:src="@raw/searchicon"
-                app:tint="@color/white" />
-
-        </LinearLayout>
+        <ImageButton
+            android:id="@+id/btn_limpar"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="#000000"
+            android:padding="13dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/baseline_clear_24"
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/textView"

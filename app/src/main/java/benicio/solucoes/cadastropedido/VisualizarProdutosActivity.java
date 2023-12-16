@@ -58,6 +58,12 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoes);
 
+        mainBinding.btnLimpar.setOnClickListener(view -> {
+            mainBinding.autoCompleteFiltro.setText("");
+            mainBinding.textInfo.setText("");
+        });
+
+
         mainBinding.autoCompleteFiltro.setAdapter(adapter);
 
         mainBinding.autoCompleteFiltro.setOnClickListener(view -> mainBinding.autoCompleteFiltro.showDropDown());
