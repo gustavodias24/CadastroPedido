@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         configurarLoadingDialog();
         configurarPrefs();
 
+        mainBinding.btnVerProdutos.setOnClickListener(view -> startActivity(new Intent(this, VisualizarProdutosActivity.class)));
         mainBinding.btnFazerPedido.setOnClickListener(view -> startActivity(new Intent(this , InfosActivity.class)));
 
         mainBinding.btnAtualizarBase.setOnClickListener( view -> {

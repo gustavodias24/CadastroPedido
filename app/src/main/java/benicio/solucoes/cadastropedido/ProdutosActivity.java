@@ -91,6 +91,8 @@ public class ProdutosActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),  selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
         });
 
+
+
         mainBinding.btnCalcular.setOnClickListener( view -> {
             Double valorTotalPorItem =
                     MathUtils.converterParaDouble(

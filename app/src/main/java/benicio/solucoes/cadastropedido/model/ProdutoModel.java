@@ -5,6 +5,14 @@ public class ProdutoModel {
     String nome, sku;
     String preco;
 
+    @Override
+    public String toString() {
+        return  nome + '\n' +
+                "Estoque: " + estoque + '\n' +
+                "SKU: " + sku + '\n' +
+                "Preço: R$" + preco;
+    }
+
     public float getEstoque() {
         return estoque;
     }
