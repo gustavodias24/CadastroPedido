@@ -3,7 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:orientation="horizontal">
+    android:background="@drawable/borda"
+    android:orientation="horizontal"
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/text_info_generic"
@@ -21,6 +23,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:backgroundTint="#FFFFFF"
+        android:backgroundTint="#00FFFFFF"
         android:src="@raw/lixo" />
 </LinearLayout>

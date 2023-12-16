@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center_vertical"
     android:fillViewport="true">
 
     <LinearLayout
@@ -11,8 +10,6 @@
 
 
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
         android:orientation="vertical"
         android:padding="8dp"
         tools:context=".MainActivity">
@@ -23,6 +20,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Fazer pedido"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_ver_produtos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="VER PRODUTOS"
             android:textAllCaps="true"
             android:textStyle="bold" />
 
@@ -40,5 +45,19 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text="Última atualização: " />
+
+        <TextView
+            android:id="@+id/pedidosText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Pedidos:"
+            android:textAlignment="textStart"
+            android:visibility="invisible" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerPedidos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </ScrollView>

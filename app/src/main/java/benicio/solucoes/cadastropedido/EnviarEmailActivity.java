@@ -18,9 +18,12 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.util.List;
+
 import benicio.solucoes.cadastropedido.databinding.ActivityEnviarEmailBinding;
 import benicio.solucoes.cadastropedido.databinding.ActivityInfosBinding;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
+import benicio.solucoes.cadastropedido.util.PedidosUtil;
 
 public class EnviarEmailActivity extends AppCompatActivity {
 
@@ -44,6 +47,9 @@ public class EnviarEmailActivity extends AppCompatActivity {
         mainBinding.btnEnviarEmail.setOnClickListener(view-> enviarEmail());
 
         mainBinding.btnFinalizar.setOnClickListener( view -> {
+            List<PedidoModel> listaParaAtualizar = PedidosUtil.returnPedidos(this);
+            listaParaAtualizar.add(pedido);
+            PedidosUtil.savePedidos(this, listaParaAtualizar);
             finish();
             startActivity(new Intent(this, MainActivity.class));
         });

@@ -43,7 +43,7 @@
             android:id="@+id/btn_finalizar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="finalizar"
+            android:text="finalizar/salvar"
             android:textAllCaps="true"
             android:textStyle="bold" />
 
