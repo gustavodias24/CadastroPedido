@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ShareCompat;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -17,32 +19,50 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
+import java.util.UUID;
 
 import benicio.solucoes.cadastropedido.databinding.ActivityEnviarEmailBinding;
 import benicio.solucoes.cadastropedido.databinding.ActivityInfosBinding;
+import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
+import benicio.solucoes.cadastropedido.model.UserModel;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
 
 public class EnviarEmailActivity extends AppCompatActivity {
 
+
+    private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
+    private DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
     private ActivityEnviarEmailBinding mainBinding;
     private Bundle b;
     private PedidoModel pedido;
+    private String idVendedor;
+    private Dialog loadingDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainBinding = ActivityEnviarEmailBinding.inflate(getLayoutInflater());
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-
+        
         getSupportActionBar().setTitle("Enviar E-mail");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        configurarLoadingDialog();
+        configurarIdVendedor();
 
         String[] sugestoesEmails = {"pedidos@redcloudtechnology.com", "credito@redcloudtechnology.com"};
         ArrayAdapter<String> adapterEmails = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesEmails);
@@ -61,11 +81,22 @@ public class EnviarEmailActivity extends AppCompatActivity {
         mainBinding.btnEnviarEmail.setOnClickListener(view-> enviarEmail());
 
         mainBinding.btnFinalizar.setOnClickListener( view -> {
-            List<PedidoModel> listaParaAtualizar = PedidosUtil.returnPedidos(this);
-            listaParaAtualizar.add(pedido);
-            PedidosUtil.savePedidos(this, listaParaAtualizar);
-            finish();
-            startActivity(new Intent(this, MainActivity.class));
+            pedido.setId(UUID.randomUUID().toString());
+            pedido.setIdVendedor(idVendedor);
+            loadingDialog.show();
+            refPedidos.child(pedido.getId()).setValue(pedido).addOnCompleteListener(task -> {
+                loadingDialog.dismiss();
+                
+                if( task.isSuccessful() ){
+                    Toast.makeText(this, "Peidido Criado!", Toast.LENGTH_SHORT).show();
+                    finish();
+                    startActivity(new Intent(this, MainActivity.class));
+                }
+            });
+//            List<PedidoModel> listaParaAtualizar = PedidosUtil.returnPedidos(this);
+//            listaParaAtualizar.add(pedido);
+//            PedidosUtil.savePedidos(this, listaParaAtualizar);
+           
         });
 
         mainBinding.bodyEmail.setText(
@@ -78,6 +109,36 @@ public class EnviarEmailActivity extends AppCompatActivity {
             ClipData clipData =  ClipData.newPlainText("venda", mainBinding.bodyEmail.getText().toString());
             clipboardManager.setPrimaryClip(clipData);
             Toast.makeText(this, "Copiado!", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void configurarLoadingDialog() {
+        AlertDialog.Builder b = new AlertDialog.Builder(this);
+        b.setCancelable(false);
+        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
+        loadingDialog = b.create();
+    }
+    private void configurarIdVendedor(){
+
+        loadingDialog.show();
+        refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                loadingDialog.dismiss();
+
+                for ( DataSnapshot dado : snapshot.getChildren()){
+                    UserModel userModel = dado.getValue(UserModel.class);
+                    if ( userModel.getEmail().equals(auth.getCurrentUser().getEmail())){
+                        idVendedor = userModel.getId();
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                loadingDialog.dismiss();
+            }
         });
     }
 

@@ -5,6 +5,10 @@ public class ItemCompra {
     String nomeProduto, sku,
     valor,quantidade, valorTotalPorItem,
     valorTotalFinal;
+
+    public ItemCompra() {
+    }
+
     String desconto = "0";
 
     @Override

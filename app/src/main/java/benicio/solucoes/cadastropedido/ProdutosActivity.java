@@ -65,7 +65,7 @@ public class ProdutosActivity extends AppCompatActivity {
 
         listaProdutos = ProdutosUtils.returnProdutos(this);
         for ( ProdutoModel produtoModel : listaProdutos){
-            listaNomeProdutos.add(produtoModel.getNome() + " | " + produtoModel.getFornecedor());
+            listaNomeProdutos.add(produtoModel.getNome() + " -F- " + produtoModel.getFornecedor());
             listaNomeSKU.add(produtoModel.getSku());
         }
 
@@ -102,6 +102,7 @@ public class ProdutosActivity extends AppCompatActivity {
 
         mainBinding.edtNomeProduto.setOnItemClickListener((parent, view, position, id) -> {
             String selectedFrase = (String) parent.getItemAtPosition(position);
+            selectedFrase = selectedFrase.split(" -F- ")[0];
             mainBinding.edtNomeProduto.setText(selectedFrase);
 
             for ( ProdutoModel produtoModel : listaProdutos){

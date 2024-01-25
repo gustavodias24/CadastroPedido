@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PedidoModel {
+    String id, idVendedor;
     String lojaVendedor, data, idAgente, nomeEstabelecimento, nomeComprador, email, tele, cnpj, inscriEstadual,
     formaPagamento, enderecoCompleto, enderecoEntrega, obsEntrega;
 
     String totalCompra;
     List<ItemCompra> produtos = new ArrayList<>();
+
+    public PedidoModel() {
+    }
 
     @Override
     public String toString() {
@@ -50,6 +54,22 @@ public class PedidoModel {
         this.enderecoEntrega = enderecoEntrega;
         this.obsEntrega = obsEntrega;
         this.produtos = produtos;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getIdVendedor() {
+        return idVendedor;
+    }
+
+    public void setIdVendedor(String idVendedor) {
+        this.idVendedor = idVendedor;
     }
 
     public String getLojaVendedor() {
