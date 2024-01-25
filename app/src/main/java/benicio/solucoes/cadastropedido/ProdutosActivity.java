@@ -65,14 +65,15 @@ public class ProdutosActivity extends AppCompatActivity {
 
         listaProdutos = ProdutosUtils.returnProdutos(this);
         for ( ProdutoModel produtoModel : listaProdutos){
-            listaNomeProdutos.add(produtoModel.getNome());
+            listaNomeProdutos.add(produtoModel.getNome() + " | " + produtoModel.getFornecedor());
             listaNomeSKU.add(produtoModel.getSku());
         }
 
         String[] sugestoes = listaNomeProdutos.toArray(new String[0]);
         String[] sugestoesSKU = listaNomeSKU.toArray(new String[0]);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.custom_dropdown_item, R.id.textoProdutos, sugestoes);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoes);
         ArrayAdapter<String> adapterSKU = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesSKU);
 
         mainBinding.edtNomeProduto.setAdapter(adapter);

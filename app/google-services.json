@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "698204145371",
+    "project_id": "redcloudapppedidos",
+    "storage_bucket": "redcloudapppedidos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:698204145371:android:0a54bf2b03bb6f7fbc2efe",
+        "android_client_info": {
+          "package_name": "benicio.solucoes.cadastropedido"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDGcYV4nm2qDbRKDDBHdgTyMzJLAbf6iI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

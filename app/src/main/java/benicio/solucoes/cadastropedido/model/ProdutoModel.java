@@ -4,6 +4,7 @@ public class ProdutoModel {
     float estoque;
     String nome, sku;
     String preco;
+    String fornecedor;
 
     @Override
     public String toString() {
@@ -11,6 +12,14 @@ public class ProdutoModel {
                 "Estoque: " + estoque + '\n' +
                 "SKU: " + sku + '\n' +
                 "Preço: R$" + preco;
+    }
+
+    public String getFornecedor() {
+        return fornecedor;
+    }
+
+    public void setFornecedor(String fornecedor) {
+        this.fornecedor = fornecedor;
     }
 
     public float getEstoque() {
