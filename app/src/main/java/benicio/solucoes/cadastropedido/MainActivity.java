@@ -22,6 +22,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -91,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<List<ProdutoModel>> call, Throwable t) {
                     loadingDialog.dismiss();
+                    Log.d("mayara", "onFailure: " + t.getMessage());
                     Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -121,6 +125,5 @@ public class MainActivity extends AppCompatActivity {
         b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
         loadingDialog = b.create();
     }
-
 }
 

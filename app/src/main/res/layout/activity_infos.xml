@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="ID Agente"
-            android:inputType="number" />
+            android:inputType="text" />
 
         <EditText
             android:id="@+id/edtEstabelecimento"
@@ -124,6 +124,7 @@
             android:id="@+id/btn_produtos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/botaoColor"
             android:text="PRODUTOS"
             android:textAllCaps="true"
             android:textStyle="bold" />

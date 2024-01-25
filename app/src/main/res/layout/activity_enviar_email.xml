@@ -15,7 +15,7 @@
         tools:context=".MainActivity">
 
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/edtEmailEnvio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,6 +35,7 @@
             android:id="@+id/btn_enviar_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/botaoColor"
             android:text="Enviar e-mail"
             android:textAllCaps="true"
             android:textStyle="bold" />
@@ -43,15 +44,17 @@
             android:id="@+id/btn_finalizar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/botaoColor"
             android:text="finalizar/salvar"
             android:textAllCaps="true"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/body_email"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="Última atualização: " />
+            android:text="Última atualização: "
+            android:textAlignment="viewStart" />
     </LinearLayout>
 </ScrollView>

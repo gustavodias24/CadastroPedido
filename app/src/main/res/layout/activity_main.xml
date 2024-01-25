@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,6 +20,7 @@
             android:id="@+id/btn_fazer_pedido"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/botaoColor"
             android:text="Fazer pedido"
             android:textAllCaps="true"
             android:textStyle="bold" />
@@ -27,6 +29,7 @@
             android:id="@+id/btn_ver_produtos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/botaoColor"
             android:text="VER PRODUTOS"
             android:textAllCaps="true"
             android:textStyle="bold" />
@@ -35,6 +38,7 @@
             android:id="@+id/btn_atualizar_base"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/botaoColor"
             android:text="atualizar base"
             android:textAllCaps="true"
             android:textStyle="bold" />

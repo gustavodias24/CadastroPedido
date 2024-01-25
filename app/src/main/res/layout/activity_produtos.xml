@@ -22,7 +22,7 @@
             android:hint="Produto"
             android:inputType="text" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/edtSKU"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -101,6 +101,7 @@
             android:id="@+id/btn_calcular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/botaoColor"
             android:text="Calcular"
             android:textAllCaps="true"
             android:textStyle="bold" />
@@ -109,6 +110,7 @@
             android:id="@+id/btn_add_produtos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/botaoColor"
             android:text="adicionar produto"
             android:textAllCaps="true"
             android:textStyle="bold" />
@@ -117,6 +119,7 @@
             android:id="@+id/btn_enviar_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/botaoColor"
             android:text="enviar por e-mail"
             android:textAllCaps="true"
             android:textStyle="bold" />

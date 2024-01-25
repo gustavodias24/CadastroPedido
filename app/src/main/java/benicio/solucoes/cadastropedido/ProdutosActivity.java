@@ -42,6 +42,7 @@ public class ProdutosActivity extends AppCompatActivity {
     private List<ItemCompra> listaCompra = new ArrayList<>();
     private AdapterProduto adapterProdutos;
     private List<String> listaNomeProdutos = new ArrayList<>();
+    private List<String> listaNomeSKU = new ArrayList<>();
 
     @SuppressLint({"NotifyDataSetChanged", "SetTextI18n"})
     @Override
@@ -65,15 +66,38 @@ public class ProdutosActivity extends AppCompatActivity {
         listaProdutos = ProdutosUtils.returnProdutos(this);
         for ( ProdutoModel produtoModel : listaProdutos){
             listaNomeProdutos.add(produtoModel.getNome());
+            listaNomeSKU.add(produtoModel.getSku());
         }
 
         String[] sugestoes = listaNomeProdutos.toArray(new String[0]);
+        String[] sugestoesSKU = listaNomeSKU.toArray(new String[0]);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoes);
+        ArrayAdapter<String> adapterSKU = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesSKU);
 
         mainBinding.edtNomeProduto.setAdapter(adapter);
+        mainBinding.edtSKU.setAdapter(adapterSKU);
 
         mainBinding.edtNomeProduto.setOnClickListener(view -> mainBinding.edtNomeProduto.showDropDown());
+        mainBinding.edtSKU.setOnClickListener(view -> mainBinding.edtSKU.showDropDown());
+
+        mainBinding.edtSKU.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedFrase = (String) parent.getItemAtPosition(position);
+            mainBinding.edtSKU.setText(selectedFrase);
+
+            for ( ProdutoModel produtoModel : listaProdutos){
+                if ( produtoModel.getSku().equals(selectedFrase)){
+                    mainBinding.edtNomeProduto.setText(produtoModel.getNome());
+                    mainBinding.edtSKU.setText(produtoModel.getSku());
+                    mainBinding.edtValor.setText( "R$ " + produtoModel.getPreco().replace(".", ","));
+                    mainBinding.textEstoque.setText("Esse produto tem "+produtoModel.getEstoque()+" no estoque.");
+                    mainBinding.textEstoque.setVisibility(View.VISIBLE);
+                    break;
+                }
+            }
+
+            Toast.makeText(getApplicationContext(),  selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
+        });
 
         mainBinding.edtNomeProduto.setOnItemClickListener((parent, view, position, id) -> {
             String selectedFrase = (String) parent.getItemAtPosition(position);
