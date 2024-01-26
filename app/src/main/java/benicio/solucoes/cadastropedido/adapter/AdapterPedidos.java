@@ -59,6 +59,7 @@ public class AdapterPedidos extends RecyclerView.Adapter<AdapterPedidos.MyViewHo
 
                 AlertDialog.Builder b = new AlertDialog.Builder(a);
 
+                b.setTitle("Atualizar Status");
                 b.setNegativeButton("Fechar", (dialog, i) -> d.dismiss());
                 LayoutAlterarStatusBinding alterarStatusBinding = LayoutAlterarStatusBinding.inflate(a.getLayoutInflater());
 

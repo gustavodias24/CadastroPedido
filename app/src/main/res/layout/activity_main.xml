@@ -39,7 +39,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/botaoColor"
-            android:text="atualizar base"
+            android:text="atualizar  base produtos"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_atualizar_base_clientes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/botaoColor"
+            android:text="atualizar base clientes"
             android:textAllCaps="true"
             android:textStyle="bold" />
 

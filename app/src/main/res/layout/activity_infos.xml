@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center_vertical"
     android:fillViewport="true">
 
@@ -14,23 +14,25 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="8dp"
-        tools:context=".MainActivity">
+        tools:context=".InfosActivity">
 
         <EditText
             android:id="@+id/edtLoja"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Loja ( vendedor )"
+            android:hint="Loja ( vendedor ) * OBRIGATÓRIO"
             android:inputType="text" />
 
-        <EditText
+        <com.vicmikhailau.maskededittext.MaskedEditText
             android:id="@+id/edtData"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Data"
-            android:inputType="date" />
+            android:hint="Data  * OBRIGATÓRIO"
+            android:inputType="date"
+            app:mask="##/##/####"
+            />
 
         <EditText
             android:id="@+id/edtAgente"
@@ -45,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Nome estabelecimento"
+            android:hint="Nome estabelecimento  * OBRIGATÓRIO"
             android:inputType="text" />
 
         <EditText
@@ -53,7 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Nome completo comprador"
+            android:hint="Nome completo comprador  * OBRIGATÓRIO"
             android:inputType="text" />
 
         <EditText
@@ -61,7 +63,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="e-mail"
+            android:hint="E-mail  * OBRIGATÓRIO"
             android:inputType="textEmailAddress" />
 
         <EditText
@@ -69,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Telefone com DDD"
+            android:hint="Telefone com DDD  * OBRIGATÓRIO"
             android:inputType="phone" />
 
         <EditText
@@ -77,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="CNPJ"
+            android:hint="CNPJ  * OBRIGATÓRIO"
             android:inputType="text" />
 
         <EditText
@@ -85,7 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Inscrição Estadual"
+            android:hint="Inscrição Estadual  * OBRIGATÓRIO"
             android:inputType="text" />
 
         <EditText
@@ -93,7 +95,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Forma de Pagamento"
+            android:hint="Forma de Pagamento  * OBRIGATÓRIO"
             android:inputType="text" />
 
         <EditText
@@ -101,7 +103,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Endereço Completo"
+            android:hint="Endereço Completo  * OBRIGATÓRIO"
             android:inputType="text" />
 
         <EditText
@@ -109,7 +111,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Endereço Entrega"
+            android:hint="Endereço Entrega  * OBRIGATÓRIO"
             android:inputType="text" />
 
         <EditText
@@ -117,7 +119,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Observação / Entrega"
+            android:hint="Observação / Entrega  * OBRIGATÓRIO"
             android:inputType="text" />
 
         <Button

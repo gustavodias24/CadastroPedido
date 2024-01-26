@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -35,28 +36,46 @@ public class InfosActivity extends AppCompatActivity {
 
             Gson gson = new Gson();
 
-            String dadosPedido = gson.toJson(
-                    new PedidoModel(
-                           mainBinding.edtLoja.getText().toString(),
-                            mainBinding.edtData.getText().toString(),
-                            mainBinding.edtAgente.getText().toString(),
-                            mainBinding.edtEstabelecimento.getText().toString(),
-                            mainBinding.edtComprador.getText().toString(),
-                            mainBinding.edtEmail.getText().toString(),
-                            mainBinding.edtTelefone.getText().toString(),
-                            mainBinding.edtCnpj.getText().toString(),
-                            mainBinding.edtEstadual.getText().toString(),
-                            mainBinding.edtFormaPagamento.getText().toString(),
-                            mainBinding.edtEndereco.getText().toString(),
-                            mainBinding.edtEnderecoEntrega.getText().toString(),
-                            mainBinding.edtObsEntrega.getText().toString(),
-                            new ArrayList<>()
-                    )
-            );
+            if (
+                    mainBinding.edtLoja.getText().toString().isEmpty()||
+                    mainBinding.edtData.getText().toString().isEmpty()||
+                    mainBinding.edtEstabelecimento.getText().toString().isEmpty()||
+                    mainBinding.edtComprador.getText().toString().isEmpty()||
+                    mainBinding.edtEmail.getText().toString().isEmpty()||
+                    mainBinding.edtTelefone.getText().toString().isEmpty()||
+                    mainBinding.edtCnpj.getText().toString().isEmpty()||
+                    mainBinding.edtEstadual.getText().toString().isEmpty()||
+                    mainBinding.edtFormaPagamento.getText().toString().isEmpty()||
+                    mainBinding.edtEndereco.getText().toString().isEmpty()||
+                    mainBinding.edtEnderecoEntrega.getText().toString().isEmpty()||
+                    mainBinding.edtObsEntrega.getText().toString().isEmpty()
+            ){
+                Toast.makeText(this, "Preencha Todos os Dados Obrigatórios!", Toast.LENGTH_LONG).show();
+            }else{
+                String dadosPedido = gson.toJson(
+                        new PedidoModel(
+                                mainBinding.edtLoja.getText().toString(),
+                                mainBinding.edtData.getText().toString(),
+                                mainBinding.edtAgente.getText().toString(),
+                                mainBinding.edtEstabelecimento.getText().toString(),
+                                mainBinding.edtComprador.getText().toString(),
+                                mainBinding.edtEmail.getText().toString(),
+                                mainBinding.edtTelefone.getText().toString(),
+                                mainBinding.edtCnpj.getText().toString(),
+                                mainBinding.edtEstadual.getText().toString(),
+                                mainBinding.edtFormaPagamento.getText().toString(),
+                                mainBinding.edtEndereco.getText().toString(),
+                                mainBinding.edtEnderecoEntrega.getText().toString(),
+                                mainBinding.edtObsEntrega.getText().toString(),
+                                new ArrayList<>()
+                        )
+                );
 
-            i.putExtra("dadosPedido", dadosPedido);
+                i.putExtra("dadosPedido", dadosPedido);
 
-            startActivity(i);
+                startActivity(i);
+            }
+
         });
     }
 
