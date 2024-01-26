@@ -59,7 +59,7 @@ public class PedidoModel {
                 statusText = "CANCELADO";
                 break;
             case 5:
-                statusText =  "FEHCADO";
+                statusText =  "FECHADO";
                 break;
         }
 

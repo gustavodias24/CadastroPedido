@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -32,13 +33,13 @@ import benicio.solucoes.cadastropedido.util.PedidosUtil;
 
 public class PedidoVendedorActivity extends AppCompatActivity {
 
-    private DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
-    private AdapterPedidos adapterPedidos;
-    List<PedidoModel> listaPedidos = new ArrayList<>();
-    private Dialog loadingDialog;
+    public static DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
+    public static AdapterPedidos adapterPedidos;
+    public static List<PedidoModel> listaPedidos = new ArrayList<>();
+    public static Dialog loadingDialog;
     private ActivityPedidoVendedorBinding mainBinding;
     private RecyclerView recyclerPedidos;
-    private String idUsuario;
+    public static String idUsuario;
     private Bundle b;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +73,8 @@ public class PedidoVendedorActivity extends AppCompatActivity {
         recyclerPedidos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerPedidos.setHasFixedSize(true);
         listaPedidos.addAll(PedidosUtil.returnPedidos(this));
-        configurarListener("");
-        adapterPedidos = new AdapterPedidos(listaPedidos, this);
+        configurarListener("", this);
+        adapterPedidos = new AdapterPedidos(listaPedidos, this, true, loadingDialog);
         recyclerPedidos.setAdapter(adapterPedidos);
     }
 
@@ -84,7 +85,7 @@ public class PedidoVendedorActivity extends AppCompatActivity {
         loadingDialog = b.create();
     }
 
-    private void configurarListener(String query){
+    public static void configurarListener(String query, Context c){
         loadingDialog.show();
         refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
@@ -125,7 +126,7 @@ public class PedidoVendedorActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 loadingDialog.dismiss();
-                Toast.makeText(PedidoVendedorActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
+                Toast.makeText(c, "Sem Conexão", Toast.LENGTH_LONG).show();
             }
         });
     }

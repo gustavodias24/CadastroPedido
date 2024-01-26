@@ -109,7 +109,7 @@ public class CadastroLoginActivity extends AppCompatActivity {
             email = mainBinding.edtEmailLogin.getText().toString();
             senha = mainBinding.edtSenhaLogin.getText().toString();
 
-            if ( email.equals("adm") && senha.equals("adm@233")){
+            if ( email.equals("adm") && senha.equals("adm@2332")){
                 finish();
                 startActivity(new Intent(this, AdminActivity.class));
             }else{

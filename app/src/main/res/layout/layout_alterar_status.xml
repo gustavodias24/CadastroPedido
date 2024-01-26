@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <RadioButton
+                android:id="@+id/radioPendente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pendente" />
+
+            <RadioButton
+                android:id="@+id/radioEmProcesso"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Em Processamento" />
+
+            <RadioButton
+                android:id="@+id/radioCompleto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Completo" />
+
+            <RadioButton
+                android:id="@+id/radioPagamentoPendente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pagamento Pendente" />
+
+            <RadioButton
+                android:id="@+id/radioCancelado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cancelado" />
+
+            <RadioButton
+                android:id="@+id/radioFechado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fechado" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+</ScrollView>
