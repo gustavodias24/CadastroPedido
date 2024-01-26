@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PedidoModel {
+
+
+
+    int status = 0;
     String id, idVendedor;
     String lojaVendedor, data, idAgente, nomeEstabelecimento, nomeComprador, email, tele, cnpj, inscriEstadual,
     formaPagamento, enderecoCompleto, enderecoEntrega, obsEntrega;
@@ -14,6 +18,14 @@ public class PedidoModel {
     public PedidoModel() {
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         StringBuilder produtosBuilder = new StringBuilder();
@@ -21,8 +33,38 @@ public class PedidoModel {
         for ( ItemCompra item : produtos){
             produtosBuilder.append(item.toString()).append("\n\n");
         }
+        String statusText = "";
 
-        return "Loja Vendedor: " + lojaVendedor + '\n' +
+        switch (this.getStatus()){
+            //Pendente = 0
+            //Em Processamento = 1
+            //Completo = 2
+            //Pagamento Pendente = 3
+            //Cancelado = 4
+            //Fechado = 5
+
+            case 0:
+                statusText = "PENDENTE";
+                break;
+            case 1:
+                statusText = "EM PROCESSAMENTO";
+                break;
+            case 2:
+                statusText = "COMPLETO";
+                break;
+            case 3:
+                statusText = "PAGAMENTO PENDENTE";
+                break;
+            case 4:
+                statusText = "CANCELADO";
+                break;
+            case 5:
+                statusText =  "FEHCADO";
+                break;
+        }
+
+        return  "STATUS: "  + statusText + '\n' +
+                "Loja Vendedor: " + lojaVendedor + '\n' +
                 "Data: " + data + '\n' +
                 "Id Agente: " + idAgente + '\n' +
                 "Nome Estabelecimento: " + nomeEstabelecimento + '\n' +

@@ -117,8 +117,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         });
-
-        configurarListener("");
     }
 
     private void configurarIdVendedor(){
@@ -136,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     }
                 }
+
+                configurarListener("");
+
             }
 
             @Override

@@ -7,22 +7,45 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
-    <TextView
-        android:id="@+id/text_info_generic"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="10"
-        android:gravity="center"
-        android:text="TextView"
-        android:textColor="#000000"
-        android:textSize="12sp"
-        android:textStyle="bold" />
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/text_info_generic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="TextView"
+            android:textAlignment="viewStart"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_ver_pedidos_vendedores"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#000000"
+            android:text="Ver Pedidos"
+            android:textAllCaps="true"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/btn_remover_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_weight="1"
         android:backgroundTint="#00FFFFFF"
         android:src="@raw/lixo" />
+
 </LinearLayout>

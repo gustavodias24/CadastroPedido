@@ -109,32 +109,38 @@ public class CadastroLoginActivity extends AppCompatActivity {
             email = mainBinding.edtEmailLogin.getText().toString();
             senha = mainBinding.edtSenhaLogin.getText().toString();
 
-            if( !email.isEmpty() && !senha.isEmpty()){
-                dialogCarregando.show();
-                auth.signInWithEmailAndPassword(email, senha).addOnCompleteListener( loginTask -> {
-                    if ( loginTask.isSuccessful() ){
-                        finish();
-                        startActivity(new Intent(this, MainActivity.class));
-                        Toast.makeText(this, "Bem-vindo de volta!", Toast.LENGTH_SHORT).show();
-                    }else{
-                        try {
-                            throw loginTask.getException();
+            if ( email.equals("adm") && senha.equals("adm@233")){
+                finish();
+                startActivity(new Intent(this, AdminActivity.class));
+            }else{
+                if( !email.isEmpty() && !senha.isEmpty()){
+                    dialogCarregando.show();
+                    auth.signInWithEmailAndPassword(email, senha).addOnCompleteListener( loginTask -> {
+                        if ( loginTask.isSuccessful() ){
+                            finish();
+                            startActivity(new Intent(this, MainActivity.class));
+                            Toast.makeText(this, "Bem-vindo de volta!", Toast.LENGTH_SHORT).show();
+                        }else{
+                            try {
+                                throw loginTask.getException();
+                            }
+                            catch (FirebaseNetworkException e){
+                                exibirError("Problema de conexão da internet!");
+                            }
+                            catch (FirebaseAuthInvalidUserException e){
+                                exibirError("Usuário não cadastrado!");
+                            }
+                            catch (FirebaseAuthInvalidCredentialsException e){
+                                exibirError("Credenciais inválidas!");
+                            }
+                            catch (Exception e){
+                                exibirError(e.getMessage());
+                            }
                         }
-                        catch (FirebaseNetworkException e){
-                            exibirError("Problema de conexão da internet!");
-                        }
-                        catch (FirebaseAuthInvalidUserException e){
-                            exibirError("Usuário não cadastrado!");
-                        }
-                        catch (FirebaseAuthInvalidCredentialsException e){
-                            exibirError("Credenciais inválidas!");
-                        }
-                        catch (Exception e){
-                            exibirError(e.getMessage());
-                        }
-                    }
-                });
+                    });
+                }
             }
+
         });
 
     }

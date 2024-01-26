@@ -57,7 +57,7 @@
             android:layout_marginTop="8dp"
             android:text="Pedidos:"
             android:textAlignment="textStart"
-            android:visibility="invisible" />
+            android:visibility="visible" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerPedidos"

@@ -5,6 +5,14 @@ public class UserModel {
     }
     String id,nome, email, senha;
 
+    @Override
+    public String toString() {
+        return
+                "Nome: " + '\n' + nome + '\n' +
+                "E-mail: " + '\n' + email + '\n' +
+                "Senha: " + '\n' + senha ;
+    }
+
     public UserModel(String id, String nome, String email, String senha) {
         this.id = id;
         this.nome = nome;
