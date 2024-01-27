@@ -16,23 +16,43 @@
         android:padding="8dp"
         tools:context=".InfosActivity">
 
+        <TextView
+            android:id="@+id/textView11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Loja ( vendedor ) * OBRIGATÓRIO *" />
+
         <EditText
             android:id="@+id/edtLoja"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Loja ( vendedor ) * OBRIGATÓRIO"
+            android:hint="Loja ( vendedor ) "
             android:inputType="text" />
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Data  * OBRIGATÓRIO *" />
 
         <com.vicmikhailau.maskededittext.MaskedEditText
             android:id="@+id/edtData"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Data  * OBRIGATÓRIO"
+            android:hint="Data  "
             android:inputType="date"
-            app:mask="##/##/####"
-            />
+            app:mask="##/##/####" />
+
+        <TextView
+            android:id="@+id/textView13"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="ID Agente" />
 
         <EditText
             android:id="@+id/edtAgente"
@@ -42,84 +62,153 @@
             android:hint="ID Agente"
             />
 
-        <EditText
+        <TextView
+            android:id="@+id/textView14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Nome estabelecimento  * OBRIGATÓRIO *" />
+
+        <AutoCompleteTextView
             android:id="@+id/edtEstabelecimento"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Nome estabelecimento  * OBRIGATÓRIO"
+            android:hint="Nome estabelecimento  "
             android:inputType="text" />
 
-        <EditText
+        <TextView
+            android:id="@+id/textView15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Nome completo comprador  * OBRIGATÓRIO *" />
+
+        <AutoCompleteTextView
             android:id="@+id/edtComprador"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Nome completo comprador  * OBRIGATÓRIO"
+            android:hint="Nome completo comprador  "
             android:inputType="text" />
 
-        <EditText
+        <TextView
+            android:id="@+id/textView16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="E-mail  * OBRIGATÓRIO *" />
+
+        <AutoCompleteTextView
             android:id="@+id/edtEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="E-mail  * OBRIGATÓRIO"
-            android:inputType="textEmailAddress" />
+            android:hint="E-mail  " />
+
+        <TextView
+            android:id="@+id/textView17"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Telefone com DDD  * OBRIGATÓRIO *" />
 
         <EditText
             android:id="@+id/edtTelefone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Telefone com DDD  * OBRIGATÓRIO"
+            android:hint="Telefone com DDD  "
             android:inputType="phone" />
 
-        <EditText
+        <TextView
+            android:id="@+id/textView18"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="CNPJ  * OBRIGATÓRIO *" />
+
+        <AutoCompleteTextView
             android:id="@+id/edtCnpj"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="CNPJ  * OBRIGATÓRIO"
+            android:hint="CNPJ  "
             android:inputType="text" />
+
+        <TextView
+            android:id="@+id/textView19"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Inscrição Estadual  * OBRIGATÓRIO *" />
 
         <EditText
             android:id="@+id/edtEstadual"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Inscrição Estadual  * OBRIGATÓRIO"
+            android:hint="Inscrição Estadual  "
             android:inputType="text" />
+
+        <TextView
+            android:id="@+id/textView20"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Forma de Pagamento  * OBRIGATÓRIO *" />
 
         <EditText
             android:id="@+id/edtFormaPagamento"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Forma de Pagamento  * OBRIGATÓRIO"
+            android:hint="Forma de Pagamento  "
             android:inputType="text" />
+
+        <TextView
+            android:id="@+id/textView21"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Endereço Completo  * OBRIGATÓRIO *" />
 
         <EditText
             android:id="@+id/edtEndereco"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Endereço Completo  * OBRIGATÓRIO"
+            android:hint="Endereço Completo  "
             android:inputType="text" />
+
+        <TextView
+            android:id="@+id/textView23"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Endereço Entrega  * OBRIGATÓRIO *" />
 
         <EditText
             android:id="@+id/edtEnderecoEntrega"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Endereço Entrega  * OBRIGATÓRIO"
+            android:hint="Endereço Entrega  "
             android:inputType="text" />
+
+        <TextView
+            android:id="@+id/textView22"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Observação / Entrega  * OBRIGATÓRIO *" />
 
         <EditText
             android:id="@+id/edtObsEntrega"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Observação / Entrega  * OBRIGATÓRIO"
+            android:hint="Observação / Entrega  "
             android:inputType="text" />
 
         <Button

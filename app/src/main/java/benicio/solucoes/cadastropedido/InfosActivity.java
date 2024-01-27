@@ -7,18 +7,28 @@ import androidx.appcompat.app.AppCompatDelegate;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import benicio.solucoes.cadastropedido.databinding.ActivityInfosBinding;
+import benicio.solucoes.cadastropedido.model.ClienteModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
+import benicio.solucoes.cadastropedido.model.ProdutoModel;
+import benicio.solucoes.cadastropedido.util.ClientesUtil;
 
 public class InfosActivity extends AppCompatActivity {
 
     private ActivityInfosBinding mainBinding;
+    private List<ClienteModel> clientes = new ArrayList<>();
+    private List<String> nomesEstabelecimentos = new ArrayList<>();
+    private List<String> nomesClientes = new ArrayList<>();
+    private List<String> emails = new ArrayList<>();
+    private List<String> cnpjs = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +39,111 @@ public class InfosActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Pedido");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        clientes.addAll(ClientesUtil.returnClientes(this));
+
+        for ( ClienteModel clienteModel : clientes){
+            nomesEstabelecimentos.add(clienteModel.getNomeEstabelecimento());
+            nomesClientes.add(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
+            emails.add(clienteModel.getEmail());
+            cnpjs.add(clienteModel.getCnpj());
+        }
+
+        String[] sugestoesNomesEstabelecimentos = nomesEstabelecimentos.toArray(new String[0]);
+        String[] sugestoesNomesClientes = nomesClientes.toArray(new String[0]);
+        String[] sugestoesEmails = emails.toArray(new String[0]);
+        String[] sugestoesCnpjs = cnpjs.toArray(new String[0]);
+
+        ArrayAdapter<String> adapterNomesEstabelecimentos = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesNomesEstabelecimentos);
+        ArrayAdapter<String> adapterNomesClientes = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesNomesClientes);
+        ArrayAdapter<String> adapterNomesEmails = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesEmails);
+        ArrayAdapter<String> adapterNomesCnpjs = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesCnpjs);
+
+        mainBinding.edtEstabelecimento.setAdapter(adapterNomesEstabelecimentos);
+        mainBinding.edtComprador.setAdapter(adapterNomesClientes);
+        mainBinding.edtEmail.setAdapter(adapterNomesEmails);
+        mainBinding.edtCnpj.setAdapter(adapterNomesCnpjs);
+
+        mainBinding.edtEstabelecimento.setOnClickListener(view -> mainBinding.edtEstabelecimento.showDropDown());
+        mainBinding.edtComprador.setOnClickListener(view -> mainBinding.edtComprador.showDropDown());
+        mainBinding.edtEmail.setOnClickListener(view -> mainBinding.edtEmail.showDropDown());
+        mainBinding.edtCnpj.setOnClickListener(view -> mainBinding.edtCnpj.showDropDown());
+
+        mainBinding.edtEstabelecimento.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedFrase = (String) parent.getItemAtPosition(position);
+
+            mainBinding.edtEstabelecimento.setText(selectedFrase);
+
+            for ( ClienteModel clienteModel : clientes){
+                if ( clienteModel.getNomeEstabelecimento().equals(selectedFrase)){
+                    mainBinding.edtCnpj.setText(clienteModel.getCnpj());
+                    mainBinding.edtEmail.setText(clienteModel.getEmail());
+                    mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
+                    mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
+                    mainBinding.edtEndereco.setText(clienteModel.getEndereco());
+                    mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    break;
+                }
+            }
+            Toast.makeText(getApplicationContext(),  selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
+        });
+
+        mainBinding.edtComprador.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedFrase = (String) parent.getItemAtPosition(position);
+
+            mainBinding.edtComprador.setText(selectedFrase);
+
+            for ( ClienteModel clienteModel : clientes){
+                if ( (clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome() ).equals(selectedFrase)){
+                    mainBinding.edtCnpj.setText(clienteModel.getCnpj());
+                    mainBinding.edtEmail.setText(clienteModel.getEmail());
+                    mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
+                    mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
+                    mainBinding.edtEndereco.setText(clienteModel.getEndereco());
+                    mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    break;
+                }
+            }
+            Toast.makeText(getApplicationContext(),  selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
+        });
+
+        mainBinding.edtEmail.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedFrase = (String) parent.getItemAtPosition(position);
+
+            mainBinding.edtEmail.setText(selectedFrase);
+
+            for ( ClienteModel clienteModel : clientes){
+                if ( clienteModel.getEmail().equals(selectedFrase)){
+                    mainBinding.edtCnpj.setText(clienteModel.getCnpj());
+                    mainBinding.edtEmail.setText(clienteModel.getEmail());
+                    mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
+                    mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
+                    mainBinding.edtEndereco.setText(clienteModel.getEndereco());
+                    mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    break;
+                }
+            }
+            Toast.makeText(getApplicationContext(),  selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
+        });
+
+        mainBinding.edtCnpj.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedFrase = (String) parent.getItemAtPosition(position);
+
+            mainBinding.edtCnpj.setText(selectedFrase);
+
+            for ( ClienteModel clienteModel : clientes){
+                if ( clienteModel.getCnpj().equals(selectedFrase)){
+                    mainBinding.edtCnpj.setText(clienteModel.getCnpj());
+                    mainBinding.edtEmail.setText(clienteModel.getEmail());
+                    mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
+                    mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
+                    mainBinding.edtEndereco.setText(clienteModel.getEndereco());
+                    mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    break;
+                }
+            }
+            Toast.makeText(getApplicationContext(),  selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
+        });
 
 
         mainBinding.btnProdutos.setOnClickListener(view -> {
