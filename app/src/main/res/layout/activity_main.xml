@@ -43,6 +43,13 @@
             android:textAllCaps="true"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/ultimoUpdate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Última Atualização: " />
+
         <Button
             android:id="@+id/btn_atualizar_base_clientes"
             android:layout_width="match_parent"
@@ -53,11 +60,11 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/ultimoUpdate"
+            android:id="@+id/ultimoUpdateCliente"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="Última atualização: " />
+            android:text="Última Atualização: " />
 
         <TextView
             android:id="@+id/pedidosText"

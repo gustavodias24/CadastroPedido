@@ -42,10 +42,12 @@ import java.util.List;
 import benicio.solucoes.cadastropedido.adapter.AdapterPedidos;
 import benicio.solucoes.cadastropedido.databinding.ActivityMainBinding;
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
+import benicio.solucoes.cadastropedido.model.ClienteModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
 import benicio.solucoes.cadastropedido.model.UserModel;
 import benicio.solucoes.cadastropedido.service.ProdutosServices;
+import benicio.solucoes.cadastropedido.util.ClientesUtil;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
 import benicio.solucoes.cadastropedido.util.ProdutosUtils;
 import benicio.solucoes.cadastropedido.util.RetrofitUitl;
@@ -89,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
         mainBinding.btnAtualizarBase.setOnClickListener( view -> {
             loadingDialog.show();
-
             produtosServices.atualizarBase().enqueue(new Callback<List<ProdutoModel>>() {
                 @SuppressLint("SetTextI18n")
                 @Override
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                         LocalDateTime agora = LocalDateTime.now();
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                         String formatado = agora.format(formatter);
-                        mainBinding.ultimoUpdate.setText("Última atualização: " + formatado);
+                        mainBinding.ultimoUpdate.setText("Última Atualização: " + formatado);
                         editor.putString("data", formatado).apply();
                     }else{
                         Toast.makeText(MainActivity.this, response.message(), Toast.LENGTH_SHORT).show();
@@ -111,6 +112,36 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<List<ProdutoModel>> call, Throwable t) {
+                    loadingDialog.dismiss();
+                    Log.d("mayara", "onFailure: " + t.getMessage());
+                    Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+
+        mainBinding.btnAtualizarBaseClientes.setOnClickListener( view ->{
+            loadingDialog.show();
+
+            produtosServices.atualizarBaseCliente().enqueue(new Callback<List<ClienteModel>>() {
+                @Override
+                public void onResponse(Call<List<ClienteModel>> call, Response<List<ClienteModel>> response) {
+                    if ( response.isSuccessful()){
+                        ClientesUtil.saveClientes(getApplicationContext(), response.body());
+                        Toast.makeText(MainActivity.this, "Base  de clientes atualizada!", Toast.LENGTH_SHORT).show();
+                        LocalDateTime agora = LocalDateTime.now();
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        String formatado = agora.format(formatter);
+                        mainBinding.ultimoUpdateCliente.setText("Última Atualização: " + formatado);
+                        editor.putString("dataCliente", formatado).apply();
+                    }else{
+                        Toast.makeText(MainActivity.this, response.message(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    loadingDialog.dismiss();
+                }
+
+                @Override
+                public void onFailure(Call<List<ClienteModel>> call, Throwable t) {
                     loadingDialog.dismiss();
                     Log.d("mayara", "onFailure: " + t.getMessage());
                     Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
@@ -239,7 +270,8 @@ public class MainActivity extends AppCompatActivity {
         updatePrefs = getSharedPreferences("updates_prefs", MODE_PRIVATE);
         editor = updatePrefs.edit();
 
-        mainBinding.ultimoUpdate.setText("Última atualização: " + updatePrefs.getString("data", ""));
+        mainBinding.ultimoUpdate.setText("Última Atualização: " + updatePrefs.getString("data", ""));
+        mainBinding.ultimoUpdateCliente.setText("Última Atualização: " + updatePrefs.getString("dataCliente", ""));
     }
 
     private void configurarLoadingDialog() {
