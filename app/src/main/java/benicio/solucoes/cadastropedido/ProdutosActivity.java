@@ -20,8 +20,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import benicio.solucoes.cadastropedido.adapter.AdapterProduto;
 import benicio.solucoes.cadastropedido.databinding.ActivityProdutosBinding;
@@ -90,7 +93,7 @@ public class ProdutosActivity extends AppCompatActivity {
                 if ( produtoModel.getSku().equals(selectedFrase)){
                     mainBinding.edtNomeProduto.setText(produtoModel.getNome());
                     mainBinding.edtSKU.setText(produtoModel.getSku());
-                    mainBinding.edtValor.setText( "R$ " + produtoModel.getPreco().replace(".", ","));
+                    mainBinding.edtValor.setText(formatarMoeda(produtoModel.getPreco()));
                     mainBinding.textEstoque.setText("Esse produto tem "+produtoModel.getEstoque()+" no estoque.");
                     mainBinding.textEstoque.setVisibility(View.VISIBLE);
                     break;
@@ -108,7 +111,7 @@ public class ProdutosActivity extends AppCompatActivity {
             for ( ProdutoModel produtoModel : listaProdutos){
                 if ( produtoModel.getNome().equals(selectedFrase)){
                     mainBinding.edtSKU.setText(produtoModel.getSku());
-                    mainBinding.edtValor.setText( "R$ " + produtoModel.getPreco().replace(".", ","));
+                    mainBinding.edtValor.setText(formatarMoeda(produtoModel.getPreco()));
                     mainBinding.textEstoque.setText("Esse produto tem "+produtoModel.getEstoque()+" no estoque.");
                     mainBinding.textEstoque.setVisibility(View.VISIBLE);
                     break;
@@ -193,6 +196,21 @@ public class ProdutosActivity extends AppCompatActivity {
             startActivity(i);
             finish();
         });
+    }
+
+    public static String formatarMoeda(String valor) {
+        // Remove o prefixo "R$ " e substitui vírgulas por pontos para garantir formato numérico correto
+        String valorNumerico = valor.replace("R$ ", "").replace(",", ".");
+
+        // Converte a string para um valor double
+        double valorDouble = Double.parseDouble(valorNumerico);
+
+        // Cria um formato para moeda brasileira
+        DecimalFormatSymbols simbolos = new DecimalFormatSymbols(new Locale("pt", "BR"));
+        DecimalFormat formatoMoeda = new DecimalFormat("¤ ###,##0.00", simbolos);
+
+        // Formata o valor para moeda brasileira
+        return formatoMoeda.format(valorDouble);
     }
 
     private void configurarRecycler() {

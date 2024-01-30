@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -51,6 +52,10 @@ public class AdminActivity extends AppCompatActivity {
         configurarRecyclerUsuarios();
 
         getSupportActionBar().setTitle("Admin Manager");
+
+        mainBinding.btnUltimosPedidos.setOnClickListener(view -> {
+            startActivity(new Intent(this, AllPedidosActivity.class));
+        });
 
     }
 

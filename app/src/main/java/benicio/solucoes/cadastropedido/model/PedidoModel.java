@@ -26,8 +26,7 @@ public class PedidoModel {
         this.status = status;
     }
 
-    @Override
-    public String toString() {
+    public String toInformacao(Boolean isAdmin) {
         StringBuilder produtosBuilder = new StringBuilder();
 
         for ( ItemCompra item : produtos){
@@ -62,8 +61,16 @@ public class PedidoModel {
                 statusText =  "FECHADO";
                 break;
         }
+        String statusExibicao = "";
+        if ( isAdmin ){
+            statusExibicao = "STATUS: "  + statusText ;
+        }else{
+            if (this.getStatus() == 4){
+                statusExibicao = "STATUS: "  + statusText ;
+            }
+        }
 
-        return  "STATUS: "  + statusText + '\n' +
+        return   statusExibicao + '\n' +
                 "Loja Vendedor: " + lojaVendedor + '\n' +
                 "Data: " + data + '\n' +
                 "Id Agente: " + idAgente + '\n' +

@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
                     for ( DataSnapshot dado : snapshot.getChildren()){
                         PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
 
-                        if ( pedidoModel.getIdVendedor().equals(idUsuario)){
+                        if ( pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)){
                             if ( query.isEmpty() ){
                                 listaPedidos.add(pedidoModel);
                             }else{

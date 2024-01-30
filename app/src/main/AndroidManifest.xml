@@ -18,9 +18,14 @@
         android:theme="@style/Theme.CadastroPedido"
         tools:targetApi="31">
         <activity
+            android:name=".AllPedidosActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
+            />
+        <activity
             android:name=".PedidoVendedorActivity"
             android:exported="false"
-            android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"/>
+            android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar" />
         <activity
             android:name=".AdminActivity"
             android:exported="false"
