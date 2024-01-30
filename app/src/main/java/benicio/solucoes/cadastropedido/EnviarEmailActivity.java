@@ -100,7 +100,7 @@ public class EnviarEmailActivity extends AppCompatActivity {
         });
 
         mainBinding.bodyEmail.setText(
-                pedido.toString()
+                pedido.toInformacao(false)
         );
 
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -145,7 +145,7 @@ public class EnviarEmailActivity extends AppCompatActivity {
     private void enviarEmail() {
         String email = mainBinding.edtEmailEnvio.getText().toString();
         String assunto = mainBinding.edtTituloEmail.getText().toString();
-        String corpo = pedido.toString();
+        String corpo = pedido.toInformacao(false);
         
         String[] emailList = {email};
         final Intent intent = ShareCompat.IntentBuilder.from(this)
