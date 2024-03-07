@@ -7,6 +7,8 @@
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
 
+    <protected-broadcast android:name="com.motorola.motocare.INTENT_TRIGGER" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -18,10 +20,14 @@
         android:theme="@style/Theme.CadastroPedido"
         tools:targetApi="31">
         <activity
-            android:name=".AllPedidosActivity"
+            android:name=".EditarPedidoActivity"
             android:exported="false"
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             />
+        <activity
+            android:name=".AllPedidosActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar" />
         <activity
             android:name=".PedidoVendedorActivity"
             android:exported="false"

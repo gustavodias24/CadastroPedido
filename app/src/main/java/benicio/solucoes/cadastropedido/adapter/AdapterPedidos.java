@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import benicio.solucoes.cadastropedido.EditarPedidoActivity;
 import benicio.solucoes.cadastropedido.PedidoVendedorActivity;
 import benicio.solucoes.cadastropedido.R;
 import benicio.solucoes.cadastropedido.databinding.LayoutAlterarStatusBinding;
@@ -57,6 +59,15 @@ public class AdapterPedidos extends RecyclerView.Adapter<AdapterPedidos.MyViewHo
 
         if ( isAdm ){
             holder.btn_editar_status_pedidos.setVisibility(View.VISIBLE);
+            holder.btn_editar_pedido_completo.setVisibility(View.VISIBLE);
+
+            holder.btn_editar_pedido_completo.setOnClickListener(view -> {
+                Intent i = new Intent(a, EditarPedidoActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                i.putExtra("idPedido", pedidoModel.getId());
+                a.startActivity(i);
+            });
+
             holder.btn_editar_status_pedidos.setOnClickListener(view -> {
 
                 AlertDialog.Builder b = new AlertDialog.Builder(a);
@@ -146,11 +157,13 @@ public class AdapterPedidos extends RecyclerView.Adapter<AdapterPedidos.MyViewHo
         TextView info;
         ImageButton btnExcluir;
         Button btn_editar_status_pedidos;
+        Button btn_editar_pedido_completo;
         public MyViewHolde(@NonNull View itemView) {
             super(itemView);
             info = itemView.findViewById(R.id.text_info_generic);
             btnExcluir = itemView.findViewById(R.id.btn_remover_item);
             btn_editar_status_pedidos = itemView.findViewById(R.id.btn_editar_status_pedidos);
+            btn_editar_pedido_completo = itemView.findViewById(R.id.btn_editar_pedido_completo);
         }
     }
 }

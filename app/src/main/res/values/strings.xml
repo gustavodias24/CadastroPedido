@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CadastroPedido</string>
+    <string name="app_name">RedCloud - Pedidos</string>
     <string name="action_import_xlxs">Import .XLXS</string>
     <string name="action_import_xls">Import .XLS</string>
 

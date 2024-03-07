@@ -88,7 +88,7 @@ public class EnviarEmailActivity extends AppCompatActivity {
                 loadingDialog.dismiss();
                 
                 if( task.isSuccessful() ){
-                    Toast.makeText(this, "Peidido Criado!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Pedido Criado!", Toast.LENGTH_SHORT).show();
                     finish();
                     startActivity(new Intent(this, MainActivity.class));
                 }

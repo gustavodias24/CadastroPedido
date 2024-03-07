@@ -87,7 +87,7 @@ public class PedidoVendedorActivity extends AppCompatActivity {
 
     public static void configurarListener(String query, Context c){
         loadingDialog.show();
-        refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
+        refPedidos.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

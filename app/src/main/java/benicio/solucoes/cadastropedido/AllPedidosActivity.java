@@ -3,6 +3,7 @@ package benicio.solucoes.cadastropedido;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -67,7 +69,7 @@ public class AllPedidosActivity extends AppCompatActivity {
         recyclerPedidos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerPedidos.setHasFixedSize(true);
         listaPedidos.addAll(PedidosUtil.returnPedidos(this));
-        configurarListener("", this);
+        configurarListener("");
         adapterPedidos = new AdapterPedidos(listaPedidos, this, true, loadingDialog);
         recyclerPedidos.setAdapter(adapterPedidos);
     }
@@ -80,7 +82,7 @@ public class AllPedidosActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static void configurarListener(String query, Context c){
+    public void configurarListener(String query){
         loadingDialog.show();
         refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
@@ -119,8 +121,30 @@ public class AllPedidosActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 loadingDialog.dismiss();
-                Toast.makeText(c, "Sem Conexão", Toast.LENGTH_LONG).show();
+                Toast.makeText(AllPedidosActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_principal, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                configurarListener(newText.toLowerCase().trim());
+                return true;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 }
