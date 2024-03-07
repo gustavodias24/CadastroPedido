@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -47,6 +48,8 @@ public class ProdutosActivity extends AppCompatActivity {
     private List<String> listaNomeProdutos = new ArrayList<>();
     private List<String> listaNomeSKU = new ArrayList<>();
 
+    private float estoqueAtual = 0.0f;
+
     @SuppressLint({"NotifyDataSetChanged", "SetTextI18n"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +66,12 @@ public class ProdutosActivity extends AppCompatActivity {
 
         b = getIntent().getExtras();
         Gson gson = new Gson();
-        Type type = new TypeToken<PedidoModel>(){}.getType();
+        Type type = new TypeToken<PedidoModel>() {
+        }.getType();
         pedidoModel = gson.fromJson(b.getString("dadosPedido", ""), type);
 
         listaProdutos = ProdutosUtils.returnProdutos(this);
-        for ( ProdutoModel produtoModel : listaProdutos){
+        for (ProdutoModel produtoModel : listaProdutos) {
             listaNomeProdutos.add(produtoModel.getNome() + " -F- " + produtoModel.getFornecedor());
             listaNomeSKU.add(produtoModel.getSku());
         }
@@ -89,18 +93,19 @@ public class ProdutosActivity extends AppCompatActivity {
             String selectedFrase = (String) parent.getItemAtPosition(position);
             mainBinding.edtSKU.setText(selectedFrase);
 
-            for ( ProdutoModel produtoModel : listaProdutos){
-                if ( produtoModel.getSku().equals(selectedFrase)){
+            for (ProdutoModel produtoModel : listaProdutos) {
+                if (produtoModel.getSku().equals(selectedFrase)) {
                     mainBinding.edtNomeProduto.setText(produtoModel.getNome());
                     mainBinding.edtSKU.setText(produtoModel.getSku());
                     mainBinding.edtValor.setText(formatarMoeda(produtoModel.getPreco()));
-                    mainBinding.textEstoque.setText("Esse produto tem "+produtoModel.getEstoque()+" no estoque.");
+                    mainBinding.textEstoque.setText("Esse produto tem " + produtoModel.getEstoque() + " no estoque.");
+                    estoqueAtual = produtoModel.getEstoque();
                     mainBinding.textEstoque.setVisibility(View.VISIBLE);
                     break;
                 }
             }
 
-            Toast.makeText(getApplicationContext(),  selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
         });
 
         mainBinding.edtNomeProduto.setOnItemClickListener((parent, view, position, id) -> {
@@ -108,85 +113,53 @@ public class ProdutosActivity extends AppCompatActivity {
             selectedFrase = selectedFrase.split(" -F- ")[0];
             mainBinding.edtNomeProduto.setText(selectedFrase);
 
-            for ( ProdutoModel produtoModel : listaProdutos){
-                if ( produtoModel.getNome().equals(selectedFrase)){
+            for (ProdutoModel produtoModel : listaProdutos) {
+                if (produtoModel.getNome().equals(selectedFrase)) {
                     mainBinding.edtSKU.setText(produtoModel.getSku());
                     mainBinding.edtValor.setText(formatarMoeda(produtoModel.getPreco()));
-                    mainBinding.textEstoque.setText("Esse produto tem "+produtoModel.getEstoque()+" no estoque.");
+                    mainBinding.textEstoque.setText("Esse produto tem " + produtoModel.getEstoque() + " no estoque.");
+                    estoqueAtual = produtoModel.getEstoque();
                     mainBinding.textEstoque.setVisibility(View.VISIBLE);
                     break;
                 }
             }
-            Toast.makeText(getApplicationContext(),  selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
         });
 
 
+        mainBinding.btnCalcular.setOnClickListener(view -> calcularValorProduto());
+        mainBinding.btnAddProdutos.setOnClickListener(view -> {
 
-        mainBinding.btnCalcular.setOnClickListener( view -> {
-            Double valorTotalPorItem =
-                    MathUtils.converterParaDouble(
-                            mainBinding.edtValor.getText().toString()
-                    ) *
-                    MathUtils.converterParaDouble(
-                            mainBinding.edtQTD.getText().toString()
-                    );
+            calcularValorProduto();
 
-            mainBinding.edtValorTotal.setText(
-                    MathUtils.formatarMoeda(valorTotalPorItem)
-            );
+            if (estoqueAtual > 0) {
 
+                String valorTotalString = mainBinding.edtValorTotal.getText().toString();
 
-            Double descontoPorcentagem = (Double.parseDouble(
-                    mainBinding.edtDesconto.getText().toString().isEmpty() ? "0" :
-                            mainBinding.edtDesconto.getText().toString()
-            )) / 100;
+                listaCompra.add(new ItemCompra(mainBinding.edtNomeProduto.getText().toString(), mainBinding.edtSKU.getText().toString(), mainBinding.edtValor.getText().toString(), mainBinding.edtQTD.getText().toString(), valorTotalString, mainBinding.edtDesconto.getText().toString(), mainBinding.edtValorTotalDesconto.getText().toString()));
 
-            Double desconto = valorTotalPorItem * descontoPorcentagem;
+                adapterProdutos.notifyDataSetChanged();
 
+                Double valorAtual = MathUtils.converterParaDouble(mainBinding.textValorTotal.getText().toString().split(" ")[2]);
 
-            mainBinding.edtValorTotalDesconto.setText(
-                    MathUtils.formatarMoeda(
-                            valorTotalPorItem - desconto
-                    )
-            );
+                valorAtual += MathUtils.converterParaDouble(mainBinding.edtValorTotalDesconto.getText().toString());
 
+                mainBinding.textValorTotal.setText("Total Compra: " + MathUtils.formatarMoeda(valorAtual));
+
+                mainBinding.edtNomeProduto.setText("");
+                mainBinding.edtSKU.setText("");
+                mainBinding.edtValor.setText("");
+                mainBinding.edtQTD.setText("");
+                mainBinding.edtValorTotal.setText("");
+                mainBinding.edtDesconto.setText("");
+                mainBinding.edtValorTotalDesconto.setText("");
+
+            } else {
+                Toast.makeText(this, "Produto sem estoque.", Toast.LENGTH_SHORT).show();
+            }
         });
-        mainBinding.btnAddProdutos.setOnClickListener( view -> {
-            listaCompra.add(
-                    new ItemCompra(
-                            mainBinding.edtNomeProduto.getText().toString(),
-                            mainBinding.edtSKU.getText().toString(),
-                            mainBinding.edtValor.getText().toString(),
-                            mainBinding.edtQTD.getText().toString(),
-                            mainBinding.edtValorTotal.getText().toString(),
-                            mainBinding.edtDesconto.getText().toString(),
-                            mainBinding.edtValorTotalDesconto.getText().toString()
-                    )
-            );
 
-            adapterProdutos.notifyDataSetChanged();
-
-            Double valorAtual =
-                    MathUtils.converterParaDouble(
-                            mainBinding.textValorTotal.getText().toString().split(" ")[2]
-                    );
-
-            valorAtual += MathUtils.converterParaDouble(mainBinding.edtValorTotalDesconto.getText().toString());
-
-            mainBinding.textValorTotal.setText("Total Compra: "+ MathUtils.formatarMoeda(valorAtual));
-
-            mainBinding.edtNomeProduto.setText("");
-            mainBinding.edtSKU.setText("");
-            mainBinding.edtValor.setText("");
-            mainBinding.edtQTD.setText("");
-            mainBinding.edtValorTotal.setText("");
-            mainBinding.edtDesconto.setText("");
-            mainBinding.edtValorTotalDesconto.setText("");
-
-
-
-        });
-        mainBinding.btnEnviarEmail.setOnClickListener( view -> {
+        mainBinding.btnEnviarEmail.setOnClickListener(view -> {
             List<ItemCompra> listaAntigaDeProdutos = pedidoModel.getProdutos();
             pedidoModel.setTotalCompra(mainBinding.textValorTotal.getText().toString());
             listaAntigaDeProdutos.addAll(listaCompra);
@@ -224,7 +197,24 @@ public class ProdutosActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if ( item.getItemId() == android.R.id.home){finish();}
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void calcularValorProduto() {
+        Double valorTotalPorItem = MathUtils.converterParaDouble(mainBinding.edtValor.getText().toString()) * MathUtils.converterParaDouble(mainBinding.edtQTD.getText().toString());
+
+        mainBinding.edtValorTotal.setText(MathUtils.formatarMoeda(valorTotalPorItem));
+
+
+        Double descontoPorcentagem = (Double.parseDouble(mainBinding.edtDesconto.getText().toString().isEmpty() ? "0" : mainBinding.edtDesconto.getText().toString())) / 100;
+
+        Double desconto = valorTotalPorItem * descontoPorcentagem;
+
+
+        mainBinding.edtValorTotalDesconto.setText(MathUtils.formatarMoeda(valorTotalPorItem - desconto));
+
     }
 }

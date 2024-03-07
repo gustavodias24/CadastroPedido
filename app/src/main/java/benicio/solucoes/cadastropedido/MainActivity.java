@@ -89,6 +89,11 @@ public class MainActivity extends AppCompatActivity {
         mainBinding.btnVerProdutos.setOnClickListener(view -> startActivity(new Intent(this, VisualizarProdutosActivity.class)));
         mainBinding.btnFazerPedido.setOnClickListener(view -> startActivity(new Intent(this , InfosActivity.class)));
 
+        mainBinding.pesquisarProduto.setOnClickListener(view -> {
+            String pesquisa = mainBinding.edtPesquisa.getText().toString();
+            configurarListener(pesquisa.toLowerCase().trim());
+        });
+
         mainBinding.btnAtualizarBase.setOnClickListener( view -> {
             loadingDialog.show();
             produtosServices.atualizarBase().enqueue(new Callback<List<ProdutoModel>>() {

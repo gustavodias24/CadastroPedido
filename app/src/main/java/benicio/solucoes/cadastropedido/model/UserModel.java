@@ -4,6 +4,7 @@ public class UserModel {
     public UserModel() {
     }
     String id,nome, email, senha;
+    String idAgente;
 
     @Override
     public String toString() {
@@ -20,6 +21,13 @@ public class UserModel {
         this.senha = senha;
     }
 
+    public String getIdAgente() {
+        return idAgente;
+    }
+
+    public void setIdAgente(String idAgente) {
+        this.idAgente = idAgente;
+    }
 
     public String getId() {
         return id;

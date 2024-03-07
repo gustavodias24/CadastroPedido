@@ -6,16 +6,23 @@ import java.util.List;
 public class PedidoModel {
 
 
-
     int status = 0;
     String id, idVendedor;
     String lojaVendedor, data, idAgente, nomeEstabelecimento, nomeComprador, email, tele, cnpj, inscriEstadual,
-    formaPagamento, enderecoCompleto, enderecoEntrega, obsEntrega;
-
+            formaPagamento, enderecoCompleto, enderecoEntrega, obsEntrega;
+    String cep = "";
     String totalCompra;
     List<ItemCompra> produtos = new ArrayList<>();
 
     public PedidoModel() {
+    }
+
+    public String getCep() {
+        return cep;
+    }
+
+    public void setCep(String cep) {
+        this.cep = cep;
     }
 
     public int getStatus() {
@@ -29,12 +36,12 @@ public class PedidoModel {
     public String toInformacao(Boolean isAdmin) {
         StringBuilder produtosBuilder = new StringBuilder();
 
-        for ( ItemCompra item : produtos){
+        for (ItemCompra item : produtos) {
             produtosBuilder.append(item.toString()).append("\n\n");
         }
         String statusText = "";
 
-        switch (this.getStatus()){
+        switch (this.getStatus()) {
             //Pendente = 0
             //Em Processamento = 1
             //Completo = 2
@@ -58,19 +65,19 @@ public class PedidoModel {
                 statusText = "CANCELADO";
                 break;
             case 5:
-                statusText =  "FECHADO";
+                statusText = "FECHADO";
                 break;
         }
         String statusExibicao = "";
-        if ( isAdmin ){
-            statusExibicao = "STATUS: "  + statusText ;
-        }else{
-            if (this.getStatus() == 4){
-                statusExibicao = "STATUS: "  + statusText ;
+        if (isAdmin) {
+            statusExibicao = "STATUS: " + statusText;
+        } else {
+            if (this.getStatus() == 4) {
+                statusExibicao = "STATUS: " + statusText;
             }
         }
 
-        return   statusExibicao + '\n' +
+        return statusExibicao + '\n' +
                 "Loja Vendedor: " + lojaVendedor + '\n' +
                 "Data: " + data + '\n' +
                 "Id Agente: " + idAgente + '\n' +
@@ -82,13 +89,14 @@ public class PedidoModel {
                 "Inscrição Estadual: " + inscriEstadual + '\n' +
                 "Forma de Pagamento: " + formaPagamento + '\n' +
                 "Endereço Completo: " + enderecoCompleto + '\n' +
+                "CEP: " + cep + '\n' +
                 "Endereço Entrega: " + enderecoEntrega + '\n' +
                 "Observação Entrega: " + obsEntrega + '\n' +
-                 totalCompra + '\n' +
+                totalCompra + '\n' +
                 "Produtos: " + "\n\n" + produtosBuilder.toString();
     }
 
-    public PedidoModel(String lojaVendedor, String data, String idAgente, String nomeEstabelecimento, String nomeComprador, String email, String tele, String cnpj, String inscriEstadual, String formaPagamento, String enderecoCompleto, String enderecoEntrega, String obsEntrega, List<ItemCompra> produtos) {
+    public PedidoModel(String lojaVendedor, String data, String idAgente, String nomeEstabelecimento, String nomeComprador, String email, String tele, String cnpj, String inscriEstadual, String formaPagamento, String enderecoCompleto, String enderecoEntrega, String obsEntrega, List<ItemCompra> produtos, String cep) {
         this.lojaVendedor = lojaVendedor;
         this.data = data;
         this.idAgente = idAgente;
@@ -103,6 +111,7 @@ public class PedidoModel {
         this.enderecoEntrega = enderecoEntrega;
         this.obsEntrega = obsEntrega;
         this.produtos = produtos;
+        this.cep = cep;
     }
 
     public String getId() {
