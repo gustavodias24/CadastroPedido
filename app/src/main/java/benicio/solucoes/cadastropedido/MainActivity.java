@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -59,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
 
     private AdapterPedidos adapterPedidos;
     private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
+    private DatabaseReference refUpdate = FirebaseDatabase.getInstance().getReference().getRoot().child("info");
+    private String ultimoUpdateDatabase = "";
     private DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
     private FirebaseAuth auth = FirebaseAuth.getInstance();
     private RecyclerView recyclerPedidos;
@@ -71,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
 
     private String idUsuario;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +84,21 @@ public class MainActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle("Tela principal");
 
+        refUpdate.child("dataHora").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ultimoUpdateDatabase = task.getResult().getValue(String.class);
+
+                if (!ultimoUpdateDatabase.equals(updatePrefs.getString("data", ""))) {
+                    AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
+                    b.setTitle("Aviso!");
+                    b.setCancelable(false);
+                    b.setMessage("Sua base de dados está desatualizada! o último update foi " + ultimoUpdateDatabase + ", clique em OK para atualizar!");
+                    b.setPositiveButton("ok", (dialogInterface, i) -> atualizarBaseProdutos());
+                    b.create().show();
+                }
+            }
+        });
+
         produtosServices = RetrofitUitl.criarService(RetrofitUitl.criarRetrofit());
         configurarLoadingDialog();
         configurarIdVendedor();
@@ -87,50 +106,22 @@ public class MainActivity extends AppCompatActivity {
         configurarPrefs();
 
         mainBinding.btnVerProdutos.setOnClickListener(view -> startActivity(new Intent(this, VisualizarProdutosActivity.class)));
-        mainBinding.btnFazerPedido.setOnClickListener(view -> startActivity(new Intent(this , InfosActivity.class)));
+        mainBinding.btnFazerPedido.setOnClickListener(view -> startActivity(new Intent(this, InfosActivity.class)));
 
         mainBinding.pesquisarProduto.setOnClickListener(view -> {
             String pesquisa = mainBinding.edtPesquisa.getText().toString();
             configurarListener(pesquisa.toLowerCase().trim());
         });
 
-        mainBinding.btnAtualizarBase.setOnClickListener( view -> {
-            loadingDialog.show();
-            produtosServices.atualizarBase().enqueue(new Callback<List<ProdutoModel>>() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onResponse(Call<List<ProdutoModel>> call, Response<List<ProdutoModel>> response) {
-                    if ( response.isSuccessful()){
-                        ProdutosUtils.saveProdutos(getApplicationContext(), response.body());
-                        Toast.makeText(MainActivity.this, "Base atualizada!", Toast.LENGTH_SHORT).show();
-                        LocalDateTime agora = LocalDateTime.now();
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                        String formatado = agora.format(formatter);
-                        mainBinding.ultimoUpdate.setText("Última Atualização: " + formatado);
-                        editor.putString("data", formatado).apply();
-                    }else{
-                        Toast.makeText(MainActivity.this, response.message(), Toast.LENGTH_SHORT).show();
-                    }
+        mainBinding.btnAtualizarBase.setOnClickListener(view -> atualizarBaseProdutos());
 
-                    loadingDialog.dismiss();
-                }
-
-                @Override
-                public void onFailure(Call<List<ProdutoModel>> call, Throwable t) {
-                    loadingDialog.dismiss();
-                    Log.d("mayara", "onFailure: " + t.getMessage());
-                    Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
-                }
-            });
-        });
-
-        mainBinding.btnAtualizarBaseClientes.setOnClickListener( view ->{
+        mainBinding.btnAtualizarBaseClientes.setOnClickListener(view -> {
             loadingDialog.show();
 
             produtosServices.atualizarBaseCliente().enqueue(new Callback<List<ClienteModel>>() {
                 @Override
                 public void onResponse(Call<List<ClienteModel>> call, Response<List<ClienteModel>> response) {
-                    if ( response.isSuccessful()){
+                    if (response.isSuccessful()) {
                         ClientesUtil.saveClientes(getApplicationContext(), response.body());
                         Toast.makeText(MainActivity.this, "Base  de clientes atualizada!", Toast.LENGTH_SHORT).show();
                         LocalDateTime agora = LocalDateTime.now();
@@ -138,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                         String formatado = agora.format(formatter);
                         mainBinding.ultimoUpdateCliente.setText("Última Atualização: " + formatado);
                         editor.putString("dataCliente", formatado).apply();
-                    }else{
+                    } else {
                         Toast.makeText(MainActivity.this, response.message(), Toast.LENGTH_SHORT).show();
                     }
 
@@ -155,7 +146,34 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void configurarIdVendedor(){
+    private void atualizarBaseProdutos() {
+        loadingDialog.show();
+        produtosServices.atualizarBase().enqueue(new Callback<List<ProdutoModel>>() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onResponse(Call<List<ProdutoModel>> call, Response<List<ProdutoModel>> response) {
+                if (response.isSuccessful()) {
+                    ProdutosUtils.saveProdutos(getApplicationContext(), response.body());
+                    Toast.makeText(MainActivity.this, "Base atualizada!", Toast.LENGTH_SHORT).show();
+                    mainBinding.ultimoUpdate.setText("Última Atualização: " + ultimoUpdateDatabase);
+                    editor.putString("data", ultimoUpdateDatabase).apply();
+                } else {
+                    Toast.makeText(MainActivity.this, response.message(), Toast.LENGTH_SHORT).show();
+                }
+
+                loadingDialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<List<ProdutoModel>> call, Throwable t) {
+                loadingDialog.dismiss();
+                Log.d("mayara", "onFailure: " + t.getMessage());
+                Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void configurarIdVendedor() {
 
         loadingDialog.show();
         refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -163,9 +181,9 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 loadingDialog.dismiss();
 
-                for ( DataSnapshot dado : snapshot.getChildren()){
+                for (DataSnapshot dado : snapshot.getChildren()) {
                     UserModel userModel = dado.getValue(UserModel.class);
-                    if ( userModel.getEmail().equals(auth.getCurrentUser().getEmail())){
+                    if (userModel.getEmail().equals(auth.getCurrentUser().getEmail())) {
                         idUsuario = userModel.getId();
                         break;
                     }
@@ -181,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_principal, menu);
@@ -205,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if ( item.getItemId() == R.id.sair){
+        if (item.getItemId() == R.id.sair) {
             finish();
             startActivity(new Intent(this, CadastroLoginActivity.class));
             auth.signOut();
@@ -213,22 +232,22 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void configurarListener(String query){
+    private void configurarListener(String query) {
         loadingDialog.show();
         refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 loadingDialog.dismiss();
-                if ( snapshot.exists() ){
+                if (snapshot.exists()) {
                     listaPedidos.clear();
-                    for ( DataSnapshot dado : snapshot.getChildren()){
+                    for (DataSnapshot dado : snapshot.getChildren()) {
                         PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
 
-                        if ( pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)){
-                            if ( query.isEmpty() ){
+                        if (pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)) {
+                            if (query.isEmpty()) {
                                 listaPedidos.add(pedidoModel);
-                            }else{
+                            } else {
                                 assert pedidoModel != null;
                                 if (
                                         pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
@@ -240,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
                                                 pedidoModel.getTele().toLowerCase().trim().contains(query) ||
                                                 pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
                                                 pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
-                                ){
+                                ) {
                                     listaPedidos.add(pedidoModel);
                                 }
                             }
