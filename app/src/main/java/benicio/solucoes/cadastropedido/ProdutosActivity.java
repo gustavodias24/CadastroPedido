@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,13 +31,25 @@ import java.util.Locale;
 
 import benicio.solucoes.cadastropedido.adapter.AdapterProduto;
 import benicio.solucoes.cadastropedido.databinding.ActivityProdutosBinding;
+import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
+import benicio.solucoes.cadastropedido.model.ClienteModel;
+import benicio.solucoes.cadastropedido.model.DistribuidorModel;
 import benicio.solucoes.cadastropedido.model.ItemCompra;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
+import benicio.solucoes.cadastropedido.service.ProdutosServices;
 import benicio.solucoes.cadastropedido.util.MathUtils;
 import benicio.solucoes.cadastropedido.util.ProdutosUtils;
+import benicio.solucoes.cadastropedido.util.RetrofitUitl;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class ProdutosActivity extends AppCompatActivity {
+    private boolean jaTemRegra = false;
+    private Dialog loadingDialog;
+    private int valorMinimo = 999;
     private RecyclerView r;
     private ActivityProdutosBinding mainBinding;
     private Bundle b;
@@ -49,6 +63,8 @@ public class ProdutosActivity extends AppCompatActivity {
     private List<String> listaNomeSKU = new ArrayList<>();
 
     private float estoqueAtual = 0.0f;
+    private Retrofit retrofit;
+    private ProdutosServices services;
 
     @SuppressLint({"NotifyDataSetChanged", "SetTextI18n"})
     @Override
@@ -57,6 +73,11 @@ public class ProdutosActivity extends AppCompatActivity {
         mainBinding = ActivityProdutosBinding.inflate(getLayoutInflater());
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+        configurarLoadingDialog();
+
+        retrofit = RetrofitUitl.criarRetrofit();
+        services = RetrofitUitl.criarService(retrofit);
 
         getSupportActionBar().setTitle("Produtos");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -95,6 +116,7 @@ public class ProdutosActivity extends AppCompatActivity {
 
             for (ProdutoModel produtoModel : listaProdutos) {
                 if (produtoModel.getSku().equals(selectedFrase)) {
+                    configurarRegra(produtoModel.getFornecedor());
                     mainBinding.edtNomeProduto.setText(produtoModel.getNome());
                     mainBinding.edtSKU.setText(produtoModel.getSku());
                     mainBinding.edtValor.setText(formatarMoeda(produtoModel.getPreco()));
@@ -115,6 +137,7 @@ public class ProdutosActivity extends AppCompatActivity {
 
             for (ProdutoModel produtoModel : listaProdutos) {
                 if (produtoModel.getNome().equals(selectedFrase)) {
+                    configurarRegra(produtoModel.getFornecedor());
                     mainBinding.edtSKU.setText(produtoModel.getSku());
                     mainBinding.edtValor.setText(formatarMoeda(produtoModel.getPreco()));
                     mainBinding.textEstoque.setText("Esse produto tem " + produtoModel.getEstoque() + " no estoque.");
@@ -166,9 +189,75 @@ public class ProdutosActivity extends AppCompatActivity {
             pedidoModel.setProdutos(listaAntigaDeProdutos);
             Intent i = new Intent(this, EnviarEmailActivity.class);
             i.putExtra("dados", new Gson().toJson(pedidoModel));
-            startActivity(i);
-            finish();
+
+            double somaCompra = 0;
+
+            for (ItemCompra item : pedidoModel.getProdutos()) {
+                somaCompra += Integer.parseInt(item.getValorTotalFinal().replace(".", "").replace(",", "").replace("R$", "").replace(" ", "").replace(" ", ""));
+            }
+
+            if (somaCompra >= valorMinimo) {
+                startActivity(i);
+                finish();
+            } else {
+                Toast.makeText(this, "Valor Mínimo não Alcançado!", Toast.LENGTH_LONG).show();
+            }
+
         });
+    }
+
+    private void configurarLoadingDialog() {
+        AlertDialog.Builder b = new AlertDialog.Builder(this);
+        b.setCancelable(false);
+        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
+        loadingDialog = b.create();
+    }
+
+    private void configurarRegra(String nomeDist) {
+        if (!jaTemRegra) {
+            loadingDialog.show();
+            StringBuilder regrasDist = new StringBuilder();
+            regrasDist.append("Regras do Distribuidor").append("\n");
+
+            services.pegarDistribuidores().enqueue(new Callback<List<DistribuidorModel>>() {
+                @Override
+                public void onResponse(Call<List<DistribuidorModel>> call, Response<List<DistribuidorModel>> response) {
+                    loadingDialog.dismiss();
+                    if (response.isSuccessful()) {
+                        for (DistribuidorModel distribuidorModel : response.body()) {
+                            if (nomeDist.equals(distribuidorModel.getEmpresa())) {
+
+                                try {
+                                    valorMinimo = Integer.parseInt(distribuidorModel.getValorMinimo());
+                                } catch (Exception ignored) {
+
+                                }
+
+                                regrasDist.append("Aceita vouhcer de desconto?").append(distribuidorModel.getAceitaVouche()).append("\n");
+                                regrasDist.append("Valor do pedido mínimo: R$").append(distribuidorModel.getValorMinimo()).append("\n");
+                                regrasDist.append("Tipo de Frete: ").append(distribuidorModel.getFrete()).append("\n");
+                                regrasDist.append("Meio de Pagamento aceitos: ").append(distribuidorModel.getMeioPagamento()).append("\n");
+                                regrasDist.append("Detalhes sobre prazo de entrega: ").append(distribuidorModel.getPrazo()).append("\n");
+
+                                jaTemRegra = true;
+
+                                mainBinding.textRegrasDoDistribuidor.setText(regrasDist.toString());
+                                mainBinding.textRegrasDoDistribuidor.setVisibility(View.VISIBLE);
+
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<DistribuidorModel>> call, Throwable t) {
+                    loadingDialog.dismiss();
+                }
+            });
+        }
+
+
     }
 
     public static String formatarMoeda(String valor) {

@@ -225,26 +225,30 @@ public class InfosActivity extends AppCompatActivity {
     }
 
     private void encontrarUsuarioAtual() {
-        loadingDialog.show();
-        refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                loadingDialog.dismiss();
+        try {
+            loadingDialog.show();
+            refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    loadingDialog.dismiss();
 
-                for (DataSnapshot dado : snapshot.getChildren()) {
-                    if (dado.getValue(UserModel.class).getEmail().equals(user.getEmail())) {
-                        usuarioAtual = dado.getValue(UserModel.class);
-                        mainBinding.edtAgente.setText(usuarioAtual.getIdAgente());
-                        break;
+                    for (DataSnapshot dado : snapshot.getChildren()) {
+                        if (dado.getValue(UserModel.class).getEmail().equals(user.getEmail())) {
+                            usuarioAtual = dado.getValue(UserModel.class);
+                            mainBinding.edtAgente.setText(usuarioAtual.getIdAgente());
+                            break;
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                loadingDialog.dismiss();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    loadingDialog.dismiss();
+                }
+            });
+        } catch (Exception ignored) {
+        }
+
     }
 
 
