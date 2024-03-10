@@ -15,6 +15,17 @@ public class DistribuidorModel {
         return aceitaVouche;
     }
 
+    @Override
+    public String toString() {
+
+        return "EMPRESA: " + empresa + "\n" +
+                "ACEITA VOUCHER?: " + aceitaVouche + "\n" +
+                "FRETE: " + frete + "\n" +
+                "MEIO  DE PAGAMENTO: " + meioPagamento + "\n" +
+                "PRAZO: " + prazo + "\n" +
+                "VALOR MÍNIMO: " + valorMinimo + "\n";
+    }
+
     public void setAceitaVouche(String aceitaVouche) {
         this.aceitaVouche = aceitaVouche;
     }

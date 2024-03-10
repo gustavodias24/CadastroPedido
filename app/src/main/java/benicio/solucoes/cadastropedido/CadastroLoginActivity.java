@@ -48,7 +48,7 @@ public class CadastroLoginActivity extends AppCompatActivity {
 
         if ( user != null){
             finish();
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, MenuPedidoOrCreditoActivity.class));
             Toast.makeText(this, "Bem-Vindo de Volta!", Toast.LENGTH_SHORT).show();
         }
 
@@ -77,7 +77,7 @@ public class CadastroLoginActivity extends AppCompatActivity {
                                     if (logarTask.isSuccessful()) {
                                         finish();
                                         Toast.makeText(this, "Usuário criado com sucesso.", Toast.LENGTH_SHORT).show();
-                                        startActivity(new Intent(this, MainActivity.class));
+                                        startActivity(new Intent(this, MenuPedidoOrCreditoActivity.class));
                                     } else {
                                         exibirError("Conta criada, faça login agora!");
                                     }
@@ -118,7 +118,7 @@ public class CadastroLoginActivity extends AppCompatActivity {
                     auth.signInWithEmailAndPassword(email, senha).addOnCompleteListener( loginTask -> {
                         if ( loginTask.isSuccessful() ){
                             finish();
-                            startActivity(new Intent(this, MainActivity.class));
+                            startActivity(new Intent(this, MenuPedidoOrCreditoActivity.class));
                             Toast.makeText(this, "Bem-vindo de volta!", Toast.LENGTH_SHORT).show();
                         }else{
                             try {

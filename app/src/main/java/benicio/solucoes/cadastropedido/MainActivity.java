@@ -83,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         getSupportActionBar().setTitle("Tela principal");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         refUpdate.child("dataHora").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -200,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_principal, menu);
@@ -228,6 +231,8 @@ public class MainActivity extends AppCompatActivity {
             finish();
             startActivity(new Intent(this, CadastroLoginActivity.class));
             auth.signOut();
+        } else if (item.getItemId() == android.R.id.home) {
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -304,5 +309,6 @@ public class MainActivity extends AppCompatActivity {
         b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
         loadingDialog = b.create();
     }
+
 }
 
