@@ -86,26 +86,13 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        refUpdate.child("dataHora").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                ultimoUpdateDatabase = task.getResult().getValue(String.class);
+        configurarLoadingDialog();
+        configurarPrefs();
 
-                if (!ultimoUpdateDatabase.equals(updatePrefs.getString("data", ""))) {
-                    AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
-                    b.setTitle("Aviso!");
-                    b.setCancelable(false);
-                    b.setMessage("Sua base de dados está desatualizada! o último update foi " + ultimoUpdateDatabase + ", clique em OK para atualizar!");
-                    b.setPositiveButton("ok", (dialogInterface, i) -> atualizarBaseProdutos());
-                    b.create().show();
-                }
-            }
-        });
+        verificarUpdates();
+
 
         produtosServices = RetrofitUitl.criarService(RetrofitUitl.criarRetrofit());
-        configurarLoadingDialog();
-        configurarIdVendedor();
-        configurarRecyclerPedidos();
-        configurarPrefs();
 
         mainBinding.btnVerProdutos.setOnClickListener(view -> startActivity(new Intent(this, VisualizarProdutosActivity.class)));
         mainBinding.btnFazerPedido.setOnClickListener(view -> startActivity(new Intent(this, InfosActivity.class)));
@@ -148,6 +135,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void verificarUpdates() {
+        refUpdate.child("dataHora").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ultimoUpdateDatabase = task.getResult().getValue(String.class);
+
+                if (!ultimoUpdateDatabase.equals(updatePrefs.getString("data", ""))) {
+                    AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
+                    b.setTitle("Aviso!");
+                    b.setCancelable(false);
+                    b.setMessage("Sua base de dados está desatualizada! o último update foi " + ultimoUpdateDatabase + ", clique em OK para atualizar!");
+                    b.setPositiveButton("ok", (dialogInterface, i) -> atualizarBaseProdutos());
+                    b.create().show();
+                }
+
+                configurarIdVendedor();
+
+            }
+        });
+    }
+
     private void atualizarBaseProdutos() {
         loadingDialog.show();
         produtosServices.atualizarBase().enqueue(new Callback<List<ProdutoModel>>() {
@@ -181,18 +188,14 @@ public class MainActivity extends AppCompatActivity {
         refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                loadingDialog.dismiss();
-
                 for (DataSnapshot dado : snapshot.getChildren()) {
                     UserModel userModel = dado.getValue(UserModel.class);
                     if (userModel.getEmail().equals(auth.getCurrentUser().getEmail())) {
                         idUsuario = userModel.getId();
+                        configurarRecyclerPedidos();
                         break;
                     }
                 }
-
-                configurarListener("");
-
             }
 
             @Override
@@ -238,7 +241,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void configurarListener(String query) {
-        loadingDialog.show();
         refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
@@ -288,7 +290,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerPedidos.setLayoutManager(new LinearLayoutManager(this));
         recyclerPedidos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerPedidos.setHasFixedSize(true);
-        listaPedidos.addAll(PedidosUtil.returnPedidos(this));
         configurarListener("");
         adapterPedidos = new AdapterPedidos(listaPedidos, this);
         recyclerPedidos.setAdapter(adapterPedidos);

@@ -59,6 +59,70 @@ public class InfosActivity extends AppCompatActivity {
         configurarLoadingDialog();
         encontrarUsuarioAtual();
 
+        configurarToglers();
+
+        mainBinding.btnProdutos.setOnClickListener(view -> {
+            Intent i = new Intent(this, ProdutosActivity.class);
+
+            Gson gson = new Gson();
+
+            if (
+                    mainBinding.edtLoja.getText().toString().isEmpty() ||
+                            mainBinding.edtData.getText().toString().isEmpty() ||
+                            mainBinding.edtEstabelecimento.getText().toString().isEmpty() ||
+                            mainBinding.edtComprador.getText().toString().isEmpty() ||
+                            mainBinding.edtEmail.getText().toString().isEmpty() ||
+                            mainBinding.edtTelefone.getText().toString().isEmpty() ||
+                            mainBinding.edtCnpj.getText().toString().isEmpty() ||
+                            mainBinding.edtFormaPagamento.getText().toString().isEmpty() ||
+                            mainBinding.edtEndereco.getText().toString().isEmpty() ||
+                            mainBinding.edtEnderecoEntrega.getText().toString().isEmpty() ||
+                            mainBinding.edtObsEntrega.getText().toString().isEmpty() ||
+                            mainBinding.edtCep.getText().toString().isEmpty()
+            ) {
+                Toast.makeText(this, "Preencha Todos os Dados Obrigatórios!", Toast.LENGTH_LONG).show();
+            } else {
+                String idAgente = mainBinding.edtAgente.getText().toString();
+
+                String dadosPedido = gson.toJson(
+                        new PedidoModel(
+                                mainBinding.edtLoja.getText().toString(),
+                                mainBinding.edtData.getText().toString(),
+                                idAgente,
+                                mainBinding.edtEstabelecimento.getText().toString(),
+                                mainBinding.edtComprador.getText().toString(),
+                                mainBinding.edtEmail.getText().toString(),
+                                mainBinding.edtTelefone.getText().toString(),
+                                mainBinding.edtCnpj.getText().toString(),
+                                mainBinding.edtEstadual.getText().toString(),
+                                mainBinding.edtFormaPagamento.getText().toString(),
+                                mainBinding.edtEndereco.getText().toString(),
+                                mainBinding.edtEnderecoEntrega.getText().toString(),
+                                mainBinding.edtObsEntrega.getText().toString(),
+                                new ArrayList<>(),
+                                mainBinding.edtCep.getText().toString()
+                        )
+                );
+
+                i.putExtra("dadosPedido", dadosPedido);
+
+                usuarioAtual.setIdAgente(idAgente);
+                loadingDialog.show();
+                refUsuarios.child(usuarioAtual.getId()).setValue(usuarioAtual).addOnCompleteListener(task -> {
+                    loadingDialog.dismiss();
+                    if (task.isSuccessful()) {
+                        startActivity(i);
+                    } else {
+                        Toast.makeText(this, "Tente novamente...", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
+
+    void configurarToglers() {
+        Thread t = new Thread(){};
+
         clientes.addAll(ClientesUtil.returnClientes(this));
 
         for (ClienteModel clienteModel : clientes) {
@@ -165,63 +229,6 @@ public class InfosActivity extends AppCompatActivity {
         });
 
 
-        mainBinding.btnProdutos.setOnClickListener(view -> {
-            Intent i = new Intent(this, ProdutosActivity.class);
-
-            Gson gson = new Gson();
-
-            if (
-                    mainBinding.edtLoja.getText().toString().isEmpty() ||
-                            mainBinding.edtData.getText().toString().isEmpty() ||
-                            mainBinding.edtEstabelecimento.getText().toString().isEmpty() ||
-                            mainBinding.edtComprador.getText().toString().isEmpty() ||
-                            mainBinding.edtEmail.getText().toString().isEmpty() ||
-                            mainBinding.edtTelefone.getText().toString().isEmpty() ||
-                            mainBinding.edtCnpj.getText().toString().isEmpty() ||
-                            mainBinding.edtFormaPagamento.getText().toString().isEmpty() ||
-                            mainBinding.edtEndereco.getText().toString().isEmpty() ||
-                            mainBinding.edtEnderecoEntrega.getText().toString().isEmpty() ||
-                            mainBinding.edtObsEntrega.getText().toString().isEmpty() ||
-                            mainBinding.edtCep.getText().toString().isEmpty()
-            ) {
-                Toast.makeText(this, "Preencha Todos os Dados Obrigatórios!", Toast.LENGTH_LONG).show();
-            } else {
-                String idAgente = mainBinding.edtAgente.getText().toString();
-
-                String dadosPedido = gson.toJson(
-                        new PedidoModel(
-                                mainBinding.edtLoja.getText().toString(),
-                                mainBinding.edtData.getText().toString(),
-                                idAgente,
-                                mainBinding.edtEstabelecimento.getText().toString(),
-                                mainBinding.edtComprador.getText().toString(),
-                                mainBinding.edtEmail.getText().toString(),
-                                mainBinding.edtTelefone.getText().toString(),
-                                mainBinding.edtCnpj.getText().toString(),
-                                mainBinding.edtEstadual.getText().toString(),
-                                mainBinding.edtFormaPagamento.getText().toString(),
-                                mainBinding.edtEndereco.getText().toString(),
-                                mainBinding.edtEnderecoEntrega.getText().toString(),
-                                mainBinding.edtObsEntrega.getText().toString(),
-                                new ArrayList<>(),
-                                mainBinding.edtCep.getText().toString()
-                        )
-                );
-
-                i.putExtra("dadosPedido", dadosPedido);
-
-                usuarioAtual.setIdAgente(idAgente);
-                loadingDialog.show();
-                refUsuarios.child(usuarioAtual.getId()).setValue(usuarioAtual).addOnCompleteListener(task -> {
-                    loadingDialog.dismiss();
-                    if (task.isSuccessful()) {
-                        startActivity(i);
-                    } else {
-                        Toast.makeText(this, "Tente novamente...", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
     }
 
     private void encontrarUsuarioAtual() {
