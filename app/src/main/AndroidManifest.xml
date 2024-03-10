@@ -20,10 +20,18 @@
         android:theme="@style/Theme.CadastroPedido"
         tools:targetApi="31">
         <activity
-            android:name=".FornecedoresActivity"
+            android:name=".CriarInfoCreditoActivity"
             android:exported="false"
             android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
             />
+        <activity
+            android:name=".MenuCreditoActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar" />
+        <activity
+            android:name=".FornecedoresActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar" />
         <activity
             android:name=".MenuPedidoOrCreditoActivity"
             android:exported="false"

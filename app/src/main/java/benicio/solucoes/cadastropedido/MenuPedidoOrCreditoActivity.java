@@ -23,6 +23,7 @@ public class MenuPedidoOrCreditoActivity extends AppCompatActivity {
 
         mainBinding.pedido.setOnClickListener(view -> startActivity(new Intent(this, MainActivity.class)));
         mainBinding.fornecedor.setOnClickListener(view -> startActivity(new Intent(this, FornecedoresActivity.class)));
+        mainBinding.credito.setOnClickListener(view -> startActivity(new Intent(this, MenuCreditoActivity.class)));
 
     }
 }
