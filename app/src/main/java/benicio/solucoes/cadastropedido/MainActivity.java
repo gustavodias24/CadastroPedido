@@ -95,7 +95,10 @@ public class MainActivity extends AppCompatActivity {
         produtosServices = RetrofitUitl.criarService(RetrofitUitl.criarRetrofit());
 
         mainBinding.btnVerProdutos.setOnClickListener(view -> startActivity(new Intent(this, VisualizarProdutosActivity.class)));
-        mainBinding.btnFazerPedido.setOnClickListener(view -> startActivity(new Intent(this, InfosActivity.class)));
+        mainBinding.btnFazerPedido.setOnClickListener(view -> {
+            finish();
+            startActivity(new Intent(this, InfosActivity.class));
+        });
 
         mainBinding.pesquisarProduto.setOnClickListener(view -> {
             String pesquisa = mainBinding.edtPesquisa.getText().toString();

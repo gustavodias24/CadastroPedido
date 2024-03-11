@@ -157,28 +157,42 @@ public class ProdutosActivity extends AppCompatActivity {
 
             if (estoqueAtual > 0) {
 
-                String valorTotalString = mainBinding.edtValorTotal.getText().toString();
+                int soma = 0;
 
-                listaCompra.add(new ItemCompra(mainBinding.edtNomeProduto.getText().toString(), mainBinding.edtSKU.getText().toString(), mainBinding.edtValor.getText().toString(), mainBinding.edtQTD.getText().toString(), valorTotalString, mainBinding.edtDesconto.getText().toString(), mainBinding.edtValorTotalDesconto.getText().toString()));
+                try{
+                    soma = Integer.parseInt(
+                            mainBinding.edtValorTotalDesconto.getText().toString().replace(",", "").replace("R$", "").replace(" ", "").replace(" ", "")
+                    );
+                }catch (Exception ignored){}
 
-                adapterProdutos.notifyDataSetChanged();
+                if (soma > 0) {
+                    String valorTotalString = mainBinding.edtValorTotal.getText().toString();
 
-                Double valorAtual = MathUtils.converterParaDouble(mainBinding.textValorTotal.getText().toString().split(" ")[2]);
+                    listaCompra.add(new ItemCompra(mainBinding.edtNomeProduto.getText().toString(), mainBinding.edtSKU.getText().toString(), mainBinding.edtValor.getText().toString(), mainBinding.edtQTD.getText().toString(), valorTotalString, mainBinding.edtDesconto.getText().toString(), mainBinding.edtValorTotalDesconto.getText().toString()));
 
-                valorAtual += MathUtils.converterParaDouble(mainBinding.edtValorTotalDesconto.getText().toString());
+                    adapterProdutos.notifyDataSetChanged();
 
-                mainBinding.textValorTotal.setText("Total Compra: " + MathUtils.formatarMoeda(valorAtual));
+                    Double valorAtual = MathUtils.converterParaDouble(mainBinding.textValorTotal.getText().toString().split(" ")[2]);
 
-                mainBinding.edtNomeProduto.setText("");
-                mainBinding.edtSKU.setText("");
-                mainBinding.edtValor.setText("");
-                mainBinding.edtQTD.setText("");
-                mainBinding.edtValorTotal.setText("");
-                mainBinding.edtDesconto.setText("");
-                mainBinding.edtValorTotalDesconto.setText("");
+                    valorAtual += MathUtils.converterParaDouble(mainBinding.edtValorTotalDesconto.getText().toString());
+
+                    mainBinding.textValorTotal.setText("Total Compra: " + MathUtils.formatarMoeda(valorAtual));
+
+                    mainBinding.edtNomeProduto.setText("");
+                    mainBinding.edtSKU.setText("");
+                    mainBinding.edtValor.setText("");
+                    mainBinding.edtQTD.setText("");
+                    mainBinding.edtValorTotal.setText("");
+                    mainBinding.edtDesconto.setText("");
+                    mainBinding.edtValorTotalDesconto.setText("");
+                }
 
             } else {
-                Toast.makeText(this, "Produto sem estoque.", Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder b = new AlertDialog.Builder(this);
+                b.setTitle("AVISO!");
+                b.setMessage("produto sem estoque!");
+                b.setPositiveButton("ok", null);
+                b.create().show();
             }
         });
 
@@ -193,7 +207,7 @@ public class ProdutosActivity extends AppCompatActivity {
             double somaCompra = 0;
 
             for (ItemCompra item : pedidoModel.getProdutos()) {
-                somaCompra += Integer.parseInt(item.getValorTotalFinal().replace(".", "").replace(",", "").replace("R$", "").replace(" ", "").replace(" ", ""));
+                somaCompra += Float.parseFloat(item.getValorTotalFinal().replace(",", ".").replace("R$", "").replace(" ", "").replace(" ", ""));
             }
 
             if (somaCompra >= valorMinimo) {

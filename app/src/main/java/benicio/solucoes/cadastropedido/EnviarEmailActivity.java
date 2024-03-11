@@ -53,13 +53,14 @@ public class EnviarEmailActivity extends AppCompatActivity {
     private CreditoModel credito;
     private String idVendedor;
     private Dialog loadingDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainBinding = ActivityEnviarEmailBinding.inflate(getLayoutInflater());
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-        
+
         getSupportActionBar().setTitle("Enviar E-mail");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -74,43 +75,46 @@ public class EnviarEmailActivity extends AppCompatActivity {
         mainBinding.edtEmailEnvio.setOnItemClickListener((parent, view, position, id) -> {
             String selectedFrase = (String) parent.getItemAtPosition(position);
             mainBinding.edtEmailEnvio.setText(selectedFrase);
-            Toast.makeText(getApplicationContext(),  selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
         });
 
 
         b = getIntent().getExtras();
 
         assert b != null;
-        if(b.getBoolean("credito", false)){
-            credito = new Gson().fromJson(b.getString("dados", ""), new TypeToken<CreditoModel>(){}.getType());
-        }else{
-            pedido = new Gson().fromJson(b.getString("dados", ""), new TypeToken<PedidoModel>(){}.getType());
+        if (b.getBoolean("credito", false)) {
+            credito = new Gson().fromJson(b.getString("dados", ""), new TypeToken<CreditoModel>() {
+            }.getType());
+            credito.setId(UUID.randomUUID().toString());
+            
+        } else {
+            pedido = new Gson().fromJson(b.getString("dados", ""), new TypeToken<PedidoModel>() {
+            }.getType());
         }
 
-        mainBinding.btnEnviarEmail.setOnClickListener(view-> enviarEmail());
+        mainBinding.btnEnviarEmail.setOnClickListener(view -> enviarEmail());
 
-        mainBinding.btnFinalizar.setOnClickListener( view -> {
+        mainBinding.btnFinalizar.setOnClickListener(view -> {
 
             assert b != null;
-            if(b.getBoolean("credito", false)){
-                credito.setId(UUID.randomUUID().toString());
+            if (b.getBoolean("credito", false)) {
                 credito.setIdVendedor(idVendedor);
                 loadingDialog.show();
                 refCreditos.child(credito.getId()).setValue(credito).addOnCompleteListener(task -> {
                     loadingDialog.dismiss();
-                    if( task.isSuccessful() ){
-                        Toast.makeText(this, "Pedido Criado!", Toast.LENGTH_SHORT).show();
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "Crédito Solicitado", Toast.LENGTH_SHORT).show();
                         finish();
-                        startActivity(new Intent(this, MainActivity.class));
+                        startActivity(new Intent(this, MenuCreditoActivity.class));
                     }
                 });
-            }else{
+            } else {
                 pedido.setId(UUID.randomUUID().toString());
                 pedido.setIdVendedor(idVendedor);
                 loadingDialog.show();
                 refPedidos.child(pedido.getId()).setValue(pedido).addOnCompleteListener(task -> {
                     loadingDialog.dismiss();
-                    if( task.isSuccessful() ){
+                    if (task.isSuccessful()) {
                         Toast.makeText(this, "Pedido Criado!", Toast.LENGTH_SHORT).show();
                         finish();
                         startActivity(new Intent(this, MainActivity.class));
@@ -121,11 +125,11 @@ public class EnviarEmailActivity extends AppCompatActivity {
         });
 
         assert b != null;
-        if(b.getBoolean("credito", false)){
+        if (b.getBoolean("credito", false)) {
             mainBinding.bodyEmail.setText(
                     credito.toString()
             );
-        }else{
+        } else {
             mainBinding.bodyEmail.setText(
                     pedido.toInformacao(false)
             );
@@ -134,8 +138,8 @@ public class EnviarEmailActivity extends AppCompatActivity {
 
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
-        mainBinding.bodyEmail.setOnClickListener( view -> {
-            ClipData clipData =  ClipData.newPlainText("venda", mainBinding.bodyEmail.getText().toString());
+        mainBinding.bodyEmail.setOnClickListener(view -> {
+            ClipData clipData = ClipData.newPlainText("venda", mainBinding.bodyEmail.getText().toString());
             clipboardManager.setPrimaryClip(clipData);
             Toast.makeText(this, "Copiado!", Toast.LENGTH_SHORT).show();
         });
@@ -147,7 +151,8 @@ public class EnviarEmailActivity extends AppCompatActivity {
         b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
         loadingDialog = b.create();
     }
-    private void configurarIdVendedor(){
+
+    private void configurarIdVendedor() {
 
         loadingDialog.show();
         refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -155,9 +160,9 @@ public class EnviarEmailActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 loadingDialog.dismiss();
 
-                for ( DataSnapshot dado : snapshot.getChildren()){
+                for (DataSnapshot dado : snapshot.getChildren()) {
                     UserModel userModel = dado.getValue(UserModel.class);
-                    if ( userModel.getEmail().equals(auth.getCurrentUser().getEmail())){
+                    if (userModel.getEmail().equals(auth.getCurrentUser().getEmail())) {
                         idVendedor = userModel.getId();
                         break;
                     }
@@ -175,7 +180,7 @@ public class EnviarEmailActivity extends AppCompatActivity {
         String email = mainBinding.edtEmailEnvio.getText().toString();
         String assunto = mainBinding.edtTituloEmail.getText().toString();
         String corpo = mainBinding.bodyEmail.getText().toString();
-        
+
         String[] emailList = {email};
         final Intent intent = ShareCompat.IntentBuilder.from(this)
                 .setType("message/rfc822")
@@ -192,7 +197,14 @@ public class EnviarEmailActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if ( item.getItemId() == android.R.id.home){finish();}
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            if (b.getBoolean("credito", false)) {
+                startActivity(new Intent(this, MenuCreditoActivity.class));
+            } else {
+                startActivity(new Intent(this, MainActivity.class));
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
 }

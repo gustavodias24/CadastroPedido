@@ -3,6 +3,8 @@ package benicio.solucoes.cadastropedido.model;
 public class CreditoModel {
 
     String id, idVendedor;
+
+    String status = "pendente", distribuidor;
     String nome, razaoSocial, cnpj, inscricaoEstadual, email, telefone, endereco, prazoSocilitado,
             valorSolicitado;
 
@@ -19,7 +21,10 @@ public class CreditoModel {
 
     @Override
     public String toString() {
-        return "Nome: " + nome + "\n" +
+        return "id: " + id + "\n" +
+                "Status: " + status.toUpperCase() + "\n" +
+                "Distribuidor: " + distribuidor + "\n" +
+                "Nome: " + nome + "\n" +
                 "Razão Social: " + razaoSocial + "\n" +
                 "CNPJ: " + cnpj + "\n" +
                 "Inscrição Estadual: " + inscricaoEstadual + "\n" +
@@ -35,6 +40,22 @@ public class CreditoModel {
         this.idVendedor = idVendedor;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getDistribuidor() {
+        return distribuidor;
+    }
+
+    public void setDistribuidor(String distribuidor) {
+        this.distribuidor = distribuidor;
+    }
+
     public String getId() {
         return id;
     }
@@ -43,7 +64,7 @@ public class CreditoModel {
         this.id = id;
     }
 
-    public CreditoModel(String nome, String razaoSocial, String cnpj, String inscricaoEstadual, String email, String telefone, String endereco, String prazoSocilitado, String valorSolicitado) {
+    public CreditoModel(String nome, String razaoSocial, String cnpj, String inscricaoEstadual, String email, String telefone, String endereco, String prazoSocilitado, String valorSolicitado, String distribuidor, String status) {
         this.nome = nome;
         this.razaoSocial = razaoSocial;
         this.cnpj = cnpj;
@@ -53,6 +74,8 @@ public class CreditoModel {
         this.endereco = endereco;
         this.prazoSocilitado = prazoSocilitado;
         this.valorSolicitado = valorSolicitado;
+        this.distribuidor = distribuidor;
+        this.status = status;
     }
 
     public String getNome() {

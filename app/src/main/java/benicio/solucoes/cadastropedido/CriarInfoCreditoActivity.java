@@ -28,12 +28,14 @@ public class CriarInfoCreditoActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         mainBinding.btnProsseguir.setOnClickListener(view -> {
+            finish();
             Intent i = new Intent(this, EnviarEmailActivity.class);
             i.putExtra("credito", true);
 
             Gson gson = new Gson();
 
             if (
+                    mainBinding.edtDistribuidor.getText().toString().isEmpty() ||
                     mainBinding.edtNome.getText().toString().isEmpty() ||
                             mainBinding.edtRazaoSocial.getText().toString().isEmpty() ||
                             mainBinding.edtEmail.getText().toString().isEmpty() ||
@@ -54,7 +56,9 @@ public class CriarInfoCreditoActivity extends AppCompatActivity {
                         mainBinding.edtTelefone.getText().toString(),
                         mainBinding.edtEndereO.getText().toString(),
                         mainBinding.edtPrazo.getText().toString(),
-                        mainBinding.edtValor.getText().toString()
+                        mainBinding.edtValor.getText().toString(),
+                        mainBinding.edtDistribuidor.getText().toString(),
+                        "pendente"
                 ));
 
                 i.putExtra("dados", dadosCredito);
@@ -69,6 +73,7 @@ public class CriarInfoCreditoActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
+            startActivity(new Intent(this, MenuCreditoActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

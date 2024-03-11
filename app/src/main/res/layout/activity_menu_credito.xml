@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/botaoColor"
-            android:text="Fazer novo pedido"
+            android:text="Solicitação de Crédito"
             android:textAllCaps="true"
             android:textStyle="bold" />
 

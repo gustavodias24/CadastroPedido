@@ -54,7 +54,10 @@ public class MenuCreditoActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        mainBinding.btnFazerPedido.setOnClickListener( view -> startActivity(new Intent(this, CriarInfoCreditoActivity.class)));
+        mainBinding.btnFazerPedido.setOnClickListener( view -> {
+            finish();
+            startActivity(new Intent(this, CriarInfoCreditoActivity.class));
+        });
 
         configurarLoadingDialog();
         configurarIdVendedor();
