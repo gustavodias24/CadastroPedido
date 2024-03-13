@@ -24,6 +24,38 @@
             android:textStyle="bold" />
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Filtragem:"
+            android:textAlignment="textStart"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edtPesquisa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:hint="Filtrar Pedidos"
+                android:inputType="text" />
+
+            <ImageButton
+                android:id="@+id/pesquisarProduto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/botaoColor"
+                android:src="@android:drawable/ic_menu_search" />
+
+        </LinearLayout>
+
+        <TextView
             android:id="@+id/pedidosText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

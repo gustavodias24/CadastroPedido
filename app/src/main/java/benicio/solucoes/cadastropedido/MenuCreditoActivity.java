@@ -2,6 +2,7 @@ package benicio.solucoes.cadastropedido;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,6 +12,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -62,6 +64,11 @@ public class MenuCreditoActivity extends AppCompatActivity {
         configurarLoadingDialog();
         configurarIdVendedor();
         configurarRecyclerPedidos();
+
+        mainBinding.pesquisarProduto.setOnClickListener(view -> {
+            String query = mainBinding.edtPesquisa.getText().toString();
+            configurarListener(query);
+        });
     }
 
     @Override
@@ -69,7 +76,35 @@ public class MenuCreditoActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             finish();
         }
+        else if( item.getItemId() == R.id.sair){
+            finish();
+            auth.signOut();
+        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_principal, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                configurarListener(newText.toLowerCase().trim());
+                return true;
+            }
+        });
+
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     private void configurarRecyclerPedidos() {
@@ -97,23 +132,22 @@ public class MenuCreditoActivity extends AppCompatActivity {
                         if (pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)) {
                             if (query.isEmpty()) {
                                 lista.add(pedidoModel);
+                            } else {
+                                assert pedidoModel != null;
+                                if (
+                                                pedidoModel.getId().toLowerCase().trim().contains(query) ||
+                                                pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
+                                                pedidoModel.getDistribuidor().toLowerCase().trim().contains(query) ||
+                                                pedidoModel.getRazaoSocial().toLowerCase().trim().contains(query) ||
+                                                pedidoModel.getStatus().toLowerCase().trim().contains(query) ||
+                                                pedidoModel.getPrazoSocilitado().toLowerCase().trim().contains(query) ||
+                                                pedidoModel.getValorSolicitado().toLowerCase().trim().contains(query) ||
+                                                pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
+                                                pedidoModel.getEndereco().toLowerCase().trim().contains(query)
+                                ) {
+                                    lista.add(pedidoModel);
+                                }
                             }
-//                            } else {
-//                                assert pedidoModel != null;
-//                                if (
-//                                        pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
-//                                                pedidoModel.getData().toLowerCase().trim().contains(query) ||
-//                                                pedidoModel.getIdAgente().toLowerCase().trim().contains(query) ||
-//                                                pedidoModel.getNomeEstabelecimento().toLowerCase().trim().contains(query) ||
-//                                                pedidoModel.getNomeComprador().toLowerCase().trim().contains(query) ||
-//                                                pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
-//                                                pedidoModel.getTele().toLowerCase().trim().contains(query) ||
-//                                                pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
-//                                                pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
-//                                ) {
-//                                    listaPedidos.add(pedidoModel);
-//                                }
-//                            }
                         }
                     }
 
