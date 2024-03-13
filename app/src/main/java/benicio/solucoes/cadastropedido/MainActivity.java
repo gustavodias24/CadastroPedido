@@ -147,7 +147,8 @@ public class MainActivity extends AppCompatActivity {
                     AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
                     b.setTitle("Aviso!");
                     b.setCancelable(false);
-                    b.setMessage("Sua base de dados está desatualizada! o último update foi " + ultimoUpdateDatabase + ", clique em OK para atualizar!");
+                    b.setMessage("Clique em OK para atualizar a base");
+//                    b.setMessage("Sua base de dados está desatualizada! o último update foi " + ultimoUpdateDatabase + ", clique em OK para atualizar!");
                     b.setPositiveButton("ok", (dialogInterface, i) -> atualizarBaseProdutos());
                     b.create().show();
                 }

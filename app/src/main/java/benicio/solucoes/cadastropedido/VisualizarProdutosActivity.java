@@ -51,6 +51,7 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
 
         for ( ProdutoModel produtoModel : listaProdutos){
             listaNomeProdutos.add(produtoModel.getNome());
+            listaNomeProdutos.add(produtoModel.getSku());
         }
         
 
@@ -86,7 +87,8 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
             String selectedFrase = mainBinding.autoCompleteFiltro.getText().toString();
 
             for ( ProdutoModel produtoModel : listaProdutos){
-                if ( produtoModel.getNome().contains(selectedFrase)){
+                if ( produtoModel.getNome().trim().toLowerCase().contains(selectedFrase.trim().toLowerCase())
+                        || produtoModel.getSku().trim().toLowerCase().contains(selectedFrase.trim().toLowerCase())){
                     mainBinding.textInfo.setText(
                             produtoModel.toString()
                     );

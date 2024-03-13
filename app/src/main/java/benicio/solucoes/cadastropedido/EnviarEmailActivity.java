@@ -5,17 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ShareCompat;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
@@ -28,17 +25,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.util.List;
 import java.util.UUID;
 
 import benicio.solucoes.cadastropedido.databinding.ActivityEnviarEmailBinding;
-import benicio.solucoes.cadastropedido.databinding.ActivityInfosBinding;
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
-import benicio.solucoes.cadastropedido.model.ProdutoModel;
 import benicio.solucoes.cadastropedido.model.UserModel;
-import benicio.solucoes.cadastropedido.util.PedidosUtil;
 
 public class EnviarEmailActivity extends AppCompatActivity {
 
@@ -85,8 +78,7 @@ public class EnviarEmailActivity extends AppCompatActivity {
         if (b.getBoolean("credito", false)) {
             credito = new Gson().fromJson(b.getString("dados", ""), new TypeToken<CreditoModel>() {
             }.getType());
-            credito.setId(UUID.randomUUID().toString());
-            
+
         } else {
             pedido = new Gson().fromJson(b.getString("dados", ""), new TypeToken<PedidoModel>() {
             }.getType());

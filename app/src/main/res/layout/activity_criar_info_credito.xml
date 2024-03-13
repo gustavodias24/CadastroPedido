@@ -296,7 +296,7 @@
             android:id="@+id/textView11"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Aviso\nAnexar documento ao e-mail!"
+            android:text="AVISO\nANEXAR DOCUMENTOS NO EMAIL AO ENVIAR SOLICITAÇÃO"
             android:textAlignment="center"
             android:textAllCaps="true"
             android:textColor="#FF0000"

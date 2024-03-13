@@ -35,4 +35,11 @@ public class MathUtils {
 
         return result.toString();
     }
+
+    public static String formatarNumero(int numero) {
+        // Formata o número como string preenchendo com zeros à esquerda
+        String numeroFormatado = String.format("%06d", numero);
+        // Retorna a string formatada com o prefixo "RC"
+        return "RC" + numeroFormatado;
+    }
 }
