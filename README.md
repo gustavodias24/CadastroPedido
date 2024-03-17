@@ -36,8 +36,12 @@ Por enquanto você precisa abaixar o projeto e compilar o seu próprio Apk!.
 
 ## Exibição
 
-![image]()
-
+![image](https://github.com/gustavodias24/CadastroPedido/blob/8eab03eb8fbde68c4fb5e213e4d6349154d0d659/app/src/main/res/raw/tela_cadastro_login.png)
+![image](https://github.com/gustavodias24/CadastroPedido/blob/8eab03eb8fbde68c4fb5e213e4d6349154d0d659/app/src/main/res/raw/tela_pedido_de_credito.png)
+![image](https://github.com/gustavodias24/CadastroPedido/blob/8eab03eb8fbde68c4fb5e213e4d6349154d0d659/app/src/main/res/raw/formulario_credito.png)
+![image](https://github.com/gustavodias24/CadastroPedido/blob/8eab03eb8fbde68c4fb5e213e4d6349154d0d659/app/src/main/res/raw/integracao_gmail.png)
+![image](https://github.com/gustavodias24/CadastroPedido/blob/8eab03eb8fbde68c4fb5e213e4d6349154d0d659/app/src/main/res/raw/tela_cadastro_produto.png)
+![image](https://github.com/gustavodias24/CadastroPedido/blob/8eab03eb8fbde68c4fb5e213e4d6349154d0d659/app/src/main/res/raw/formulario_casdastro_produto.png)
 
 
 ## Contato
