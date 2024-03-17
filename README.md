@@ -1,8 +1,8 @@
 # Cadastro Pedido - RedCloud
 
-![Logo](https://github.com/gustavodias24/EnfermaGuia/blob/18a59c633549103a80590a59672324eec7455aa5/app/src/main/res/drawable/iconeapp.png)
+![Logo](https://github.com/gustavodias24/CadastroPedido/blob/a4d162ce5284b3ee6d5a74eb1871b0b93a13676a/app/src/main/res/raw/logo.png)
 
-Projeto FreeLancer para um trabalho de um curso de Doutorado de Enfermagem, da universidade da Bahia!
+Projeto FreeLancer para a empresa da RedCloud, basicamente o aplicativo é usado pelos colaboradores para fazerem pedidos de produtos e créditos, uma forma mais simples e farcil de organizar um sistema abrangente de pedidos de uma empresa.
 
 ## Índice
 
@@ -14,12 +14,12 @@ Projeto FreeLancer para um trabalho de um curso de Doutorado de Enfermagem, da u
 
 ## Sobre o Projeto
 
-Painel de Admin.
-Cadastro de Hospitais.
+Painel de Admin visualiza os usuários e informações deles.
+Cadastro de Pedidos de Produtos/Crédito.
 Sistema de Login.
-Sistema de Cadastro de Guias de Enfermagem.
-Sistema de Cadastros de Sugestões.
-Gerador de PDF ( dos Guias de Enfermagem ).
+Sistema de atualizar base de dados de Produtos/Clientes.
+Sistema de filtro de pedidos.
+Sistema integrado com G-mail para envio dos pedidos.
 Muito mais....
 
 ### Tecnologias Utilizadas
@@ -36,13 +36,8 @@ Por enquanto você precisa abaixar o projeto e compilar o seu próprio Apk!.
 
 ## Exibição
 
-![image](https://github.com/gustavodias24/EnfermaGuia/blob/c9abb553719ea13e9ead1f5f33a3cc6863f36c24/app/src/main/res/raw/tela_de_login.png)
-![image](https://github.com/gustavodias24/EnfermaGuia/blob/c9abb553719ea13e9ead1f5f33a3cc6863f36c24/app/src/main/res/raw/tele_do_usuario.png)
-![image](https://github.com/gustavodias24/EnfermaGuia/blob/c9abb553719ea13e9ead1f5f33a3cc6863f36c24/app/src/main/res/raw/visualizando_procedimento.png)
-![image](https://github.com/gustavodias24/EnfermaGuia/blob/c9abb553719ea13e9ead1f5f33a3cc6863f36c24/app/src/main/res/raw/adicionar_sugestao.png)
-![image](https://github.com/gustavodias24/EnfermaGuia/blob/c9abb553719ea13e9ead1f5f33a3cc6863f36c24/app/src/main/res/raw/gerando_pdf_compartilhavel.png)
-![image](https://github.com/gustavodias24/EnfermaGuia/blob/c9abb553719ea13e9ead1f5f33a3cc6863f36c24/app/src/main/res/raw/tela_adm_hospital.png)
-![image](https://github.com/gustavodias24/EnfermaGuia/blob/c9abb553719ea13e9ead1f5f33a3cc6863f36c24/app/src/main/res/raw/tela_criacao_procedimento.png)
+![image]()
+
 
 
 ## Contato
