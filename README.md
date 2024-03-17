@@ -2,7 +2,7 @@
 
 ![Logo](https://github.com/gustavodias24/CadastroPedido/blob/a4d162ce5284b3ee6d5a74eb1871b0b93a13676a/app/src/main/res/raw/logo.png)
 
-Projeto FreeLancer para a empresa da RedCloud, basicamente o aplicativo é usado pelos colaboradores para fazerem pedidos de produtos e créditos, uma forma mais simples e farcil de organizar um sistema abrangente de pedidos de uma empresa.
+Projeto FreeLancer para a empresa da RedCloud, basicamente o aplicativo é usado pelos colaboradores para fazerem pedidos de produtos e créditos, uma forma mais simples e fácil de organizar um sistema abrangente de pedidos de uma empresa.
 
 ## Índice
 
