@@ -49,7 +49,7 @@ import retrofit2.Retrofit;
 public class ProdutosActivity extends AppCompatActivity {
     private boolean jaTemRegra = false;
     private Dialog loadingDialog;
-    private int valorMinimo = 999;
+    private int valorMinimo = 0;
     private RecyclerView r;
     private ActivityProdutosBinding mainBinding;
     private Bundle b;
@@ -157,13 +157,13 @@ public class ProdutosActivity extends AppCompatActivity {
 
             if (estoqueAtual > 0) {
 
-                int soma = 0;
+                float soma = 0.f;
+                String valorString = mainBinding.edtValorTotalDesconto.getText().toString().replace(",", "").replace("R$", "").replace(" ", "").replace(" ", "");
 
-                try{
-                    soma = Integer.parseInt(
-                            mainBinding.edtValorTotalDesconto.getText().toString().replace(",", "").replace("R$", "").replace(" ", "").replace(" ", "")
-                    );
-                }catch (Exception ignored){}
+                try {
+                    soma = Float.parseFloat(valorString);
+                } catch (Exception ignored) {
+                }
 
                 if (soma > 0) {
                     String valorTotalString = mainBinding.edtValorTotal.getText().toString();

@@ -81,6 +81,7 @@ public class InfosActivity extends AppCompatActivity {
                             mainBinding.edtCep.getText().toString().isEmpty()
             ) {
                 Toast.makeText(this, "Preencha Todos os Dados Obrigatórios!", Toast.LENGTH_LONG).show();
+
             } else {
                 String idAgente = mainBinding.edtAgente.getText().toString();
 
