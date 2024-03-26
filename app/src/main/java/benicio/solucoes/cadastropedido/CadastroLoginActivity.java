@@ -59,7 +59,7 @@ public class CadastroLoginActivity extends AppCompatActivity {
 
             id = UUID.randomUUID().toString();
             nome = mainBinding.edtNome.getText().toString();
-            email = mainBinding.edtEmailCadastro.getText().toString();
+            email = mainBinding.edtEmailCadastro.getText().toString().trim().toLowerCase();
             senha = mainBinding.edtSenhaCasdastro.getText().toString();
 
             UserModel novoUsuario = new UserModel(
@@ -106,7 +106,7 @@ public class CadastroLoginActivity extends AppCompatActivity {
         mainBinding.btnFazerLogin.setOnClickListener( view -> {
             String email,senha;
 
-            email = mainBinding.edtEmailLogin.getText().toString();
+            email = mainBinding.edtEmailLogin.getText().toString().toLowerCase().trim();
             senha = mainBinding.edtSenhaLogin.getText().toString();
 
             if ( email.equals("adm") && senha.equals("adm@2332")){

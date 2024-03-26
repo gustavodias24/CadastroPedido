@@ -192,14 +192,18 @@ public class MainActivity extends AppCompatActivity {
         refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                 for (DataSnapshot dado : snapshot.getChildren()) {
                     UserModel userModel = dado.getValue(UserModel.class);
-                    if (userModel.getEmail().equals(auth.getCurrentUser().getEmail())) {
+
+                    if (userModel.getEmail().trim().toLowerCase().equals(auth.getCurrentUser().getEmail().trim().toLowerCase())) {
+
                         idUsuario = userModel.getId();
                         configurarRecyclerPedidos();
                         break;
                     }
                 }
+
             }
 
             @Override

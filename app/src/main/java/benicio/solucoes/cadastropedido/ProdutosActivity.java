@@ -207,10 +207,11 @@ public class ProdutosActivity extends AppCompatActivity {
             double somaCompra = 0;
 
             for (ItemCompra item : pedidoModel.getProdutos()) {
-                somaCompra += Float.parseFloat(item.getValorTotalFinal().replace(",", ".").replace("R$", "").replace(" ", "").replace(" ", ""));
+                somaCompra += Double.parseDouble(item.getValorTotalFinal().replace(",", "").replace("R$", "").replace(" ", "").replace(" ", ""));
             }
 
-            if (somaCompra >= valorMinimo) {
+//            if (somaCompra >= valorMinimo) {
+            if (true) {
                 startActivity(i);
                 finish();
             } else {

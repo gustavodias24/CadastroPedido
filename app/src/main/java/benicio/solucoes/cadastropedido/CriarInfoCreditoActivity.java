@@ -67,7 +67,7 @@ public class CriarInfoCreditoActivity extends AppCompatActivity {
                         mainBinding.edtRazaoSocial.getText().toString(),
                         mainBinding.edtCNPJ.getText().toString(),
                         mainBinding.edtEstadual.getText().toString(),
-                        mainBinding.edtEmail.getText().toString(),
+                        mainBinding.edtEmail.getText().toString().toLowerCase().trim(),
                         mainBinding.edtTelefone.getText().toString(),
                         mainBinding.edtEndereO.getText().toString(),
                         mainBinding.edtPrazo.getText().toString(),

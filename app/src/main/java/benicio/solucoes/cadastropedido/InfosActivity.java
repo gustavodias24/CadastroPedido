@@ -92,7 +92,7 @@ public class InfosActivity extends AppCompatActivity {
                                 idAgente,
                                 mainBinding.edtEstabelecimento.getText().toString(),
                                 mainBinding.edtComprador.getText().toString(),
-                                mainBinding.edtEmail.getText().toString(),
+                                mainBinding.edtEmail.getText().toString().toLowerCase().trim(),
                                 mainBinding.edtTelefone.getText().toString(),
                                 mainBinding.edtCnpj.getText().toString(),
                                 mainBinding.edtEstadual.getText().toString(),
@@ -108,6 +108,7 @@ public class InfosActivity extends AppCompatActivity {
                 i.putExtra("dadosPedido", dadosPedido);
 
                 usuarioAtual.setIdAgente(idAgente);
+
                 loadingDialog.show();
                 refUsuarios.child(usuarioAtual.getId()).setValue(usuarioAtual).addOnCompleteListener(task -> {
                     loadingDialog.dismiss();
@@ -122,7 +123,8 @@ public class InfosActivity extends AppCompatActivity {
     }
 
     void configurarToglers() {
-        Thread t = new Thread(){};
+        Thread t = new Thread() {
+        };
 
         clientes.addAll(ClientesUtil.returnClientes(this));
 
@@ -241,7 +243,7 @@ public class InfosActivity extends AppCompatActivity {
                     loadingDialog.dismiss();
 
                     for (DataSnapshot dado : snapshot.getChildren()) {
-                        if (dado.getValue(UserModel.class).getEmail().equals(user.getEmail())) {
+                        if (dado.getValue(UserModel.class).getEmail().trim().toLowerCase().equals(user.getEmail().trim().toLowerCase())) {
                             usuarioAtual = dado.getValue(UserModel.class);
                             mainBinding.edtAgente.setText(usuarioAtual.getIdAgente());
                             break;

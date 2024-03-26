@@ -42,5 +42,14 @@
             android:textAllCaps="true"
             android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="v2.0"
+            android:textStyle="bold" />
+
     </LinearLayout>
 </ScrollView>

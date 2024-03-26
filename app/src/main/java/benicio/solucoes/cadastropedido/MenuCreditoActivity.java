@@ -180,7 +180,7 @@ public class MenuCreditoActivity extends AppCompatActivity {
 
                 for (DataSnapshot dado : snapshot.getChildren()) {
                     UserModel userModel = dado.getValue(UserModel.class);
-                    if (userModel.getEmail().equals(auth.getCurrentUser().getEmail())) {
+                    if (userModel.getEmail().trim().toLowerCase().equals(auth.getCurrentUser().getEmail().trim().toLowerCase())) {
                         idUsuario = userModel.getId();
                         break;
                     }

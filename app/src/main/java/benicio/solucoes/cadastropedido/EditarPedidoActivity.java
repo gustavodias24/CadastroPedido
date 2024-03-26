@@ -69,7 +69,7 @@ public class EditarPedidoActivity extends AppCompatActivity {
             pedido.setIdAgente(mainBinding.edtAgente.getText().toString());
             pedido.setNomeEstabelecimento(mainBinding.edtEstabelecimento.getText().toString());
             pedido.setNomeComprador(mainBinding.edtComprador.getText().toString());
-            pedido.setEmail(mainBinding.edtEmail.getText().toString());
+            pedido.setEmail(mainBinding.edtEmail.getText().toString().toLowerCase().trim());
             pedido.setTele(mainBinding.edtTelefone.getText().toString());
             pedido.setCnpj(mainBinding.edtCnpj.getText().toString());
             pedido.setInscriEstadual(mainBinding.edtEstadual.getText().toString());
@@ -111,7 +111,7 @@ public class EditarPedidoActivity extends AppCompatActivity {
         mainBinding.edtAgente.setText(pedido.getIdAgente());
         mainBinding.edtEstabelecimento.setText(pedido.getNomeEstabelecimento());
         mainBinding.edtComprador.setText(pedido.getNomeComprador());
-        mainBinding.edtEmail.setText(pedido.getEmail());
+        mainBinding.edtEmail.setText(pedido.getEmail().toLowerCase().trim());
         mainBinding.edtTelefone.setText(pedido.getTele());
         mainBinding.edtEstadual.setText(pedido.getInscriEstadual());
         mainBinding.edtFormaPagamento.setText(pedido.getFormaPagamento());
