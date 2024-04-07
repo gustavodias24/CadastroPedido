@@ -25,6 +25,15 @@
             android:textAllCaps="true"
             android:textStyle="bold" />
 
+        <Button
+            android:id="@+id/btn_ultimos_credito"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/botaoColor"
+            android:text="ÚLTIMOS PEDIDOS De CRÉDITO"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
+
         <TextView
             android:id="@+id/textView10"
             android:layout_width="match_parent"

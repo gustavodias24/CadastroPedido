@@ -41,6 +41,7 @@ public class AdminActivity extends AppCompatActivity {
     private RecyclerView recyclerUsuarios;
     private List<UserModel> usuarios = new ArrayList<>();
     private AdapterUsuarios adapterUsuarios;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,8 +54,14 @@ public class AdminActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle("Admin Manager");
 
-        mainBinding.btnUltimosPedidos.setOnClickListener(view -> {
-            startActivity(new Intent(this, AllPedidosActivity.class));
+        mainBinding.btnUltimosPedidos.setOnClickListener(view ->
+                startActivity(new Intent(this, AllPedidosActivity.class))
+        );
+
+        mainBinding.btnUltimosCredito.setOnClickListener(v -> {
+            Intent i = new Intent(this, AllPedidosActivity.class);
+            i.putExtra("credito", true);
+            startActivity(i);
         });
 
     }
@@ -65,6 +72,7 @@ public class AdminActivity extends AppCompatActivity {
         LoadingLayoutBinding dialogBinding = LoadingLayoutBinding.inflate(getLayoutInflater());
         dialogCarregando = b.setView(dialogBinding.getRoot()).create();
     }
+
     private void configurarRecyclerUsuarios() {
         recyclerUsuarios = mainBinding.recyclerVendedores;
         recyclerUsuarios.setLayoutManager(new LinearLayoutManager(this));
@@ -75,16 +83,16 @@ public class AdminActivity extends AppCompatActivity {
         recyclerUsuarios.setAdapter(adapterUsuarios);
     }
 
-    private void configurarListener(String query){
+    private void configurarListener(String query) {
         dialogCarregando.show();
         refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dialogCarregando.dismiss();
-                if ( snapshot.exists() ){
+                if (snapshot.exists()) {
                     usuarios.clear();
-                    for ( DataSnapshot dado : snapshot.getChildren()){
+                    for (DataSnapshot dado : snapshot.getChildren()) {
                         usuarios.add(dado.getValue(UserModel.class));
                     }
 
@@ -99,7 +107,6 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
     }
-
 
 
 }

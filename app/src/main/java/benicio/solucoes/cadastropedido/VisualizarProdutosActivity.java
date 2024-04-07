@@ -33,7 +33,8 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
 
     private List<ProdutoModel> listaProdutos;
     private List<String> listaNomeProdutos = new ArrayList<>();
-//    private RecyclerView recylerProdutos;
+
+    //    private RecyclerView recylerProdutos;
 //    private AdapterViewProduto adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,49 +47,59 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        listaProdutos = ProdutosUtils.returnProdutos(this);
+
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+
+                listaProdutos = ProdutosUtils.returnProdutos(VisualizarProdutosActivity.this);
 
 
-        for ( ProdutoModel produtoModel : listaProdutos){
-            listaNomeProdutos.add(produtoModel.getNome());
-            listaNomeProdutos.add(produtoModel.getSku());
-        }
-        
-
-        String[] sugestoes = listaNomeProdutos.toArray(new String[0]);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoes);
-
-        mainBinding.btnLimpar.setOnClickListener(view -> {
-            mainBinding.autoCompleteFiltro.setText("");
-            mainBinding.textInfo.setText("");
-        });
-
-
-        mainBinding.autoCompleteFiltro.setAdapter(adapter);
-
-        mainBinding.autoCompleteFiltro.setOnClickListener(view -> mainBinding.autoCompleteFiltro.showDropDown());
-
-        mainBinding.autoCompleteFiltro.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedFrase = (String) parent.getItemAtPosition(position);
-            mainBinding.autoCompleteFiltro.setText(selectedFrase);
-
-            for ( ProdutoModel produtoModel : listaProdutos){
-                if ( produtoModel.getNome().equals(selectedFrase)){
-                    mainBinding.textInfo.setText(
-                            produtoModel.toString()
-                    );
-                    break;
+                for (ProdutoModel produtoModel : listaProdutos) {
+                    listaNomeProdutos.add(produtoModel.getNome());
+                    listaNomeProdutos.add(produtoModel.getSku());
                 }
+
+
+                String[] sugestoes = listaNomeProdutos.toArray(new String[0]);
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(VisualizarProdutosActivity.this, android.R.layout.simple_dropdown_item_1line, sugestoes);
+
+                mainBinding.btnLimpar.setOnClickListener(view -> {
+                    mainBinding.autoCompleteFiltro.setText("");
+                    mainBinding.textInfo.setText("");
+                });
+
+
+                runOnUiThread(() -> mainBinding.autoCompleteFiltro.setAdapter(adapter));
+
+                mainBinding.autoCompleteFiltro.setOnClickListener(view -> mainBinding.autoCompleteFiltro.showDropDown());
+
+                mainBinding.autoCompleteFiltro.setOnItemClickListener((parent, view, position, id) -> {
+                    String selectedFrase = (String) parent.getItemAtPosition(position);
+                    mainBinding.autoCompleteFiltro.setText(selectedFrase);
+
+                    for (ProdutoModel produtoModel : listaProdutos) {
+                        if (produtoModel.getNome().equals(selectedFrase)) {
+                            mainBinding.textInfo.setText(
+                                    produtoModel.toString()
+                            );
+                            break;
+                        }
+                    }
+                    Toast.makeText(getApplicationContext(), selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
+                });
             }
-            Toast.makeText(getApplicationContext(),  selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
-        });
-        mainBinding.btnSearch.setOnClickListener( view -> {
+        }.start();
+
+
+        mainBinding.btnSearch.setOnClickListener(view -> {
             String selectedFrase = mainBinding.autoCompleteFiltro.getText().toString();
 
-            for ( ProdutoModel produtoModel : listaProdutos){
-                if ( produtoModel.getNome().trim().toLowerCase().contains(selectedFrase.trim().toLowerCase())
-                        || produtoModel.getSku().trim().toLowerCase().contains(selectedFrase.trim().toLowerCase())){
+            for (ProdutoModel produtoModel : listaProdutos) {
+                if (produtoModel.getNome().trim().toLowerCase().contains(selectedFrase.trim().toLowerCase())
+                        || produtoModel.getSku().trim().toLowerCase().contains(selectedFrase.trim().toLowerCase())) {
                     mainBinding.textInfo.setText(
                             produtoModel.toString()
                     );
@@ -101,16 +112,18 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
 
 //    private void configurarRecyclerView() {
 //        recylerProdutos = mainBinding.recyclerProdutos;
-//        recylerProdutos.setLayoutManager(new LinearLayoutManager(this));
+//        recylerProdutos.setLayoutManager(new LinearLayoutManager(VisualizarProdutosActivity.this));
 //        recylerProdutos.setHasFixedSize(true);
-//        recylerProdutos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-//        adapter = new AdapterViewProduto(listaProdutos, this);
+//        recylerProdutos.addItemDecoration(new DividerItemDecoration(VisualizarProdutosActivity.this, DividerItemDecoration.VERTICAL));
+//        adapter = new AdapterViewProduto(listaProdutos, VisualizarProdutosActivity.this);
 //        recylerProdutos.setAdapter(adapter);
 //    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if ( item.getItemId() == android.R.id.home){finish();}
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
         return super.onOptionsItemSelected(item);
     }
 

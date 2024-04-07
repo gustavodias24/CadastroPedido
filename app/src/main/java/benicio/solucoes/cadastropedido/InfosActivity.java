@@ -9,6 +9,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
@@ -36,7 +37,7 @@ public class InfosActivity extends AppCompatActivity {
 
     private UserModel usuarioAtual;
     private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
-    private Dialog loadingDialog;
+    //    private Dialog loadingDialog;
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private ActivityInfosBinding mainBinding;
     private List<ClienteModel> clientes = new ArrayList<>();
@@ -56,10 +57,15 @@ public class InfosActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        configurarLoadingDialog();
         encontrarUsuarioAtual();
 
-        configurarToglers();
+        new Thread() {
+            @Override
+            public void run() {
+                configurarToglers();
+                super.run();
+            }
+        }.start();
 
         mainBinding.btnProdutos.setOnClickListener(view -> {
             Intent i = new Intent(this, ProdutosActivity.class);
@@ -109,9 +115,9 @@ public class InfosActivity extends AppCompatActivity {
 
                 usuarioAtual.setIdAgente(idAgente);
 
-                loadingDialog.show();
+//                loadingDialog.show();
                 refUsuarios.child(usuarioAtual.getId()).setValue(usuarioAtual).addOnCompleteListener(task -> {
-                    loadingDialog.dismiss();
+//                    loadingDialog.dismiss();
                     if (task.isSuccessful()) {
                         startActivity(i);
                     } else {
@@ -123,8 +129,6 @@ public class InfosActivity extends AppCompatActivity {
     }
 
     void configurarToglers() {
-        Thread t = new Thread() {
-        };
 
         clientes.addAll(ClientesUtil.returnClientes(this));
 
@@ -145,10 +149,13 @@ public class InfosActivity extends AppCompatActivity {
         ArrayAdapter<String> adapterNomesEmails = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesEmails);
         ArrayAdapter<String> adapterNomesCnpjs = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesCnpjs);
 
-        mainBinding.edtEstabelecimento.setAdapter(adapterNomesEstabelecimentos);
-        mainBinding.edtComprador.setAdapter(adapterNomesClientes);
-        mainBinding.edtEmail.setAdapter(adapterNomesEmails);
-        mainBinding.edtCnpj.setAdapter(adapterNomesCnpjs);
+        runOnUiThread(() -> {
+            mainBinding.edtEstabelecimento.setAdapter(adapterNomesEstabelecimentos);
+            mainBinding.edtComprador.setAdapter(adapterNomesClientes);
+            mainBinding.edtEmail.setAdapter(adapterNomesEmails);
+            mainBinding.edtCnpj.setAdapter(adapterNomesCnpjs);
+        });
+
 
         mainBinding.edtEstabelecimento.setOnClickListener(view -> mainBinding.edtEstabelecimento.showDropDown());
         mainBinding.edtComprador.setOnClickListener(view -> mainBinding.edtComprador.showDropDown());
@@ -162,12 +169,14 @@ public class InfosActivity extends AppCompatActivity {
 
             for (ClienteModel clienteModel : clientes) {
                 if (clienteModel.getNomeEstabelecimento().equals(selectedFrase)) {
-                    mainBinding.edtCnpj.setText(clienteModel.getCnpj());
-                    mainBinding.edtEmail.setText(clienteModel.getEmail());
-                    mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
-                    mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
-                    mainBinding.edtEndereco.setText(clienteModel.getEndereco());
-                    mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    runOnUiThread(() -> {
+                        mainBinding.edtCnpj.setText(clienteModel.getCnpj());
+                        mainBinding.edtEmail.setText(clienteModel.getEmail());
+                        mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
+                        mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
+                        mainBinding.edtEndereco.setText(clienteModel.getEndereco());
+                        mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    });
                     break;
                 }
             }
@@ -181,12 +190,15 @@ public class InfosActivity extends AppCompatActivity {
 
             for (ClienteModel clienteModel : clientes) {
                 if ((clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome()).equals(selectedFrase)) {
-                    mainBinding.edtCnpj.setText(clienteModel.getCnpj());
-                    mainBinding.edtEmail.setText(clienteModel.getEmail());
-                    mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
-                    mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
-                    mainBinding.edtEndereco.setText(clienteModel.getEndereco());
-                    mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    runOnUiThread(() -> {
+                        mainBinding.edtCnpj.setText(clienteModel.getCnpj());
+                        mainBinding.edtEmail.setText(clienteModel.getEmail());
+                        mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
+                        mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
+                        mainBinding.edtEndereco.setText(clienteModel.getEndereco());
+                        mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    });
+
                     break;
                 }
             }
@@ -200,12 +212,15 @@ public class InfosActivity extends AppCompatActivity {
 
             for (ClienteModel clienteModel : clientes) {
                 if (clienteModel.getEmail().equals(selectedFrase)) {
-                    mainBinding.edtCnpj.setText(clienteModel.getCnpj());
-                    mainBinding.edtEmail.setText(clienteModel.getEmail());
-                    mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
-                    mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
-                    mainBinding.edtEndereco.setText(clienteModel.getEndereco());
-                    mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    runOnUiThread(() -> {
+                        mainBinding.edtCnpj.setText(clienteModel.getCnpj());
+                        mainBinding.edtEmail.setText(clienteModel.getEmail());
+                        mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
+                        mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
+                        mainBinding.edtEndereco.setText(clienteModel.getEndereco());
+                        mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    });
+
                     break;
                 }
             }
@@ -219,33 +234,36 @@ public class InfosActivity extends AppCompatActivity {
 
             for (ClienteModel clienteModel : clientes) {
                 if (clienteModel.getCnpj().equals(selectedFrase)) {
-                    mainBinding.edtCnpj.setText(clienteModel.getCnpj());
-                    mainBinding.edtEmail.setText(clienteModel.getEmail());
-                    mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
-                    mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
-                    mainBinding.edtEndereco.setText(clienteModel.getEndereco());
-                    mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    runOnUiThread(() -> {
+                        mainBinding.edtCnpj.setText(clienteModel.getCnpj());
+                        mainBinding.edtEmail.setText(clienteModel.getEmail());
+                        mainBinding.edtComprador.setText(clienteModel.getNomeCliente() + " " + clienteModel.getSobreNome());
+                        mainBinding.edtEstabelecimento.setText(clienteModel.getNomeEstabelecimento());
+                        mainBinding.edtEndereco.setText(clienteModel.getEndereco());
+                        mainBinding.edtTelefone.setText(clienteModel.getTelefone());
+                    });
+
                     break;
                 }
             }
             Toast.makeText(getApplicationContext(), selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
         });
 
-
+        runOnUiThread(() -> mainBinding.layoutCarregando.setVisibility(View.GONE));
     }
 
     private void encontrarUsuarioAtual() {
+        mainBinding.layoutCarregando.setVisibility(View.VISIBLE);
         try {
-            loadingDialog.show();
             refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    loadingDialog.dismiss();
-
+                    mainBinding.progressBarIdAgente.setVisibility(View.GONE);
                     for (DataSnapshot dado : snapshot.getChildren()) {
                         if (dado.getValue(UserModel.class).getEmail().trim().toLowerCase().equals(user.getEmail().trim().toLowerCase())) {
                             usuarioAtual = dado.getValue(UserModel.class);
                             mainBinding.edtAgente.setText(usuarioAtual.getIdAgente());
+
                             break;
                         }
                     }
@@ -253,10 +271,11 @@ public class InfosActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    loadingDialog.dismiss();
+                    mainBinding.progressBarIdAgente.setVisibility(View.GONE);
                 }
             });
         } catch (Exception ignored) {
+            mainBinding.progressBarIdAgente.setVisibility(View.GONE);
         }
 
     }
@@ -272,10 +291,10 @@ public class InfosActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void configurarLoadingDialog() {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setCancelable(false);
-        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
-        loadingDialog = b.create();
-    }
+//    private void configurarLoadingDialog() {
+//        AlertDialog.Builder b = new AlertDialog.Builder(this);
+//        b.setCancelable(false);
+//        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
+//        loadingDialog = b.create();
+//    }
 }

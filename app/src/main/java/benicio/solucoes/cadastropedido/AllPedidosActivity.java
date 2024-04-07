@@ -26,10 +26,12 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import benicio.solucoes.cadastropedido.adapter.AdapterCredito;
 import benicio.solucoes.cadastropedido.adapter.AdapterPedidos;
 import benicio.solucoes.cadastropedido.databinding.ActivityAllPedidosBinding;
 import benicio.solucoes.cadastropedido.databinding.ActivityPedidoVendedorBinding;
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
+import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
 
@@ -39,8 +41,15 @@ public class AllPedidosActivity extends AppCompatActivity {
     private RecyclerView recyclerPedidos;
     public static Dialog loadingDialog;
     public static List<PedidoModel> listaPedidos = new ArrayList<>();
+    public static List<CreditoModel> listaCreditos = new ArrayList<>();
     public static AdapterPedidos adapterPedidos;
+    public static AdapterCredito adapterCredito;
     public static DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
+    public static DatabaseReference refCreditos = FirebaseDatabase.getInstance().getReference().getRoot().child("creditos");
+
+    public static boolean isCredito = false;
+    public Bundle bundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,8 +61,15 @@ public class AllPedidosActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        bundle = getIntent().getExtras();
+        if (bundle != null) {
+            isCredito = bundle.getBoolean("credito", false);
+        }
+
         configurarLoadingDialog();
         configurarRecyclerPedidos();
+
+
     }
 
     private void configurarLoadingDialog() {
@@ -68,35 +84,87 @@ public class AllPedidosActivity extends AppCompatActivity {
         recyclerPedidos.setLayoutManager(new LinearLayoutManager(this));
         recyclerPedidos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerPedidos.setHasFixedSize(true);
-        listaPedidos.addAll(PedidosUtil.returnPedidos(this));
+
+//        listaPedidos.addAll(PedidosUtil.returnPedidos(this));
+
+        if (isCredito) {
+            adapterCredito = new AdapterCredito(listaCreditos, this);
+            recyclerPedidos.setAdapter(adapterCredito);
+        } else {
+            adapterPedidos = new AdapterPedidos(listaPedidos, this, true, loadingDialog);
+            recyclerPedidos.setAdapter(adapterPedidos);
+        }
+
         configurarListener("");
-        adapterPedidos = new AdapterPedidos(listaPedidos, this, true, loadingDialog);
-        recyclerPedidos.setAdapter(adapterPedidos);
+
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if ( item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void configurarListener(String query){
+    public void configurarListener(String query) {
         loadingDialog.show();
-        refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                loadingDialog.dismiss();
-                if ( snapshot.exists() ){
-                    listaPedidos.clear();
-                    for ( DataSnapshot dado : snapshot.getChildren()){
-                        PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
 
-                            if ( query.isEmpty() ){
+        if (isCredito) {
+            refCreditos.addListenerForSingleValueEvent(new ValueEventListener() {
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    loadingDialog.dismiss();
+                    if (snapshot.exists()) {
+                        listaCreditos.clear();
+                        for (DataSnapshot dado : snapshot.getChildren()) {
+                            CreditoModel creditoModel = dado.getValue(CreditoModel.class);
+
+                            if (query.isEmpty()) {
+                                listaCreditos.add(creditoModel);
+                            } else {
+                                assert creditoModel != null;
+                                if (
+                                        creditoModel.getDistribuidor().toLowerCase().trim().contains(query) ||
+                                                creditoModel.getStatus().toLowerCase().trim().contains(query) ||
+                                                creditoModel.getValorSolicitado().toLowerCase().trim().contains(query) ||
+                                                creditoModel.getNome().toLowerCase().trim().contains(query) ||
+                                                creditoModel.getRazaoSocial().toLowerCase().trim().contains(query) ||
+                                                creditoModel.getEmail().toLowerCase().trim().contains(query) ||
+                                                creditoModel.getTelefone().toLowerCase().trim().contains(query) ||
+                                                creditoModel.getCnpj().toLowerCase().trim().contains(query) ||
+                                                creditoModel.getPrazoSocilitado().toLowerCase().trim().contains(query)
+                                ) {
+                                    listaCreditos.add(creditoModel);
+                                }
+                            }
+                        }
+
+                        adapterCredito.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    loadingDialog.dismiss();
+                    Toast.makeText(AllPedidosActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
+                }
+            });
+        } else {
+            refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    loadingDialog.dismiss();
+                    if (snapshot.exists()) {
+                        listaPedidos.clear();
+                        for (DataSnapshot dado : snapshot.getChildren()) {
+                            PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
+
+                            if (query.isEmpty()) {
                                 listaPedidos.add(pedidoModel);
-                            }else{
+                            } else {
                                 assert pedidoModel != null;
                                 if (
                                         pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
@@ -108,22 +176,23 @@ public class AllPedidosActivity extends AppCompatActivity {
                                                 pedidoModel.getTele().toLowerCase().trim().contains(query) ||
                                                 pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
                                                 pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
-                                ){
+                                ) {
                                     listaPedidos.add(pedidoModel);
                                 }
                             }
+                        }
+
+                        adapterPedidos.notifyDataSetChanged();
                     }
-
-                    adapterPedidos.notifyDataSetChanged();
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                loadingDialog.dismiss();
-                Toast.makeText(AllPedidosActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    loadingDialog.dismiss();
+                    Toast.makeText(AllPedidosActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     @Override

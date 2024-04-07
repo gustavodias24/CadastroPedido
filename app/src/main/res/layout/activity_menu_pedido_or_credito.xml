@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="16dp"
-            android:text="v2.0"
+            android:text="v3.0"
             android:textStyle="bold" />
 
     </LinearLayout>

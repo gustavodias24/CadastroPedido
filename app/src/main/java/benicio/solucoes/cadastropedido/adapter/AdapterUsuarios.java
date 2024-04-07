@@ -37,6 +37,7 @@ public class AdapterUsuarios extends RecyclerView.Adapter<AdapterUsuarios.MyView
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         holder.btnExcluir.setVisibility(View.GONE);
         holder.btn_ver_pedidos_vendedores.setVisibility(View.VISIBLE);
+        holder.btn_ver_pedidos_creditos.setVisibility(View.VISIBLE);
         UserModel user = usuarios.get(position);
 
         holder.itemView.getRootView().setClickable(false);
@@ -44,6 +45,14 @@ public class AdapterUsuarios extends RecyclerView.Adapter<AdapterUsuarios.MyView
             Intent t = new Intent(c, PedidoVendedorActivity.class);
             t.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             t.putExtra("idUsuario", user.getId());
+            c.startActivity(t);
+        });
+
+        holder.btn_ver_pedidos_creditos.setOnClickListener(v -> {
+            Intent t = new Intent(c, PedidoVendedorActivity.class);
+            t.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            t.putExtra("idUsuario", user.getId());
+            t.putExtra("credito", true);
             c.startActivity(t);
         });
         holder.info.setText(
@@ -61,7 +70,7 @@ public class AdapterUsuarios extends RecyclerView.Adapter<AdapterUsuarios.MyView
         TextView info;
         ImageButton btnExcluir;
 
-        Button btn_ver_pedidos_vendedores;
+        Button btn_ver_pedidos_vendedores, btn_ver_pedidos_creditos;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -69,6 +78,7 @@ public class AdapterUsuarios extends RecyclerView.Adapter<AdapterUsuarios.MyView
             info = itemView.findViewById(R.id.text_info_generic);
             btnExcluir = itemView.findViewById(R.id.btn_remover_item);
             btn_ver_pedidos_vendedores = itemView.findViewById(R.id.btn_ver_pedidos_vendedores);
+            btn_ver_pedidos_creditos = itemView.findViewById(R.id.btn_ver_pedidos_creditos);
         }
     }
 }

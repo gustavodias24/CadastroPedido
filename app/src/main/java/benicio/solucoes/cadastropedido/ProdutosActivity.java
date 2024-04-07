@@ -48,7 +48,7 @@ import retrofit2.Retrofit;
 
 public class ProdutosActivity extends AppCompatActivity {
     private boolean jaTemRegra = false;
-    private Dialog loadingDialog;
+    //    private Dialog loadingDialog;
     private int valorMinimo = 0;
     private RecyclerView r;
     private ActivityProdutosBinding mainBinding;
@@ -74,7 +74,7 @@ public class ProdutosActivity extends AppCompatActivity {
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        configurarLoadingDialog();
+//        configurarLoadingDialog();
 
         retrofit = RetrofitUitl.criarRetrofit();
         services = RetrofitUitl.criarService(retrofit);
@@ -85,69 +85,79 @@ public class ProdutosActivity extends AppCompatActivity {
 
         configurarRecycler();
 
-        b = getIntent().getExtras();
-        Gson gson = new Gson();
-        Type type = new TypeToken<PedidoModel>() {
-        }.getType();
-        pedidoModel = gson.fromJson(b.getString("dadosPedido", ""), type);
+//        loadingDialog.show();
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                b = getIntent().getExtras();
+                Gson gson = new Gson();
+                Type type = new TypeToken<PedidoModel>() {
+                }.getType();
+                pedidoModel = gson.fromJson(b.getString("dadosPedido", ""), type);
 
-        listaProdutos = ProdutosUtils.returnProdutos(this);
-        for (ProdutoModel produtoModel : listaProdutos) {
-            listaNomeProdutos.add(produtoModel.getNome() + " -F- " + produtoModel.getFornecedor());
-            listaNomeSKU.add(produtoModel.getSku());
-        }
+                listaProdutos = ProdutosUtils.returnProdutos(ProdutosActivity.this);
+                for (ProdutoModel produtoModel : listaProdutos) {
+                    listaNomeProdutos.add(produtoModel.getNome() + " -F- " + produtoModel.getFornecedor());
+                    listaNomeSKU.add(produtoModel.getSku());
+                }
 
-        String[] sugestoes = listaNomeProdutos.toArray(new String[0]);
-        String[] sugestoesSKU = listaNomeSKU.toArray(new String[0]);
+                String[] sugestoes = listaNomeProdutos.toArray(new String[0]);
+                String[] sugestoesSKU = listaNomeSKU.toArray(new String[0]);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.custom_dropdown_item, R.id.textoProdutos, sugestoes);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(ProdutosActivity.this, R.layout.custom_dropdown_item, R.id.textoProdutos, sugestoes);
 //        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoes);
-        ArrayAdapter<String> adapterSKU = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesSKU);
+                ArrayAdapter<String> adapterSKU = new ArrayAdapter<>(ProdutosActivity.this, android.R.layout.simple_dropdown_item_1line, sugestoesSKU);
 
-        mainBinding.edtNomeProduto.setAdapter(adapter);
-        mainBinding.edtSKU.setAdapter(adapterSKU);
+                runOnUiThread(() -> {
+                    mainBinding.edtNomeProduto.setAdapter(adapter);
+                    mainBinding.edtSKU.setAdapter(adapterSKU);
+                });
 
-        mainBinding.edtNomeProduto.setOnClickListener(view -> mainBinding.edtNomeProduto.showDropDown());
-        mainBinding.edtSKU.setOnClickListener(view -> mainBinding.edtSKU.showDropDown());
+                mainBinding.edtNomeProduto.setOnClickListener(view -> mainBinding.edtNomeProduto.showDropDown());
+                mainBinding.edtSKU.setOnClickListener(view -> mainBinding.edtSKU.showDropDown());
 
-        mainBinding.edtSKU.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedFrase = (String) parent.getItemAtPosition(position);
-            mainBinding.edtSKU.setText(selectedFrase);
+                mainBinding.edtSKU.setOnItemClickListener((parent, view, position, id) -> {
+                    String selectedFrase = (String) parent.getItemAtPosition(position);
+                    mainBinding.edtSKU.setText(selectedFrase);
 
-            for (ProdutoModel produtoModel : listaProdutos) {
-                if (produtoModel.getSku().equals(selectedFrase)) {
-                    configurarRegra(produtoModel.getFornecedor());
-                    mainBinding.edtNomeProduto.setText(produtoModel.getNome());
-                    mainBinding.edtSKU.setText(produtoModel.getSku());
-                    mainBinding.edtValor.setText(formatarMoeda(produtoModel.getPreco()));
-                    mainBinding.textEstoque.setText("Esse produto tem " + produtoModel.getEstoque() + " no estoque.");
-                    estoqueAtual = produtoModel.getEstoque();
-                    mainBinding.textEstoque.setVisibility(View.VISIBLE);
-                    break;
-                }
+                    for (ProdutoModel produtoModel : listaProdutos) {
+                        if (produtoModel.getSku().equals(selectedFrase)) {
+                            configurarRegra(produtoModel.getFornecedor());
+                            mainBinding.edtNomeProduto.setText(produtoModel.getNome());
+                            mainBinding.edtSKU.setText(produtoModel.getSku());
+                            mainBinding.edtValor.setText(formatarMoeda(produtoModel.getPreco()));
+                            mainBinding.textEstoque.setText("Esse produto tem " + produtoModel.getEstoque() + " no estoque.");
+                            estoqueAtual = produtoModel.getEstoque();
+                            mainBinding.textEstoque.setVisibility(View.VISIBLE);
+                            break;
+                        }
+                    }
+
+                    Toast.makeText(getApplicationContext(), selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
+                });
+
+                mainBinding.edtNomeProduto.setOnItemClickListener((parent, view, position, id) -> {
+                    String selectedFrase = (String) parent.getItemAtPosition(position);
+                    selectedFrase = selectedFrase.split(" -F- ")[0];
+                    mainBinding.edtNomeProduto.setText(selectedFrase);
+
+                    for (ProdutoModel produtoModel : listaProdutos) {
+                        if (produtoModel.getNome().equals(selectedFrase)) {
+                            configurarRegra(produtoModel.getFornecedor());
+                            mainBinding.edtSKU.setText(produtoModel.getSku());
+                            mainBinding.edtValor.setText(formatarMoeda(produtoModel.getPreco()));
+                            mainBinding.textEstoque.setText("Esse produto tem " + produtoModel.getEstoque() + " no estoque.");
+                            estoqueAtual = produtoModel.getEstoque();
+                            mainBinding.textEstoque.setVisibility(View.VISIBLE);
+                            break;
+                        }
+                    }
+                    Toast.makeText(getApplicationContext(), selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
+                });
+                runOnUiThread(() -> mainBinding.layoutCarregando.setVisibility(View.GONE));
             }
-
-            Toast.makeText(getApplicationContext(), selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
-        });
-
-        mainBinding.edtNomeProduto.setOnItemClickListener((parent, view, position, id) -> {
-            String selectedFrase = (String) parent.getItemAtPosition(position);
-            selectedFrase = selectedFrase.split(" -F- ")[0];
-            mainBinding.edtNomeProduto.setText(selectedFrase);
-
-            for (ProdutoModel produtoModel : listaProdutos) {
-                if (produtoModel.getNome().equals(selectedFrase)) {
-                    configurarRegra(produtoModel.getFornecedor());
-                    mainBinding.edtSKU.setText(produtoModel.getSku());
-                    mainBinding.edtValor.setText(formatarMoeda(produtoModel.getPreco()));
-                    mainBinding.textEstoque.setText("Esse produto tem " + produtoModel.getEstoque() + " no estoque.");
-                    estoqueAtual = produtoModel.getEstoque();
-                    mainBinding.textEstoque.setVisibility(View.VISIBLE);
-                    break;
-                }
-            }
-            Toast.makeText(getApplicationContext(), selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
-        });
+        }.start();
 
 
         mainBinding.btnCalcular.setOnClickListener(view -> calcularValorProduto());
@@ -221,23 +231,17 @@ public class ProdutosActivity extends AppCompatActivity {
         });
     }
 
-    private void configurarLoadingDialog() {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setCancelable(false);
-        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
-        loadingDialog = b.create();
-    }
 
     private void configurarRegra(String nomeDist) {
         if (!jaTemRegra) {
-            loadingDialog.show();
+            mainBinding.progressBarRegraDistri.setVisibility(View.VISIBLE);
             StringBuilder regrasDist = new StringBuilder();
             regrasDist.append("Regras do Distribuidor").append("\n");
 
             services.pegarDistribuidores().enqueue(new Callback<List<DistribuidorModel>>() {
                 @Override
                 public void onResponse(Call<List<DistribuidorModel>> call, Response<List<DistribuidorModel>> response) {
-                    loadingDialog.dismiss();
+                    mainBinding.progressBarRegraDistri.setVisibility(View.GONE);
                     if (response.isSuccessful()) {
                         for (DistribuidorModel distribuidorModel : response.body()) {
                             if (nomeDist.equals(distribuidorModel.getEmpresa())) {
@@ -267,7 +271,7 @@ public class ProdutosActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<List<DistribuidorModel>> call, Throwable t) {
-                    loadingDialog.dismiss();
+                    mainBinding.progressBarRegraDistri.setVisibility(View.GONE);
                 }
             });
         }

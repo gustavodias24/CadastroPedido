@@ -42,6 +42,7 @@ import java.util.List;
 
 import benicio.solucoes.cadastropedido.adapter.AdapterPedidos;
 import benicio.solucoes.cadastropedido.databinding.ActivityMainBinding;
+import benicio.solucoes.cadastropedido.databinding.ActivityMenuPedidoOrCreditoBinding;
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.ClienteModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding mainBinding;
     private ProdutosServices produtosServices;
-    private Dialog loadingDialog;
+    //    private Dialog loadingDialog;
     private SharedPreferences updatePrefs;
     private SharedPreferences.Editor editor;
 
@@ -86,10 +87,16 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        configurarLoadingDialog();
+//        configurarLoadingDialog();
         configurarPrefs();
 
-        verificarUpdates();
+        new Thread() {
+            @Override
+            public void run() {
+                verificarUpdates();
+                super.run();
+            }
+        }.start();
 
 
         produtosServices = RetrofitUitl.criarService(RetrofitUitl.criarRetrofit());
@@ -107,35 +114,46 @@ public class MainActivity extends AppCompatActivity {
 
         mainBinding.btnAtualizarBase.setOnClickListener(view -> atualizarBaseProdutos());
 
-        mainBinding.btnAtualizarBaseClientes.setOnClickListener(view -> {
-            loadingDialog.show();
+        mainBinding.btnAtualizarBaseClientes.setOnClickListener(view -> atualizarBaseClientes());
+    }
 
+    private void atualizarBaseClientes() {
+
+        mainBinding.progressBarClientes.setVisibility(View.VISIBLE);
+
+        new Thread(() -> {
             produtosServices.atualizarBaseCliente().enqueue(new Callback<List<ClienteModel>>() {
                 @Override
                 public void onResponse(Call<List<ClienteModel>> call, Response<List<ClienteModel>> response) {
+
+                    runOnUiThread(() -> mainBinding.progressBarClientes.setVisibility(View.GONE));
                     if (response.isSuccessful()) {
                         ClientesUtil.saveClientes(getApplicationContext(), response.body());
-                        Toast.makeText(MainActivity.this, "Base  de clientes atualizada!", Toast.LENGTH_SHORT).show();
-                        LocalDateTime agora = LocalDateTime.now();
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                        String formatado = agora.format(formatter);
-                        mainBinding.ultimoUpdateCliente.setText("Última Atualização: " + formatado);
-                        editor.putString("dataCliente", formatado).apply();
-                    } else {
-                        Toast.makeText(MainActivity.this, response.message(), Toast.LENGTH_SHORT).show();
-                    }
 
-                    loadingDialog.dismiss();
+                        runOnUiThread(() -> {
+                            Toast.makeText(MainActivity.this, "Base  de clientes atualizada!", Toast.LENGTH_SHORT).show();
+                            LocalDateTime agora = LocalDateTime.now();
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                            String formatado = agora.format(formatter);
+                            mainBinding.ultimoUpdateCliente.setText("Última Atualização: " + formatado);
+                            editor.putString("dataCliente", formatado).apply();
+                        });
+
+                    } else {
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, response.message(), Toast.LENGTH_SHORT).show());
+                    }
                 }
 
                 @Override
                 public void onFailure(Call<List<ClienteModel>> call, Throwable t) {
-                    loadingDialog.dismiss();
-                    Log.d("mayara", "onFailure: " + t.getMessage());
-                    Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
+                    runOnUiThread(() -> {
+                        mainBinding.progressBarClientes.setVisibility(View.GONE);
+                        Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
+                    });
                 }
             });
-        });
+        }).start();
+
     }
 
     private void verificarUpdates() {
@@ -160,35 +178,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void atualizarBaseProdutos() {
-        loadingDialog.show();
-        produtosServices.atualizarBase().enqueue(new Callback<List<ProdutoModel>>() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onResponse(Call<List<ProdutoModel>> call, Response<List<ProdutoModel>> response) {
-                if (response.isSuccessful()) {
-                    ProdutosUtils.saveProdutos(getApplicationContext(), response.body());
-                    Toast.makeText(MainActivity.this, "Base atualizada!", Toast.LENGTH_SHORT).show();
-                    mainBinding.ultimoUpdate.setText("Última Atualização: " + ultimoUpdateDatabase);
-                    editor.putString("data", ultimoUpdateDatabase).apply();
-                } else {
-                    Toast.makeText(MainActivity.this, response.message(), Toast.LENGTH_SHORT).show();
+
+        Toast.makeText(this, "Atualizando Aguarde!", Toast.LENGTH_SHORT).show();
+        mainBinding.progressBarProdutos.setVisibility(View.VISIBLE);
+
+        new Thread(() -> {
+            produtosServices.atualizarBase().enqueue(new Callback<List<ProdutoModel>>() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onResponse(Call<List<ProdutoModel>> call, Response<List<ProdutoModel>> response) {
+
+                    runOnUiThread(() -> mainBinding.progressBarProdutos.setVisibility(View.GONE));
+                    if (response.isSuccessful()) {
+                        ProdutosUtils.saveProdutos(getApplicationContext(), response.body());
+
+                        runOnUiThread(() -> {
+                            Toast.makeText(MainActivity.this, "Base atualizada!", Toast.LENGTH_SHORT).show();
+                            mainBinding.ultimoUpdate.setText("Última Atualização: " + ultimoUpdateDatabase);
+                            editor.putString("data", ultimoUpdateDatabase).apply();
+                        });
+
+                    } else {
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, response.message(), Toast.LENGTH_SHORT).show());
+                    }
+
                 }
 
-                loadingDialog.dismiss();
-            }
+                @Override
+                public void onFailure(Call<List<ProdutoModel>> call, Throwable t) {
+                    runOnUiThread(() -> {
+                        mainBinding.progressBarProdutos.setVisibility(View.GONE);
+                        Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
+        }).start();
 
-            @Override
-            public void onFailure(Call<List<ProdutoModel>> call, Throwable t) {
-                loadingDialog.dismiss();
-                Log.d("mayara", "onFailure: " + t.getMessage());
-                Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void configurarIdVendedor() {
+//        runOnUiThread(() -> loadingDialog.show());
 
-        loadingDialog.show();
         refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -208,7 +238,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                loadingDialog.dismiss();
+
+//                loadingDialog.dismiss();
             }
         });
     }
@@ -243,17 +274,21 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(this, CadastroLoginActivity.class));
             auth.signOut();
         } else if (item.getItemId() == android.R.id.home) {
+            startActivity(new Intent(this, MenuPedidoOrCreditoActivity.class));
             finish();
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void configurarListener(String query) {
+
+        mainBinding.textCarregando.setVisibility(View.VISIBLE);
+        mainBinding.recyclerPedidos.setVisibility(View.INVISIBLE);
         refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                loadingDialog.dismiss();
+//                runOnUiThread(() -> loadingDialog.dismiss());
                 if (snapshot.exists()) {
                     listaPedidos.clear();
                     for (DataSnapshot dado : snapshot.getChildren()) {
@@ -281,16 +316,24 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
-                    adapterPedidos.notifyDataSetChanged();
+                    runOnUiThread(() -> {
+                        adapterPedidos.notifyDataSetChanged();
+                        mainBinding.textCarregando.setVisibility(View.GONE);
+                        mainBinding.recyclerPedidos.setVisibility(View.VISIBLE);
+                    });
+
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                loadingDialog.dismiss();
-                Toast.makeText(MainActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
+                runOnUiThread(() -> {
+                    mainBinding.textCarregando.setVisibility(View.GONE);
+                    Toast.makeText(MainActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
+                });
             }
         });
+
     }
 
     private void configurarRecyclerPedidos() {
@@ -312,12 +355,12 @@ public class MainActivity extends AppCompatActivity {
         mainBinding.ultimoUpdateCliente.setText("Última Atualização: " + updatePrefs.getString("dataCliente", ""));
     }
 
-    private void configurarLoadingDialog() {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setCancelable(false);
-        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
-        loadingDialog = b.create();
-    }
+//    private void configurarLoadingDialog() {
+//        AlertDialog.Builder b = new AlertDialog.Builder(this);
+//        b.setCancelable(false);
+//        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
+//        loadingDialog = b.create();
+//    }
 
 }
 

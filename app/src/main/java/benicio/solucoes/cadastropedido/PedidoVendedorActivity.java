@@ -24,23 +24,30 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import benicio.solucoes.cadastropedido.adapter.AdapterCredito;
 import benicio.solucoes.cadastropedido.adapter.AdapterPedidos;
 import benicio.solucoes.cadastropedido.databinding.ActivityAdminBinding;
 import benicio.solucoes.cadastropedido.databinding.ActivityPedidoVendedorBinding;
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
+import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
 
 public class PedidoVendedorActivity extends AppCompatActivity {
 
     public static DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
+    public static DatabaseReference refCreditos = FirebaseDatabase.getInstance().getReference().getRoot().child("creditos");
     public static AdapterPedidos adapterPedidos;
+    public static AdapterCredito adapterCredito;
     public static List<PedidoModel> listaPedidos = new ArrayList<>();
+    public static List<CreditoModel> listaCreditos = new ArrayList<>();
     public static Dialog loadingDialog;
     private ActivityPedidoVendedorBinding mainBinding;
     private RecyclerView recyclerPedidos;
     public static String idUsuario;
     private Bundle b;
+    static  boolean isCredito = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,13 +62,15 @@ public class PedidoVendedorActivity extends AppCompatActivity {
         b = getIntent().getExtras();
         idUsuario = b.getString("idUsuario", "");
 
+        isCredito = b.getBoolean("credito", false);
+
         configurarLoadingDialog();
         configurarRecyclerPedidos();
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if ( item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             finish();
         }
         return super.onOptionsItemSelected(item);
@@ -72,10 +81,19 @@ public class PedidoVendedorActivity extends AppCompatActivity {
         recyclerPedidos.setLayoutManager(new LinearLayoutManager(this));
         recyclerPedidos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerPedidos.setHasFixedSize(true);
-        listaPedidos.addAll(PedidosUtil.returnPedidos(this));
+//        listaPedidos.addAll(PedidosUtil.returnPedidos(this));
+
+
+        if (isCredito) {
+            adapterCredito = new AdapterCredito(listaCreditos, this);
+            recyclerPedidos.setAdapter(adapterCredito);
+        } else {
+            adapterPedidos = new AdapterPedidos(listaPedidos, this, true, loadingDialog);
+            recyclerPedidos.setAdapter(adapterPedidos);
+        }
+
         configurarListener("", this);
-        adapterPedidos = new AdapterPedidos(listaPedidos, this, true, loadingDialog);
-        recyclerPedidos.setAdapter(adapterPedidos);
+
     }
 
     private void configurarLoadingDialog() {
@@ -85,49 +103,100 @@ public class PedidoVendedorActivity extends AppCompatActivity {
         loadingDialog = b.create();
     }
 
-    public static void configurarListener(String query, Context c){
+    public static void configurarListener(String query, Context c) {
         loadingDialog.show();
-        refPedidos.addValueEventListener(new ValueEventListener() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                loadingDialog.dismiss();
-                if ( snapshot.exists() ){
-                    listaPedidos.clear();
-                    for ( DataSnapshot dado : snapshot.getChildren()){
-                        PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
 
-                        if ( pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)){
-                            if ( query.isEmpty() ){
-                                listaPedidos.add(pedidoModel);
-                            }else{
-                                assert pedidoModel != null;
-                                if (
-                                        pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getData().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getIdAgente().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getNomeEstabelecimento().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getNomeComprador().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getTele().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
-                                ){
-                                    listaPedidos.add(pedidoModel);
+        if (isCredito){
+            refCreditos.addValueEventListener(new ValueEventListener() {
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    loadingDialog.dismiss();
+
+                    if (snapshot.exists()) {
+                        listaCreditos.clear();
+                        for (DataSnapshot dado : snapshot.getChildren()) {
+
+                            CreditoModel creditoModel = dado.getValue(CreditoModel.class);
+
+                            if (creditoModel.getIdVendedor() != null && creditoModel.getIdVendedor().equals(idUsuario)) {
+                                if (query.isEmpty()) {
+                                    listaCreditos.add(creditoModel);
+                                } else {
+                                    assert creditoModel != null;
+                                    if (
+                                            creditoModel.getDistribuidor().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getStatus().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getValorSolicitado().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getNome().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getRazaoSocial().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getEmail().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getTelefone().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getCnpj().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getPrazoSocilitado().toLowerCase().trim().contains(query)
+                                    ) {
+                                        listaCreditos.add(creditoModel);
+                                    }
                                 }
                             }
                         }
+
+                        adapterCredito.notifyDataSetChanged();
                     }
-
-                    adapterPedidos.notifyDataSetChanged();
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                loadingDialog.dismiss();
-                Toast.makeText(c, "Sem Conexão", Toast.LENGTH_LONG).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    loadingDialog.dismiss();
+                    Toast.makeText(c, "Sem Conexão", Toast.LENGTH_LONG).show();
+                }
+            });
+        }else{
+            refPedidos.addValueEventListener(new ValueEventListener() {
+                @SuppressLint("NotifyDataSetChanged")
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    loadingDialog.dismiss();
+
+                    if (snapshot.exists()) {
+                        listaPedidos.clear();
+                        for (DataSnapshot dado : snapshot.getChildren()) {
+
+                            PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
+
+                            if (pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)) {
+                                if (query.isEmpty()) {
+                                    listaPedidos.add(pedidoModel);
+                                } else {
+                                    assert pedidoModel != null;
+                                    if (
+                                            pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getData().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getIdAgente().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getNomeEstabelecimento().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getNomeComprador().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getTele().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
+                                    ) {
+                                        listaPedidos.add(pedidoModel);
+                                    }
+                                }
+                            }
+                        }
+
+                        adapterPedidos.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    loadingDialog.dismiss();
+                    Toast.makeText(c, "Sem Conexão", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+
     }
 }
