@@ -8,8 +8,11 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,15 +20,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import benicio.solucoes.cadastropedido.databinding.ActivityCriarInfoCreditoBinding;
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.CreditoModel;
+import benicio.solucoes.cadastropedido.model.UserModel;
 import benicio.solucoes.cadastropedido.util.MathUtils;
 
 public class CriarInfoCreditoActivity extends AppCompatActivity {
-
+    private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
+    //    private Dialog loadingDialog;
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private String idAgent = "";
     private ActivityCriarInfoCreditoBinding mainBinding;
     private DatabaseReference refCreditos = FirebaseDatabase.getInstance().getReference().getRoot().child("creditos");
 
@@ -37,6 +46,7 @@ public class CriarInfoCreditoActivity extends AppCompatActivity {
         mainBinding = ActivityCriarInfoCreditoBinding.inflate(getLayoutInflater());
         setContentView(mainBinding.getRoot());
 
+        encontrarUsuarioAtual();
         configurarLoadingDialog();
 
         getSupportActionBar().setTitle("Pedido de Crédito");
@@ -73,7 +83,9 @@ public class CriarInfoCreditoActivity extends AppCompatActivity {
                         mainBinding.edtPrazo.getText().toString(),
                         mainBinding.edtValor.getText().toString(),
                         mainBinding.edtDistribuidor.getText().toString(),
-                        "pendente"
+                        "pendente",
+                        new SimpleDateFormat("dd/MM/yyyy").format(new Date()),
+                        idAgent
                 );
 
                 loadingDialog.show();
@@ -103,6 +115,30 @@ public class CriarInfoCreditoActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+
+    private void encontrarUsuarioAtual() {
+        try {
+            refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                    for (DataSnapshot dado : snapshot.getChildren()) {
+                        if (dado.getValue(UserModel.class).getEmail().trim().toLowerCase().equals(user.getEmail().trim().toLowerCase())) {
+                            idAgent = dado.getValue(UserModel.class).getIdAgente();
+                            break;
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+        } catch (Exception ignored) {
+        }
+
     }
 
     @Override

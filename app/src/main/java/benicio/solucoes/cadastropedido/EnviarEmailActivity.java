@@ -32,6 +32,7 @@ import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.UserModel;
+import benicio.solucoes.cadastropedido.util.MathUtils;
 
 public class EnviarEmailActivity extends AppCompatActivity {
 
@@ -101,17 +102,37 @@ public class EnviarEmailActivity extends AppCompatActivity {
                     }
                 });
             } else {
-                pedido.setId(UUID.randomUUID().toString());
                 pedido.setIdVendedor(idVendedor);
+
                 loadingDialog.show();
-                refPedidos.child(pedido.getId()).setValue(pedido).addOnCompleteListener(task -> {
-                    loadingDialog.dismiss();
-                    if (task.isSuccessful()) {
-                        Toast.makeText(this, "Pedido Criado!", Toast.LENGTH_SHORT).show();
-                        finish();
-                        startActivity(new Intent(this, MainActivity.class));
+
+                refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        int count = 0;
+                        for (DataSnapshot dado : snapshot.getChildren()) {
+                            count++;
+                        }
+
+                        pedido.setId(MathUtils.formatarNumero(count));
+
+                        refPedidos.child(pedido.getId()).setValue(pedido).addOnCompleteListener(task -> {
+                            loadingDialog.dismiss();
+                            if (task.isSuccessful()) {
+                                Toast.makeText(EnviarEmailActivity.this, "Pedido Criado!", Toast.LENGTH_SHORT).show();
+                                finish();
+                                startActivity(new Intent(EnviarEmailActivity.this, MainActivity.class));
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        loadingDialog.dismiss();
                     }
                 });
+
             }
 
         });

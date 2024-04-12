@@ -22,7 +22,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import benicio.solucoes.cadastropedido.databinding.ActivityInfosBinding;
@@ -56,6 +58,10 @@ public class InfosActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Pedido");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        mainBinding.edtData.setText(
+                new SimpleDateFormat("dd/MM/yyyy").format(new Date())
+        );
 
         encontrarUsuarioAtual();
 

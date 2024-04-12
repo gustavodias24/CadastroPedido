@@ -33,6 +33,7 @@ import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.UserModel;
+import benicio.solucoes.cadastropedido.util.CSVGenerator;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
 
 public class MenuCreditoActivity extends AppCompatActivity {
@@ -67,8 +68,12 @@ public class MenuCreditoActivity extends AppCompatActivity {
 
         mainBinding.pesquisarProduto.setOnClickListener(view -> {
             String query = mainBinding.edtPesquisa.getText().toString();
-            configurarListener(query);
+            configurarListener(query, false);
         });
+
+        mainBinding.filtrarPeriodo.setOnClickListener( v -> configurarListener("", true));
+
+        mainBinding.btnGerarRelatorio.setOnClickListener(v -> CSVGenerator.gerarCreditoADMCSV(this, lista));
     }
 
     @Override
@@ -99,7 +104,7 @@ public class MenuCreditoActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                configurarListener(newText.toLowerCase().trim());
+                configurarListener(newText.toLowerCase().trim(), false);
                 return true;
             }
         });
@@ -113,12 +118,12 @@ public class MenuCreditoActivity extends AppCompatActivity {
         recyclerPedidos.setLayoutManager(new LinearLayoutManager(this));
         recyclerPedidos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerPedidos.setHasFixedSize(true);
-        configurarListener("");
+        configurarListener("", false);
         adapterCredito = new AdapterCredito(lista, this);
         recyclerPedidos.setAdapter(adapterCredito);
     }
 
-    private void configurarListener(String query) {
+    private void configurarListener(String query, boolean filterPeriodo) {
         loadingDialog.show();
         refCreditos.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
@@ -132,7 +137,18 @@ public class MenuCreditoActivity extends AppCompatActivity {
 
                         if (pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)) {
                             if (query.isEmpty()) {
-                                lista.add(pedidoModel);
+//                                lista.add(pedidoModel);
+                                if (filterPeriodo) {
+                                    if (PedidosUtil.verificarIntervalo(
+                                            pedidoModel.getData(),
+                                            mainBinding.edtDataInicial.getText().toString(),
+                                            mainBinding.edtDataFinal.getText().toString()
+                                    )) {
+                                        lista.add(pedidoModel);
+                                    }
+                                } else {
+                                    lista.add(pedidoModel);
+                                }
                             } else {
                                 assert pedidoModel != null;
                                 if (
@@ -187,7 +203,7 @@ public class MenuCreditoActivity extends AppCompatActivity {
                     }
                 }
 
-                configurarListener("");
+                configurarListener("", false);
 
             }
 

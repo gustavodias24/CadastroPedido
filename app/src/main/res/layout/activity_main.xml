@@ -78,37 +78,106 @@
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Filtragem:"
-            android:textAlignment="textStart"
-            android:visibility="visible" />
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/contorno"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Filtragem:"
+                android:textAlignment="textStart"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edtPesquisa"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="Filtrar Pedidos"
+                    android:inputType="text" />
+
+                <ImageButton
+                    android:id="@+id/pesquisarProduto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/botaoColor"
+                    android:src="@android:drawable/ic_menu_search" />
+
+            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:orientation="horizontal">
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/contorno"
+            android:orientation="vertical"
+            android:padding="8dp">
 
-            <EditText
-                android:id="@+id/edtPesquisa"
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ems="10"
-                android:hint="Filtrar Pedidos"
-                android:inputType="text" />
+                android:text="Período:"
+                android:textAlignment="textStart"
+                android:visibility="visible" />
 
-            <ImageButton
-                android:id="@+id/pesquisarProduto"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/botaoColor"
-                android:src="@android:drawable/ic_menu_search" />
+                android:orientation="horizontal">
 
+                <com.vicmikhailau.maskededittext.MaskedEditText
+                    android:id="@+id/edtDataInicial"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="Data Inicial"
+                    android:inputType="datetime|date"
+                    app:mask="##/##/####" />
+
+                <com.vicmikhailau.maskededittext.MaskedEditText
+                    android:id="@+id/edtDataFinal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="Data Final"
+                    android:inputType="datetime|date"
+                    app:mask="##/##/####" />
+
+                <ImageButton
+                    android:id="@+id/filtrarPeriodo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/botaoColor"
+                    android:src="@android:drawable/ic_menu_search" />
+
+            </LinearLayout>
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_gerar_relatorio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/botaoColor"
+            android:text="gerar relatório"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/pedidosText"

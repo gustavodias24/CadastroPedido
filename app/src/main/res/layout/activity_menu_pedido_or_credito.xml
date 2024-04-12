@@ -9,11 +9,16 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:orientation="vertical"
         android:padding="8dp"
         tools:context=".MenuPedidoOrCreditoActivity">
 
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/logo2" />
 
         <Button
             android:id="@+id/pedido"
@@ -48,7 +53,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="16dp"
-            android:text="v3.0"
+            android:text="@string/versao"
             android:textStyle="bold" />
 
     </LinearLayout>

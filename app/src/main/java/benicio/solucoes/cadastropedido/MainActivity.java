@@ -49,6 +49,7 @@ import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
 import benicio.solucoes.cadastropedido.model.UserModel;
 import benicio.solucoes.cadastropedido.service.ProdutosServices;
+import benicio.solucoes.cadastropedido.util.CSVGenerator;
 import benicio.solucoes.cadastropedido.util.ClientesUtil;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
 import benicio.solucoes.cadastropedido.util.ProdutosUtils;
@@ -109,12 +110,19 @@ public class MainActivity extends AppCompatActivity {
 
         mainBinding.pesquisarProduto.setOnClickListener(view -> {
             String pesquisa = mainBinding.edtPesquisa.getText().toString();
-            configurarListener(pesquisa.toLowerCase().trim());
+            configurarListener(pesquisa.toLowerCase().trim(), false);
         });
+
+        mainBinding.filtrarPeriodo.setOnClickListener(v -> configurarListener("", true));
 
         mainBinding.btnAtualizarBase.setOnClickListener(view -> atualizarBaseProdutos());
 
         mainBinding.btnAtualizarBaseClientes.setOnClickListener(view -> atualizarBaseClientes());
+
+        mainBinding.btnGerarRelatorio.setOnClickListener(v -> CSVGenerator.gerarPedidoCSV(
+                this,
+                listaPedidos
+        ));
     }
 
     private void atualizarBaseClientes() {
@@ -259,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                configurarListener(newText.toLowerCase().trim());
+                configurarListener(newText.toLowerCase().trim(), false);
                 return true;
             }
         });
@@ -280,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void configurarListener(String query) {
+    private void configurarListener(String query, Boolean filterPeriodo) {
 
         mainBinding.textCarregando.setVisibility(View.VISIBLE);
         mainBinding.recyclerPedidos.setVisibility(View.INVISIBLE);
@@ -296,7 +304,17 @@ public class MainActivity extends AppCompatActivity {
 
                         if (pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)) {
                             if (query.isEmpty()) {
-                                listaPedidos.add(pedidoModel);
+                                if (filterPeriodo) {
+                                    if (PedidosUtil.verificarIntervalo(
+                                            pedidoModel.getData(),
+                                            mainBinding.edtDataInicial.getText().toString(),
+                                            mainBinding.edtDataFinal.getText().toString()
+                                    )) {
+                                        listaPedidos.add(pedidoModel);
+                                    }
+                                } else {
+                                    listaPedidos.add(pedidoModel);
+                                }
                             } else {
                                 assert pedidoModel != null;
                                 if (
@@ -341,7 +359,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerPedidos.setLayoutManager(new LinearLayoutManager(this));
         recyclerPedidos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerPedidos.setHasFixedSize(true);
-        configurarListener("");
+        configurarListener("", false);
         adapterPedidos = new AdapterPedidos(listaPedidos, this);
         recyclerPedidos.setAdapter(adapterPedidos);
     }

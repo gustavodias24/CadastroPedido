@@ -4,9 +4,10 @@ public class CreditoModel {
 
     String id, idVendedor;
 
+    String idAgent = "";
     String status = "pendente", distribuidor;
-    String nome, razaoSocial, cnpj, inscricaoEstadual, email, telefone, endereco, prazoSocilitado,
-            valorSolicitado;
+    String nome = "", razaoSocial = "", cnpj = "", inscricaoEstadual = "", email = "", telefone = "", endereco = "", prazoSocilitado = "",
+            valorSolicitado = "", data = "";
 
     String enviarEmAnexo =
             "Documentos Solicitados dos sócios e da empresa: Enviar no anexo deste email: \n" +
@@ -22,6 +23,7 @@ public class CreditoModel {
     @Override
     public String toString() {
         return "id: " + id + "\n" +
+                "data: " + data + "\n" +
                 "Status: " + status.toUpperCase() + "\n" +
                 "Distribuidor: " + distribuidor + "\n" +
                 "Nome: " + nome + "\n" +
@@ -34,6 +36,14 @@ public class CreditoModel {
                 "Prado Solicitado: " + prazoSocilitado + "\n" +
                 "Valor Solicitado: " + valorSolicitado + "\n" +
                 "\n" + "\n" + enviarEmAnexo + "\n";
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 
     public void setIdVendedor(String idVendedor) {
@@ -64,7 +74,7 @@ public class CreditoModel {
         this.id = id;
     }
 
-    public CreditoModel(String nome, String razaoSocial, String cnpj, String inscricaoEstadual, String email, String telefone, String endereco, String prazoSocilitado, String valorSolicitado, String distribuidor, String status) {
+    public CreditoModel(String nome, String razaoSocial, String cnpj, String inscricaoEstadual, String email, String telefone, String endereco, String prazoSocilitado, String valorSolicitado, String distribuidor, String status, String data, String idAgent) {
         this.nome = nome;
         this.razaoSocial = razaoSocial;
         this.cnpj = cnpj;
@@ -76,6 +86,16 @@ public class CreditoModel {
         this.valorSolicitado = valorSolicitado;
         this.distribuidor = distribuidor;
         this.status = status;
+        this.data = data;
+        this.idAgent = idAgent;
+    }
+
+    public String getIdAgent() {
+        return idAgent;
+    }
+
+    public void setIdAgent(String idAgent) {
+        this.idAgent = idAgent;
     }
 
     public String getNome() {

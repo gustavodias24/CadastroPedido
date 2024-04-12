@@ -15,6 +15,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -33,6 +34,7 @@ import benicio.solucoes.cadastropedido.databinding.ActivityPedidoVendedorBinding
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
+import benicio.solucoes.cadastropedido.util.CSVGenerator;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
 
 public class AllPedidosActivity extends AppCompatActivity {
@@ -64,10 +66,28 @@ public class AllPedidosActivity extends AppCompatActivity {
         bundle = getIntent().getExtras();
         if (bundle != null) {
             isCredito = bundle.getBoolean("credito", false);
+
+            if (isCredito) {
+                mainBinding.btnRelatorioCredito.setVisibility(View.VISIBLE);
+                mainBinding.btnRelatorioPedidos.setVisibility(View.GONE);
+            }
         }
 
         configurarLoadingDialog();
         configurarRecyclerPedidos();
+
+        mainBinding.btnRelatorioPedidos.setOnClickListener(v -> CSVGenerator.gerarPedidoADMCSV(this, listaPedidos));
+        mainBinding.filtrarPeriodo.setOnClickListener(v -> configurarListener("", true));
+
+        mainBinding.pesquisarProduto.setOnClickListener(view -> {
+            String pesquisa = mainBinding.edtPesquisa.getText().toString();
+            configurarListener(pesquisa.toLowerCase().trim(), false);
+        });
+
+        mainBinding.btnRelatorioCredito.setOnClickListener(v -> CSVGenerator.gerarCreditoADMCSV(
+                this,
+                listaCreditos
+        ));
 
 
     }
@@ -95,7 +115,7 @@ public class AllPedidosActivity extends AppCompatActivity {
             recyclerPedidos.setAdapter(adapterPedidos);
         }
 
-        configurarListener("");
+        configurarListener("", false);
 
     }
 
@@ -107,7 +127,7 @@ public class AllPedidosActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void configurarListener(String query) {
+    public void configurarListener(String query, boolean filterPeriodo) {
         loadingDialog.show();
 
         if (isCredito) {
@@ -122,7 +142,18 @@ public class AllPedidosActivity extends AppCompatActivity {
                             CreditoModel creditoModel = dado.getValue(CreditoModel.class);
 
                             if (query.isEmpty()) {
-                                listaCreditos.add(creditoModel);
+//                                listaCreditos.add(creditoModel);
+                                if (filterPeriodo) {
+                                    if (PedidosUtil.verificarIntervalo(
+                                            creditoModel.getData(),
+                                            mainBinding.edtDataInicial.getText().toString(),
+                                            mainBinding.edtDataFinal.getText().toString()
+                                    )) {
+                                        listaCreditos.add(creditoModel);
+                                    }
+                                } else {
+                                    listaCreditos.add(creditoModel);
+                                }
                             } else {
                                 assert creditoModel != null;
                                 if (
@@ -142,6 +173,7 @@ public class AllPedidosActivity extends AppCompatActivity {
                         }
 
                         adapterCredito.notifyDataSetChanged();
+                        mainBinding.totalizador.setText("Total: " + listaCreditos.size());
                     }
                 }
 
@@ -163,7 +195,17 @@ public class AllPedidosActivity extends AppCompatActivity {
                             PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
 
                             if (query.isEmpty()) {
-                                listaPedidos.add(pedidoModel);
+                                if (filterPeriodo) {
+                                    if (PedidosUtil.verificarIntervalo(
+                                            pedidoModel.getData(),
+                                            mainBinding.edtDataInicial.getText().toString(),
+                                            mainBinding.edtDataFinal.getText().toString()
+                                    )) {
+                                        listaPedidos.add(pedidoModel);
+                                    }
+                                } else {
+                                    listaPedidos.add(pedidoModel);
+                                }
                             } else {
                                 assert pedidoModel != null;
                                 if (
@@ -183,6 +225,7 @@ public class AllPedidosActivity extends AppCompatActivity {
                         }
 
                         adapterPedidos.notifyDataSetChanged();
+                        mainBinding.totalizador.setText("Total: " + listaPedidos.size());
                     }
                 }
 
@@ -209,7 +252,7 @@ public class AllPedidosActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                configurarListener(newText.toLowerCase().trim());
+                configurarListener(newText.toLowerCase().trim(), false);
                 return true;
             }
         });

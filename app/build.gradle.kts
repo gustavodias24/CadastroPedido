@@ -38,7 +38,7 @@ android {
 }
 
 dependencies {
-
+    implementation("com.opencsv:opencsv:5.5.1")
     implementation("io.github.vicmikhailau:MaskedEditText:5.0.1")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
