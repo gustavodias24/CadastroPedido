@@ -288,11 +288,10 @@ public class MainActivity extends AppCompatActivity {
 
         mainBinding.textCarregando.setVisibility(View.VISIBLE);
         mainBinding.recyclerPedidos.setVisibility(View.INVISIBLE);
-        refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
+        refPedidos.orderByChild("idVendedor").equalTo(idUsuario).addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                runOnUiThread(() -> loadingDialog.dismiss());
                 if (snapshot.exists()) {
                     listaPedidos.clear();
                     for (DataSnapshot dado : snapshot.getChildren()) {

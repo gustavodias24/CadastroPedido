@@ -85,7 +85,7 @@ public class AdminActivity extends AppCompatActivity {
 
     private void configurarListener(String query) {
         dialogCarregando.show();
-        refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
+        refUsuarios.addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

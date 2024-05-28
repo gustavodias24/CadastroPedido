@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,15 @@ public class AdapterPedidos extends RecyclerView.Adapter<AdapterPedidos.MyViewHo
         PedidoModel pedidoModel = listaPedido.get(position);
         holder.btnExcluir.setVisibility(View.GONE);
         holder.info.setText(pedidoModel.toInformacao(isAdm));
+
+
+//        if (pedidoModel.get().toLowerCase().contains("solicitado")) {
+//            holder.indodistgenerica.setTextColor(Color.BLUE);
+//        } else if (pedidoCredito.getStatus().toLowerCase().contains("aprovado")) {
+//            holder.indodistgenerica.setTextColor(Color.GREEN);
+//        }else if (pedidoCredito.getStatus().toLowerCase().contains("negado")) {
+//            holder.indodistgenerica.setTextColor(Color.RED);
+//        }
 
         if ( isAdm ){
             holder.btn_editar_status_pedidos.setVisibility(View.VISIBLE);

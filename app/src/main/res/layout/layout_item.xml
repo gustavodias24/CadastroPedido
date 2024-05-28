@@ -50,6 +50,18 @@
             android:visibility="gone" />
 
         <Button
+            android:id="@+id/btn_remover_permanente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#000000"
+            android:text="Remover Permantemente"
+            android:textAllCaps="true"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <Button
             android:id="@+id/btn_editar_status_pedidos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,6 +1,7 @@
 package benicio.solucoes.cadastropedido.adapter;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +33,18 @@ public class AdapterCredito extends RecyclerView.Adapter<AdapterCredito.MyViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.indodistgenerica.setText(lista.get(position).toString());
+
+        CreditoModel pedidoCredito = lista.get(position);
+
+        if (pedidoCredito.getStatus().toLowerCase().contains("solicitado")) {
+            holder.indodistgenerica.setTextColor(Color.BLUE);
+        } else if (pedidoCredito.getStatus().toLowerCase().contains("aprovado")) {
+            holder.indodistgenerica.setTextColor(Color.GREEN);
+        }else if (pedidoCredito.getStatus().toLowerCase().contains("negado")) {
+            holder.indodistgenerica.setTextColor(Color.RED);
+        }
+
+        holder.indodistgenerica.setText(pedidoCredito.toString());
     }
 
     @Override
@@ -42,6 +54,7 @@ public class AdapterCredito extends RecyclerView.Adapter<AdapterCredito.MyViewHo
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView indodistgenerica;
+
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             indodistgenerica = itemView.findViewById(R.id.indodistgenerica);

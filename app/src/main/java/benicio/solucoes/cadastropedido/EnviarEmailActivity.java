@@ -36,7 +36,7 @@ import benicio.solucoes.cadastropedido.util.MathUtils;
 
 public class EnviarEmailActivity extends AppCompatActivity {
 
-
+    private boolean enviouEmail = false;
     private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
     private DatabaseReference refCreditos = FirebaseDatabase.getInstance().getReference().getRoot().child("creditos");
     private DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
@@ -72,82 +72,44 @@ public class EnviarEmailActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), selectedFrase + " selecionado!", Toast.LENGTH_SHORT).show();
         });
 
-
-        b = getIntent().getExtras();
-
-        assert b != null;
-        if (b.getBoolean("credito", false)) {
-            credito = new Gson().fromJson(b.getString("dados", ""), new TypeToken<CreditoModel>() {
-            }.getType());
-
-        } else {
-            pedido = new Gson().fromJson(b.getString("dados", ""), new TypeToken<PedidoModel>() {
-            }.getType());
-        }
-
         mainBinding.btnEnviarEmail.setOnClickListener(view -> enviarEmail());
 
         mainBinding.btnFinalizar.setOnClickListener(view -> {
 
-            assert b != null;
-            if (b.getBoolean("credito", false)) {
-                credito.setIdVendedor(idVendedor);
-                loadingDialog.show();
-                refCreditos.child(credito.getId()).setValue(credito).addOnCompleteListener(task -> {
-                    loadingDialog.dismiss();
-                    if (task.isSuccessful()) {
-                        Toast.makeText(this, "Crédito Solicitado", Toast.LENGTH_SHORT).show();
-                        finish();
-                        startActivity(new Intent(this, MenuCreditoActivity.class));
-                    }
-                });
-            } else {
-                pedido.setIdVendedor(idVendedor);
-
-                loadingDialog.show();
-
-                refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        int count = 0;
-                        for (DataSnapshot dado : snapshot.getChildren()) {
-                            count++;
-                        }
-
-                        pedido.setId(MathUtils.formatarNumero(count));
-
-                        refPedidos.child(pedido.getId()).setValue(pedido).addOnCompleteListener(task -> {
-                            loadingDialog.dismiss();
-                            if (task.isSuccessful()) {
-                                Toast.makeText(EnviarEmailActivity.this, "Pedido Criado!", Toast.LENGTH_SHORT).show();
-                                finish();
-                                startActivity(new Intent(EnviarEmailActivity.this, MainActivity.class));
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+            if (enviouEmail) {
+                assert b != null;
+                if (b.getBoolean("credito", false)) {
+                    credito.setIdVendedor(idVendedor);
+                    loadingDialog.show();
+                    refCreditos.child(credito.getId()).setValue(credito).addOnCompleteListener(task -> {
                         loadingDialog.dismiss();
-                    }
-                });
+                        if (task.isSuccessful()) {
+                            Toast.makeText(this, "Crédito Solicitado", Toast.LENGTH_SHORT).show();
+                            finish();
+                            startActivity(new Intent(this, MenuCreditoActivity.class));
+                        }
+                    });
+                } else {
+                    pedido.setIdVendedor(idVendedor);
 
+                    loadingDialog.show();
+
+                    refPedidos.child(pedido.getId()).setValue(pedido).addOnCompleteListener(task -> {
+                        loadingDialog.dismiss();
+                        if (task.isSuccessful()) {
+                            Toast.makeText(EnviarEmailActivity.this, "Pedido Criado!", Toast.LENGTH_SHORT).show();
+                            finish();
+                            startActivity(new Intent(EnviarEmailActivity.this, MainActivity.class));
+                        }
+                    });
+
+
+                }
+            } else {
+                Toast.makeText(this, "Envie o E-mail primeiro!", Toast.LENGTH_SHORT).show();
             }
 
         });
-
-        assert b != null;
-        if (b.getBoolean("credito", false)) {
-            mainBinding.bodyEmail.setText(
-                    credito.toString()
-            );
-        } else {
-            mainBinding.bodyEmail.setText(
-                    pedido.toInformacao(false)
-            );
-        }
-
 
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
@@ -156,6 +118,8 @@ public class EnviarEmailActivity extends AppCompatActivity {
             clipboardManager.setPrimaryClip(clipData);
             Toast.makeText(this, "Copiado!", Toast.LENGTH_SHORT).show();
         });
+
+
     }
 
     private void configurarLoadingDialog() {
@@ -177,6 +141,13 @@ public class EnviarEmailActivity extends AppCompatActivity {
                     UserModel userModel = dado.getValue(UserModel.class);
                     if (userModel.getEmail().toLowerCase().trim().equals(auth.getCurrentUser().getEmail().toLowerCase().trim())) {
                         idVendedor = userModel.getId();
+                        b = getIntent().getExtras();
+                        assert b != null;
+                        if (b.getBoolean("credito", false)) {
+                            gerarIdCredito();
+                        } else {
+                            gerarIdPedido();
+                        }
                         break;
                     }
                 }
@@ -189,7 +160,47 @@ public class EnviarEmailActivity extends AppCompatActivity {
         });
     }
 
+    private void gerarIdPedido() {
+
+        pedido = new Gson().fromJson(b.getString("dados", ""), new TypeToken<PedidoModel>() {
+        }.getType());
+
+
+        loadingDialog.show();
+        refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int count = 0;
+                for (DataSnapshot dado : snapshot.getChildren()) {
+                    count++;
+                }
+
+                loadingDialog.dismiss();
+                pedido.setId(MathUtils.formatarNumero(count));
+                mainBinding.bodyEmail.setText(
+                        pedido.toInformacao(false)
+                );
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                loadingDialog.dismiss();
+            }
+        });
+    }
+
+    private void gerarIdCredito() {
+        credito = new Gson().fromJson(b.getString("dados", ""), new TypeToken<CreditoModel>() {
+        }.getType());
+
+        mainBinding.bodyEmail.setText(
+                credito.toString()
+        );
+
+    }
+
     private void enviarEmail() {
+        enviouEmail = true;
         String email = mainBinding.edtEmailEnvio.getText().toString();
         String assunto = mainBinding.edtTituloEmail.getText().toString();
         String corpo = mainBinding.bodyEmail.getText().toString();
