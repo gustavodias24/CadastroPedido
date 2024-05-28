@@ -27,37 +27,82 @@
             android:id="@+id/btn_search"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:backgroundTint="#000000"
+            android:background="@color/botaoColor"
             android:padding="13dp"
             android:scaleType="fitCenter"
             android:src="@raw/searchicon"
             app:tint="@color/white" />
 
-        <ImageButton
-            android:id="@+id/btn_limpar"
+        <ProgressBar
+            android:id="@+id/progressPesquisa"
+            style="?android:attr/progressBarStyle"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:backgroundTint="#000000"
-            android:padding="13dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/baseline_clear_24"
-            app:tint="@color/white" />
+            android:layout_height="wrap_content"
+            android:indeterminateTint="@color/botaoColor"
+            android:visibility="gone" />
 
         <TextView
-            android:id="@+id/textView"
+            android:id="@+id/labalinfoproduto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:paddingStart="0dp"
             android:text="Informação Produto:"
+            android:textColor="#000000"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/textInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="." />
+
+        <ImageButton
+            android:id="@+id/btn_limpar"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/botaoColor"
+            android:padding="13dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/baseline_clear_24"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/infoProduto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:text="Carregando..." />
+
+        <ProgressBar
+            android:id="@+id/progressLista"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminateTint="@color/botaoColor" />
+
+<!--        <androidx.recyclerview.widget.RecyclerView-->
+<!--            android:id="@+id/rv_produtos"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content">-->
+
+<!--        </androidx.recyclerview.widget.RecyclerView>-->
+
+<!--        <Button-->
+<!--            android:id="@+id/mais"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:backgroundTint="@color/botaoColor"-->
+<!--            android:text="Mais"-->
+<!--            android:textColor="#FFFFFF"-->
+<!--            android:textStyle="bold"-->
+<!--            android:visibility="gone" />-->
+
 
     </LinearLayout>
 </ScrollView>

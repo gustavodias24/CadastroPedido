@@ -1,26 +1,18 @@
 package benicio.solucoes.cadastropedido;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,8 +24,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -42,8 +32,7 @@ import java.util.List;
 
 import benicio.solucoes.cadastropedido.adapter.AdapterPedidos;
 import benicio.solucoes.cadastropedido.databinding.ActivityMainBinding;
-import benicio.solucoes.cadastropedido.databinding.ActivityMenuPedidoOrCreditoBinding;
-import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
+import benicio.solucoes.cadastropedido.dblocal.ProdutosDAO;
 import benicio.solucoes.cadastropedido.model.ClienteModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
@@ -52,7 +41,6 @@ import benicio.solucoes.cadastropedido.service.ProdutosServices;
 import benicio.solucoes.cadastropedido.util.CSVGenerator;
 import benicio.solucoes.cadastropedido.util.ClientesUtil;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
-import benicio.solucoes.cadastropedido.util.ProdutosUtils;
 import benicio.solucoes.cadastropedido.util.RetrofitUitl;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -198,7 +186,15 @@ public class MainActivity extends AppCompatActivity {
 
                     runOnUiThread(() -> mainBinding.progressBarProdutos.setVisibility(View.GONE));
                     if (response.isSuccessful()) {
-                        ProdutosUtils.saveProdutos(getApplicationContext(), response.body());
+
+                        ProdutosDAO produtosDAO = new ProdutosDAO(MainActivity.this);
+                        produtosDAO.limparProdutos();
+
+                        assert response.body() != null;
+                        for (ProdutoModel produtoModel : response.body()) {
+                            produtosDAO.inserirProduto(produtoModel);
+                        }
+                        // ProdutosUtils.saveProdutos(getApplicationContext(), response.body());
 
                         runOnUiThread(() -> {
                             Toast.makeText(MainActivity.this, "Base atualizada!", Toast.LENGTH_SHORT).show();

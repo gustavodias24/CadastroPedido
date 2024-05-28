@@ -3,39 +3,37 @@ package benicio.solucoes.cadastropedido;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.SearchView;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
-import benicio.solucoes.cadastropedido.adapter.AdapterViewProduto;
+
 import benicio.solucoes.cadastropedido.databinding.ActivityVisualizarProdutosBinding;
+import benicio.solucoes.cadastropedido.dblocal.ProdutosDAO;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
-import benicio.solucoes.cadastropedido.util.ProdutosUtils;
 
 public class VisualizarProdutosActivity extends AppCompatActivity {
 
+    private boolean podePesquisar = true;
+    private ProdutosDAO produtosDAO;
     private ActivityVisualizarProdutosBinding mainBinding;
+    private List<ProdutoModel> listaProdutos = new ArrayList<>();
 
-    private List<ProdutoModel> listaProdutos;
+    //    private List<ProdutoModel> listaNomeProdutosAdapter = new ArrayList<>();
+//    private List<ProdutoModel> listaNomeProdutosHelper = new ArrayList<>();
     private List<String> listaNomeProdutos = new ArrayList<>();
 
-    //    private RecyclerView recylerProdutos;
-//    private AdapterViewProduto adapter;
+//    private AdapterProdutoVisualizacao adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,23 +41,50 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        getSupportActionBar().setTitle("Produtos");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Produtos");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        produtosDAO = new ProdutosDAO(VisualizarProdutosActivity.this);
+
+//        mainBinding.rvProdutos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+//        mainBinding.rvProdutos.setLayoutManager(new LinearLayoutManager(this));
+//        mainBinding.rvProdutos.setHasFixedSize(true);
+//        adapter = new AdapterProdutoVisualizacao(listaNomeProdutosAdapter, this);
+//        mainBinding.rvProdutos.setAdapter(adapter);
 
         new Thread() {
+            @SuppressLint({"NotifyDataSetChanged", "DefaultLocale"})
             @Override
             public void run() {
                 super.run();
 
-                listaProdutos = ProdutosUtils.returnProdutos(VisualizarProdutosActivity.this);
 
+//                listaProdutos = ProdutosUtils.returnProdutos(VisualizarProdutosActivity.this);
+                listaProdutos = produtosDAO.listarProdutos();
+//                listaNomeProdutosHelper.addAll(listaProdutos);
 
+//                int maxItens = 100;
                 for (ProdutoModel produtoModel : listaProdutos) {
                     listaNomeProdutos.add(produtoModel.getNome());
                     listaNomeProdutos.add(produtoModel.getSku());
+                    listaNomeProdutos.add(produtoModel.getFornecedor());
+
+//                    if ( maxItens > 0){
+//                        listaNomeProdutosAdapter.add(produtoModel);
+//                        listaNomeProdutosHelper.remove(produtoModel);
+//                    }
+//                    maxItens--;
                 }
+
+                runOnUiThread(() -> {
+//                    mainBinding.mais.setVisibility(View.VISIBLE);
+                    mainBinding.infoProduto.setText(
+                            String.format("Foram encontrados %d produtos, filtre por fornecedor, nome ou sku!", listaProdutos.size())
+                    );
+                    mainBinding.progressLista.setVisibility(View.GONE);
+//                    adapter.notifyDataSetChanged();
+                });
 
 
                 String[] sugestoes = listaNomeProdutos.toArray(new String[0]);
@@ -67,6 +92,7 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(VisualizarProdutosActivity.this, android.R.layout.simple_dropdown_item_1line, sugestoes);
 
                 mainBinding.btnLimpar.setOnClickListener(view -> {
+                    mainBinding.labalinfoproduto.setVisibility(View.GONE);
                     mainBinding.autoCompleteFiltro.setText("");
                     mainBinding.textInfo.setText("");
                 });
@@ -95,29 +121,35 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
 
 
         mainBinding.btnSearch.setOnClickListener(view -> {
-            String selectedFrase = mainBinding.autoCompleteFiltro.getText().toString();
+            if (podePesquisar) {
+                mainBinding.progressPesquisa.setVisibility(View.VISIBLE);
+                podePesquisar = false;
+                new Thread() {
+                    @Override
+                    public void run() {
+                        super.run();
 
-            for (ProdutoModel produtoModel : listaProdutos) {
-                if (produtoModel.getNome().trim().toLowerCase().contains(selectedFrase.trim().toLowerCase())
-                        || produtoModel.getSku().trim().toLowerCase().contains(selectedFrase.trim().toLowerCase())) {
-                    mainBinding.textInfo.setText(
-                            produtoModel.toString()
-                    );
-                    break;
-                }
+                        String selectedFrase = mainBinding.autoCompleteFiltro.getText().toString();
+
+                        if (!selectedFrase.isEmpty()) {
+                            StringBuilder info = new StringBuilder();
+                            for (ProdutoModel produtoModel : produtosDAO.buscarProduto(selectedFrase)) {
+                                info.append(produtoModel.toString()).append("\n\n");
+                            }
+
+                            runOnUiThread(() -> {
+                                mainBinding.progressPesquisa.setVisibility(View.GONE);
+                                mainBinding.textInfo.setText(info.toString());
+                                podePesquisar = true;
+                            });
+                        }
+                    }
+                }.start();
             }
-        });
-//        configurarRecyclerView();
-    }
 
-//    private void configurarRecyclerView() {
-//        recylerProdutos = mainBinding.recyclerProdutos;
-//        recylerProdutos.setLayoutManager(new LinearLayoutManager(VisualizarProdutosActivity.this));
-//        recylerProdutos.setHasFixedSize(true);
-//        recylerProdutos.addItemDecoration(new DividerItemDecoration(VisualizarProdutosActivity.this, DividerItemDecoration.VERTICAL));
-//        adapter = new AdapterViewProduto(listaProdutos, VisualizarProdutosActivity.this);
-//        recylerProdutos.setAdapter(adapter);
-//    }
+
+        });
+    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

@@ -78,6 +78,7 @@ public class PedidoModel {
         }
 
         return statusExibicao + '\n' +
+                "Id: " + id + '\n' +
                 "Loja Vendedor: " + lojaVendedor + '\n' +
                 "Data: " + data + '\n' +
                 "Id Agente: " + idAgente + '\n' +

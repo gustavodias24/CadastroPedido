@@ -10,10 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -31,15 +29,13 @@ import java.util.Locale;
 
 import benicio.solucoes.cadastropedido.adapter.AdapterProduto;
 import benicio.solucoes.cadastropedido.databinding.ActivityProdutosBinding;
-import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
-import benicio.solucoes.cadastropedido.model.ClienteModel;
+import benicio.solucoes.cadastropedido.dblocal.ProdutosDAO;
 import benicio.solucoes.cadastropedido.model.DistribuidorModel;
 import benicio.solucoes.cadastropedido.model.ItemCompra;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
 import benicio.solucoes.cadastropedido.service.ProdutosServices;
 import benicio.solucoes.cadastropedido.util.MathUtils;
-import benicio.solucoes.cadastropedido.util.ProdutosUtils;
 import benicio.solucoes.cadastropedido.util.RetrofitUitl;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -96,7 +92,9 @@ public class ProdutosActivity extends AppCompatActivity {
                 }.getType();
                 pedidoModel = gson.fromJson(b.getString("dadosPedido", ""), type);
 
-                listaProdutos = ProdutosUtils.returnProdutos(ProdutosActivity.this);
+                ProdutosDAO produtosDAO = new ProdutosDAO(ProdutosActivity.this);
+
+                listaProdutos = produtosDAO.listarProdutos();
                 for (ProdutoModel produtoModel : listaProdutos) {
                     listaNomeProdutos.add(produtoModel.getNome() + " -F- " + produtoModel.getFornecedor());
                     listaNomeSKU.add(produtoModel.getSku());
