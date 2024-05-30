@@ -1,6 +1,7 @@
 package benicio.solucoes.cadastropedido.adapter;
 
 import android.app.Activity;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +35,7 @@ public class AdapterDist extends RecyclerView.Adapter<AdapterDist.MyViewHolder> 
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         DistribuidorModel dist = lista.get(position);
 
-        holder.indodistgenerica.setText(dist.toString());
+        holder.indodistgenerica.setText(Html.fromHtml(dist.toString()));
     }
 
     @Override
