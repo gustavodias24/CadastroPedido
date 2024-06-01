@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -31,14 +32,14 @@ public class AdapterPedidos extends RecyclerView.Adapter<AdapterPedidos.MyViewHo
     boolean isAdm = false;
 
     Dialog d;
-    Dialog dialogCarregando;
+    LinearLayout dialogCarregando;
 
     public AdapterPedidos(List<PedidoModel> listaPedido, Activity a) {
         this.listaPedido = listaPedido;
         this.a = a;
     }
 
-    public AdapterPedidos(List<PedidoModel> listaPedido, Activity a, boolean isAdm, Dialog dialogCarregando) {
+    public AdapterPedidos(List<PedidoModel> listaPedido, Activity a, boolean isAdm, LinearLayout dialogCarregando) {
         this.listaPedido = listaPedido;
         this.a = a;
         this.isAdm = isAdm;
@@ -108,44 +109,44 @@ public class AdapterPedidos extends RecyclerView.Adapter<AdapterPedidos.MyViewHo
                 }
 
                 alterarStatusBinding.radioPendente.setOnClickListener(view1 -> {
-                    dialogCarregando.show();
+                    dialogCarregando.setVisibility(View.VISIBLE);
                     pedidoModel.setStatus(0);
-                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task -> dialogCarregando.dismiss());
+                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioEmProcesso.setOnClickListener(view1 -> {
-                    dialogCarregando.show();
+                    dialogCarregando.setVisibility(View.VISIBLE);
                     pedidoModel.setStatus(1);
-                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task -> dialogCarregando.dismiss());
+                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioCompleto.setOnClickListener(view1 -> {
-                    dialogCarregando.show();
+                    dialogCarregando.setVisibility(View.VISIBLE);
                     pedidoModel.setStatus(2);
-                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task -> dialogCarregando.dismiss());
+                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioPagamentoPendente.setOnClickListener(view1 -> {
-                    dialogCarregando.show();
+                    dialogCarregando.setVisibility(View.VISIBLE);
                     pedidoModel.setStatus(3);
-                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task -> dialogCarregando.dismiss());
+                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioCancelado.setOnClickListener(view1 -> {
-                    dialogCarregando.show();
+                    dialogCarregando.setVisibility(View.VISIBLE);
                     pedidoModel.setStatus(4);
-                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task -> dialogCarregando.dismiss());
+                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioFechado.setOnClickListener(view1 -> {
-                    dialogCarregando.show();
+                    dialogCarregando.setVisibility(View.VISIBLE);
                     pedidoModel.setStatus(5);
-                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task -> dialogCarregando.dismiss());
+                    PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });
 

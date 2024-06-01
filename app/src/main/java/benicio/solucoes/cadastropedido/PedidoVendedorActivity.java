@@ -13,6 +13,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -41,8 +42,8 @@ public class PedidoVendedorActivity extends AppCompatActivity {
     public static AdapterCredito adapterCredito;
     public static List<PedidoModel> listaPedidos = new ArrayList<>();
     public static List<CreditoModel> listaCreditos = new ArrayList<>();
-    public static Dialog loadingDialog;
-    private ActivityPedidoVendedorBinding mainBinding;
+//    public static Dialog loadingDialog;
+    public static ActivityPedidoVendedorBinding mainBinding;
     private RecyclerView recyclerPedidos;
     public static String idUsuario;
     private Bundle b;
@@ -64,7 +65,7 @@ public class PedidoVendedorActivity extends AppCompatActivity {
 
         isCredito = b.getBoolean("credito", false);
 
-        configurarLoadingDialog();
+//        configurarLoadingDialog();
         configurarRecyclerPedidos();
     }
 
@@ -88,7 +89,7 @@ public class PedidoVendedorActivity extends AppCompatActivity {
             adapterCredito = new AdapterCredito(listaCreditos, this);
             recyclerPedidos.setAdapter(adapterCredito);
         } else {
-            adapterPedidos = new AdapterPedidos(listaPedidos, this, true, loadingDialog);
+            adapterPedidos = new AdapterPedidos(listaPedidos, this, true, mainBinding.carregandoLayout);
             recyclerPedidos.setAdapter(adapterPedidos);
         }
 
@@ -96,22 +97,22 @@ public class PedidoVendedorActivity extends AppCompatActivity {
 
     }
 
-    private void configurarLoadingDialog() {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setCancelable(false);
-        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
-        loadingDialog = b.create();
-    }
+//    private void configurarLoadingDialog() {
+//        AlertDialog.Builder b = new AlertDialog.Builder(this);
+//        b.setCancelable(false);
+//        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
+//        loadingDialog = b.create();
+//    }
 
     public static void configurarListener(String query, Context c) {
-        loadingDialog.show();
-
+        mainBinding.carregandoLayout.setVisibility(View.VISIBLE);
+        
         if (isCredito){
             refCreditos.addValueEventListener(new ValueEventListener() {
                 @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    loadingDialog.dismiss();
+                    mainBinding.carregandoLayout.setVisibility(View.GONE);
 
                     if (snapshot.exists()) {
                         listaCreditos.clear();
@@ -147,7 +148,7 @@ public class PedidoVendedorActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    loadingDialog.dismiss();
+                    mainBinding.carregandoLayout.setVisibility(View.GONE);
                     Toast.makeText(c, "Sem Conexão", Toast.LENGTH_LONG).show();
                 }
             });
@@ -156,7 +157,7 @@ public class PedidoVendedorActivity extends AppCompatActivity {
                 @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    loadingDialog.dismiss();
+                    mainBinding.carregandoLayout.setVisibility(View.GONE);
 
                     if (snapshot.exists()) {
                         listaPedidos.clear();
@@ -192,7 +193,7 @@ public class PedidoVendedorActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    loadingDialog.dismiss();
+                    mainBinding.carregandoLayout.setVisibility(View.GONE);
                     Toast.makeText(c, "Sem Conexão", Toast.LENGTH_LONG).show();
                 }
             });

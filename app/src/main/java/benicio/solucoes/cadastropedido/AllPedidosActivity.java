@@ -41,7 +41,7 @@ public class AllPedidosActivity extends AppCompatActivity {
 
     ActivityAllPedidosBinding mainBinding;
     private RecyclerView recyclerPedidos;
-    public static Dialog loadingDialog;
+    //    public static Dialog loadingDialog;
     public static List<PedidoModel> listaPedidos = new ArrayList<>();
     public static List<CreditoModel> listaCreditos = new ArrayList<>();
     public static AdapterPedidos adapterPedidos;
@@ -73,7 +73,7 @@ public class AllPedidosActivity extends AppCompatActivity {
             }
         }
 
-        configurarLoadingDialog();
+//        configurarLoadingDialog();
         configurarRecyclerPedidos();
 
         mainBinding.btnRelatorioPedidos.setOnClickListener(v -> CSVGenerator.gerarPedidoADMCSV(this, listaPedidos));
@@ -92,12 +92,12 @@ public class AllPedidosActivity extends AppCompatActivity {
 
     }
 
-    private void configurarLoadingDialog() {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setCancelable(false);
-        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
-        loadingDialog = b.create();
-    }
+//    private void configurarLoadingDialog() {
+//        AlertDialog.Builder b = new AlertDialog.Builder(this);
+//        b.setCancelable(false);
+//        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
+//        loadingDialog = b.create();
+//    }
 
     private void configurarRecyclerPedidos() {
         recyclerPedidos = mainBinding.recyclerPedidos;
@@ -111,7 +111,7 @@ public class AllPedidosActivity extends AppCompatActivity {
             adapterCredito = new AdapterCredito(listaCreditos, this);
             recyclerPedidos.setAdapter(adapterCredito);
         } else {
-            adapterPedidos = new AdapterPedidos(listaPedidos, this, true, loadingDialog);
+            adapterPedidos = new AdapterPedidos(listaPedidos, this, true, mainBinding.carregandoLayout);
             recyclerPedidos.setAdapter(adapterPedidos);
         }
 
@@ -128,14 +128,14 @@ public class AllPedidosActivity extends AppCompatActivity {
     }
 
     public void configurarListener(String query, boolean filterPeriodo) {
-        loadingDialog.show();
+        mainBinding.carregandoLayout.setVisibility(View.VISIBLE);
 
         if (isCredito) {
             refCreditos.addListenerForSingleValueEvent(new ValueEventListener() {
                 @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    loadingDialog.dismiss();
+                    mainBinding.carregandoLayout.setVisibility(View.GONE);
                     if (snapshot.exists()) {
                         listaCreditos.clear();
                         for (DataSnapshot dado : snapshot.getChildren()) {
@@ -156,19 +156,23 @@ public class AllPedidosActivity extends AppCompatActivity {
                                 }
                             } else {
                                 assert creditoModel != null;
-                                if (
-                                        creditoModel.getDistribuidor().toLowerCase().trim().contains(query) ||
-                                                creditoModel.getStatus().toLowerCase().trim().contains(query) ||
-                                                creditoModel.getValorSolicitado().toLowerCase().trim().contains(query) ||
-                                                creditoModel.getNome().toLowerCase().trim().contains(query) ||
-                                                creditoModel.getRazaoSocial().toLowerCase().trim().contains(query) ||
-                                                creditoModel.getEmail().toLowerCase().trim().contains(query) ||
-                                                creditoModel.getTelefone().toLowerCase().trim().contains(query) ||
-                                                creditoModel.getCnpj().toLowerCase().trim().contains(query) ||
-                                                creditoModel.getPrazoSocilitado().toLowerCase().trim().contains(query)
-                                ) {
-                                    listaCreditos.add(creditoModel);
+                                try {
+                                    if (
+                                            creditoModel.getDistribuidor().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getStatus().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getValorSolicitado().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getNome().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getRazaoSocial().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getEmail().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getTelefone().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getCnpj().toLowerCase().trim().contains(query) ||
+                                                    creditoModel.getPrazoSocilitado().toLowerCase().trim().contains(query)
+                                    ) {
+                                        listaCreditos.add(creditoModel);
+                                    }
+                                } catch (Exception ignored) {
                                 }
+
                             }
                         }
 
@@ -179,7 +183,7 @@ public class AllPedidosActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    loadingDialog.dismiss();
+                    mainBinding.carregandoLayout.setVisibility(View.GONE);
                     Toast.makeText(AllPedidosActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
                 }
             });
@@ -188,7 +192,7 @@ public class AllPedidosActivity extends AppCompatActivity {
                 @SuppressLint("NotifyDataSetChanged")
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    loadingDialog.dismiss();
+                    mainBinding.carregandoLayout.setVisibility(View.GONE);
                     if (snapshot.exists()) {
                         listaPedidos.clear();
                         for (DataSnapshot dado : snapshot.getChildren()) {
@@ -210,6 +214,7 @@ public class AllPedidosActivity extends AppCompatActivity {
                                 assert pedidoModel != null;
                                 if (
                                         pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
+                                                String.valueOf(pedidoModel.getStatus()).toLowerCase().trim().contains(query) ||
                                                 pedidoModel.getData().toLowerCase().trim().contains(query) ||
                                                 pedidoModel.getIdAgente().toLowerCase().trim().contains(query) ||
                                                 pedidoModel.getNomeEstabelecimento().toLowerCase().trim().contains(query) ||
@@ -231,7 +236,7 @@ public class AllPedidosActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    loadingDialog.dismiss();
+                    mainBinding.carregandoLayout.setVisibility(View.GONE);
                     Toast.makeText(AllPedidosActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
                 }
             });

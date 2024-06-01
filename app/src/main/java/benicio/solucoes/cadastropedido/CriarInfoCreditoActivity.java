@@ -3,6 +3,7 @@ package benicio.solucoes.cadastropedido;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
@@ -72,7 +73,7 @@ public class CriarInfoCreditoActivity extends AppCompatActivity {
             ) {
                 Toast.makeText(this, "Preencha Todos os Dados Obrigatórios!", Toast.LENGTH_LONG).show();
             } else {
-                CreditoModel creditoModel = new CreditoModel(
+                @SuppressLint("SimpleDateFormat") CreditoModel creditoModel = new CreditoModel(
                         mainBinding.edtNome.getText().toString(),
                         mainBinding.edtRazaoSocial.getText().toString(),
                         mainBinding.edtCNPJ.getText().toString(),

@@ -8,35 +8,29 @@
     android:padding="8dp"
     tools:context=".AllPedidosActivity">
 
-    <Button
-        android:id="@+id/btn_relatorio_pedidos"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/botaoColor"
-        android:text="RELATÓRIO PEDIDOS"
-        android:textAllCaps="true"
-        android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/btn_relatorio_credito"
+    <LinearLayout
+        android:id="@+id/carregandoLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/botaoColor"
-        android:text="RELATÓRIO crédito"
-        android:textAllCaps="true"
-        android:textStyle="bold"
-        android:visibility="gone" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Carregando"
+            android:textColor="#000000"
+            android:textSize="34sp"
+            android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/totalizador"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Total: 0"
-        android:textColor="#000000"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        <ProgressBar
+            android:id="@+id/progressBar3"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="200dp" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -128,6 +122,38 @@
 
         </LinearLayout>
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_relatorio_pedidos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#8BC34A"
+        android:text="GERAR\nRELATÓRIO"
+        android:textAllCaps="true"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btn_relatorio_credito"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#8BC34A"
+        android:text="GERAR\nRELATÓRIO"
+        android:textAllCaps="true"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/totalizador"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Total: 0"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerPedidos"
