@@ -1,6 +1,8 @@
 package benicio.solucoes.cadastropedido.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,10 +33,19 @@ public class AdapterCredito extends RecyclerView.Adapter<AdapterCredito.MyViewHo
         return new MyViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_dist, parent, false));
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
         CreditoModel pedidoCredito = lista.get(position);
+
+        if ( pedidoCredito.getStatus().toLowerCase().contains("inadiplente") ){
+            AlertDialog.Builder b = new AlertDialog.Builder(a);
+            b.setTitle("Aviso de Inadiplência");
+            b.setMessage(String.format("O Cliente de CNPJ %s está inadiplente!\nId Pedido: %s", pedidoCredito.getCnpj(), pedidoCredito.getId()));
+            b.setPositiveButton("ok", null);
+            b.create().show();
+        }
 
         if (pedidoCredito.getStatus().toLowerCase().contains("solicitado")) {
             holder.indodistgenerica.setTextColor(Color.BLUE);
