@@ -60,13 +60,13 @@ public class AdapterPedidos extends RecyclerView.Adapter<AdapterPedidos.MyViewHo
         holder.info.setText(pedidoModel.toInformacao(isAdm));
 
 
-//        if (pedidoModel.get().toLowerCase().contains("solicitado")) {
-//            holder.indodistgenerica.setTextColor(Color.BLUE);
-//        } else if (pedidoCredito.getStatus().toLowerCase().contains("aprovado")) {
-//            holder.indodistgenerica.setTextColor(Color.GREEN);
-//        }else if (pedidoCredito.getStatus().toLowerCase().contains("negado")) {
-//            holder.indodistgenerica.setTextColor(Color.RED);
-//        }
+        if ( pedidoModel.getStatus().toLowerCase().contains("inadiplente")){
+            AlertDialog.Builder builderInadiplente = new AlertDialog.Builder(a);
+            builderInadiplente.setTitle("ATENÇÃO!");
+            builderInadiplente.setMessage("O cliente " + pedidoModel.getNomeComprador() + " do estabelecimento " + pedidoModel.getNomeEstabelecimento() + " e do CNPJ " + pedidoModel.getCnpj() + " está INADIPLENTE!");
+            builderInadiplente.setPositiveButton("ok", null);
+            builderInadiplente.create().show();
+        }
 
         if ( isAdm ){
             holder.btn_editar_status_pedidos.setVisibility(View.VISIBLE);
@@ -88,64 +88,64 @@ public class AdapterPedidos extends RecyclerView.Adapter<AdapterPedidos.MyViewHo
                 LayoutAlterarStatusBinding alterarStatusBinding = LayoutAlterarStatusBinding.inflate(a.getLayoutInflater());
 
                 switch (pedidoModel.getStatus()){
-                    case 0:
+                    case "pendente":
                         alterarStatusBinding.radioPendente.setChecked(true);
                         break;
-                    case 1:
+                    case "em processo":
                         alterarStatusBinding.radioEmProcesso.setChecked(true);
                         break;
-                    case 2:
+                    case "completo":
                         alterarStatusBinding.radioCompleto.setChecked(true);
                         break;
-                    case 3:
+                    case "pagamento pendente":
                         alterarStatusBinding.radioPagamentoPendente.setChecked(true);
                         break;
-                    case 4:
+                    case "cancelado":
                         alterarStatusBinding.radioCancelado.setChecked(true);
                         break;
-                    case 5:
+                    case "fechado":
                         alterarStatusBinding.radioFechado.setChecked(true);
                         break;
                 }
 
                 alterarStatusBinding.radioPendente.setOnClickListener(view1 -> {
                     dialogCarregando.setVisibility(View.VISIBLE);
-                    pedidoModel.setStatus(0);
+                    pedidoModel.setStatus("pendente");
                     PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioEmProcesso.setOnClickListener(view1 -> {
                     dialogCarregando.setVisibility(View.VISIBLE);
-                    pedidoModel.setStatus(1);
+                    pedidoModel.setStatus("em processo");
                     PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioCompleto.setOnClickListener(view1 -> {
                     dialogCarregando.setVisibility(View.VISIBLE);
-                    pedidoModel.setStatus(2);
+                    pedidoModel.setStatus("completo");
                     PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioPagamentoPendente.setOnClickListener(view1 -> {
                     dialogCarregando.setVisibility(View.VISIBLE);
-                    pedidoModel.setStatus(3);
+                    pedidoModel.setStatus("pagamento pendente");
                     PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioCancelado.setOnClickListener(view1 -> {
                     dialogCarregando.setVisibility(View.VISIBLE);
-                    pedidoModel.setStatus(4);
+                    pedidoModel.setStatus("cancelado");
                     PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioFechado.setOnClickListener(view1 -> {
                     dialogCarregando.setVisibility(View.VISIBLE);
-                    pedidoModel.setStatus(5);
+                    pedidoModel.setStatus("fechado");
                     PedidoVendedorActivity.refPedidos.child(pedidoModel.getId()).setValue(pedidoModel).addOnCompleteListener(task ->  dialogCarregando.setVisibility(View.GONE));
                     this.notifyDataSetChanged();
                 });

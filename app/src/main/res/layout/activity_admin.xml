@@ -34,14 +34,14 @@
             android:textAllCaps="true"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/textView10"
+        <Button
+            android:id="@+id/btn_vendedores"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Vendedores" />
+            android:backgroundTint="@color/botaoColor"
+            android:text="VENDEDORES"
+            android:textAllCaps="true"
+            android:textStyle="bold" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerVendedores"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+
     </LinearLayout></ScrollView>

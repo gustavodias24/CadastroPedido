@@ -7,14 +7,19 @@ import androidx.appcompat.app.AppCompatDelegate;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 
 import benicio.solucoes.cadastropedido.databinding.ActivityVisualizarProdutosBinding;
@@ -47,12 +52,6 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
 
         produtosDAO = new ProdutosDAO(VisualizarProdutosActivity.this);
 
-//        mainBinding.rvProdutos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-//        mainBinding.rvProdutos.setLayoutManager(new LinearLayoutManager(this));
-//        mainBinding.rvProdutos.setHasFixedSize(true);
-//        adapter = new AdapterProdutoVisualizacao(listaNomeProdutosAdapter, this);
-//        mainBinding.rvProdutos.setAdapter(adapter);
-
         new Thread() {
             @SuppressLint({"NotifyDataSetChanged", "DefaultLocale"})
             @Override
@@ -60,41 +59,29 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
                 super.run();
 
 
-//                listaProdutos = ProdutosUtils.returnProdutos(VisualizarProdutosActivity.this);
                 listaProdutos = produtosDAO.listarProdutos();
-//                listaNomeProdutosHelper.addAll(listaProdutos);
 
-//                int maxItens = 100;
                 for (ProdutoModel produtoModel : listaProdutos) {
-                    listaNomeProdutos.add(produtoModel.getNome());
+                    listaNomeProdutos.add(produtoModel.getNome() + " -F- " + produtoModel.getFornecedor());
                     listaNomeProdutos.add(produtoModel.getSku());
-                    listaNomeProdutos.add(produtoModel.getFornecedor());
-
-//                    if ( maxItens > 0){
-//                        listaNomeProdutosAdapter.add(produtoModel);
-//                        listaNomeProdutosHelper.remove(produtoModel);
-//                    }
-//                    maxItens--;
                 }
 
                 runOnUiThread(() -> {
-//                    mainBinding.mais.setVisibility(View.VISIBLE);
                     mainBinding.infoProduto.setText(
                             String.format("Foram encontrados %d produtos, filtre por fornecedor, nome ou sku!", listaProdutos.size())
                     );
                     mainBinding.progressLista.setVisibility(View.GONE);
-//                    adapter.notifyDataSetChanged();
                 });
 
 
                 String[] sugestoes = listaNomeProdutos.toArray(new String[0]);
 
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(VisualizarProdutosActivity.this, android.R.layout.simple_dropdown_item_1line, sugestoes);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(VisualizarProdutosActivity.this, R.layout.custom_dropdown_item, R.id.textoProdutos, sugestoes);
 
                 mainBinding.btnLimpar.setOnClickListener(view -> {
                     mainBinding.labalinfoproduto.setVisibility(View.GONE);
                     mainBinding.autoCompleteFiltro.setText("");
-                    mainBinding.textInfo.setText("");
+                    removerLinha();
                 });
 
 
@@ -104,13 +91,12 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
 
                 mainBinding.autoCompleteFiltro.setOnItemClickListener((parent, view, position, id) -> {
                     String selectedFrase = (String) parent.getItemAtPosition(position);
-                    mainBinding.autoCompleteFiltro.setText(selectedFrase);
+
+                    mainBinding.autoCompleteFiltro.setText((selectedFrase.contains("-F-") ?selectedFrase.split("-F-")[0]:selectedFrase).trim());
 
                     for (ProdutoModel produtoModel : listaProdutos) {
-                        if (produtoModel.getNome().equals(selectedFrase)) {
-                            mainBinding.textInfo.setText(
-                                    produtoModel.toString()
-                            );
+                        if (produtoModel.getNome().equals(selectedFrase.contains("-F-") ? selectedFrase.split("-F-")[0]:selectedFrase)) {
+                            addLinha(produtoModel);
                             break;
                         }
                     }
@@ -122,6 +108,7 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
 
         mainBinding.btnSearch.setOnClickListener(view -> {
             if (podePesquisar) {
+                removerLinha();
                 mainBinding.progressPesquisa.setVisibility(View.VISIBLE);
                 podePesquisar = false;
                 new Thread() {
@@ -132,14 +119,13 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
                         String selectedFrase = mainBinding.autoCompleteFiltro.getText().toString();
 
                         if (!selectedFrase.isEmpty()) {
-                            StringBuilder info = new StringBuilder();
-                            for (ProdutoModel produtoModel : produtosDAO.buscarProduto(selectedFrase)) {
-                                info.append(produtoModel.toString()).append("\n\n");
-                            }
+                            List<ProdutoModel> info = new ArrayList<>(produtosDAO.buscarProduto(selectedFrase.contains("-F-") ? selectedFrase.split("-F-")[0]:selectedFrase));
 
                             runOnUiThread(() -> {
                                 mainBinding.progressPesquisa.setVisibility(View.GONE);
-                                mainBinding.textInfo.setText(info.toString());
+                                for (ProdutoModel produtoModel : info) {
+                                    addLinha(produtoModel);
+                                }
                                 podePesquisar = true;
                             });
                         }
@@ -149,6 +135,53 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
 
 
         });
+    }
+
+
+    private void removerLinha() {
+        for (int i = 0; i < mainBinding.tableLayout.getChildCount(); i++) {
+            TableRow tableRow = (TableRow) mainBinding.tableLayout.getChildAt(i);
+            if ( tableRow.getId() != mainBinding.rowPrincipal.getId()){
+                mainBinding.tableLayout.removeViewAt(i);
+            }
+        }
+    }
+
+    private void addLinha(ProdutoModel produto) {
+        TableRow tableRow = new TableRow(this);
+        tableRow.setId(new Random().nextInt(1000));
+
+        TextView textViewNome = new TextView(this);
+        textViewNome.setText(produto.getNome());
+        textViewNome.setPadding(8, 8, 8, 8);
+        textViewNome.setLayoutParams(new TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        textViewNome.setGravity(Gravity.CENTER);
+
+        TextView textViewEstoque = new TextView(this);
+        textViewEstoque.setText(String.valueOf(produto.getEstoque()));
+        textViewEstoque.setPadding(8, 8, 8, 8);
+        textViewEstoque.setLayoutParams(new TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        textViewEstoque.setGravity(Gravity.CENTER);
+
+        TextView textViewSKU = new TextView(this);
+        textViewSKU.setText(produto.getSku());
+        textViewSKU.setPadding(8, 8, 8, 8);
+        textViewSKU.setLayoutParams(new TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        textViewSKU.setGravity(Gravity.CENTER);
+
+        TextView textViewPreco = new TextView(this);
+        textViewPreco.setText(produto.getPreco());
+        textViewPreco.setPadding(8, 8, 8, 8);
+        textViewPreco.setLayoutParams(new TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        textViewPreco.setGravity(Gravity.CENTER);
+
+        tableRow.addView(textViewNome);
+        tableRow.addView(textViewEstoque);
+        tableRow.addView(textViewSKU);
+        tableRow.addView(textViewPreco);
+
+        mainBinding.tableLayout.addView(tableRow);
+
     }
 
     @Override

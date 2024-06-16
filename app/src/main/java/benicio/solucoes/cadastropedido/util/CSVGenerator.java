@@ -121,35 +121,6 @@ public class CSVGenerator {
                     // Escrever cada objeto IndicacaoModel como uma linha no CSV
                     for (PedidoModel pedido : pedidos) {
 
-                        String statusText = "Pendente";
-
-                        switch (pedido.getStatus()) {
-                            //Pendente = 0
-                            //Em Processamento = 1
-                            //Completo = 2
-                            //Pagamento Pendente = 3
-                            //Cancelado = 4
-                            //Fechado = 5
-
-                            case 0:
-                                statusText = "PENDENTE";
-                                break;
-                            case 1:
-                                statusText = "EM PROCESSAMENTO";
-                                break;
-                            case 2:
-                                statusText = "COMPLETO";
-                                break;
-                            case 3:
-                                statusText = "PAGAMENTO PENDENTE";
-                                break;
-                            case 4:
-                                statusText = "CANCELADO";
-                                break;
-                            case 5:
-                                statusText = "FECHADO";
-                                break;
-                        }
 
                         for (ItemCompra item : pedido.getProdutos()) {
                             String[] linha = {
@@ -161,7 +132,7 @@ public class CSVGenerator {
                                     pedido.getTele(),
                                     pedido.getData(),
                                     pedido.getId(),
-                                    statusText,
+                                    pedido.getStatus(),
                                     pedido.getFormaPagamento(),
                                     pedido.getEnderecoCompleto(),
                                     pedido.getCep(),

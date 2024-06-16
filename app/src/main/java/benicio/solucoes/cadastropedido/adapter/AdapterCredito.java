@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.graphics.Color;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,16 +47,29 @@ public class AdapterCredito extends RecyclerView.Adapter<AdapterCredito.MyViewHo
             b.setPositiveButton("ok", null);
             b.create().show();
         }
+        String[] informacao = pedidoCredito.toString().split("\n");
 
-        if (pedidoCredito.getStatus().toLowerCase().contains("solicitado")) {
-            holder.indodistgenerica.setTextColor(Color.BLUE);
-        } else if (pedidoCredito.getStatus().toLowerCase().contains("aprovado")) {
-            holder.indodistgenerica.setTextColor(Color.GREEN);
-        }else if (pedidoCredito.getStatus().toLowerCase().contains("negado")) {
-            holder.indodistgenerica.setTextColor(Color.RED);
+        StringBuilder infoBuilder = new StringBuilder();
+
+        for( String info : informacao){
+            if ( info.contains("Status:")){
+
+                if (pedidoCredito.getStatus().toLowerCase().contains("solicitado")) {
+                    infoBuilder.append("<br>").append("<font color='blue'>").append(info).append("</font>");
+                } else if (pedidoCredito.getStatus().toLowerCase().contains("aprovado")) {
+                    infoBuilder.append("<br>").append("<font color='green'>").append(info).append("</font>");
+                }else if (pedidoCredito.getStatus().toLowerCase().contains("negado")) {
+                    infoBuilder.append("<br>").append("<font color='red'>").append(info).append("</font>");
+                }
+
+            }else{
+                infoBuilder.append("<br>").append(info);
+            }
         }
 
-        holder.indodistgenerica.setText(pedidoCredito.toString());
+
+
+        holder.indodistgenerica.setText(Html.fromHtml(infoBuilder.toString()));
     }
 
     @Override

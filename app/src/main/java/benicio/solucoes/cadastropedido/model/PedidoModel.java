@@ -6,7 +6,7 @@ import java.util.List;
 public class PedidoModel {
 
 
-    int status = 0;
+    String status = "Pendente";
     String id, idVendedor;
     String lojaVendedor, data, idAgente, nomeEstabelecimento, nomeComprador, email, tele, cnpj, inscriEstadual,
             formaPagamento, enderecoCompleto, enderecoEntrega, obsEntrega;
@@ -25,11 +25,11 @@ public class PedidoModel {
         this.cep = cep;
     }
 
-    public int getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -39,46 +39,11 @@ public class PedidoModel {
         for (ItemCompra item : produtos) {
             produtosBuilder.append(item.toString()).append("\n\n");
         }
-        String statusText = "";
 
-        switch (this.getStatus()) {
-            //Pendente = 0
-            //Em Processamento = 1
-            //Completo = 2
-            //Pagamento Pendente = 3
-            //Cancelado = 4
-            //Fechado = 5
+        String statusExibicao = "STATUS: " + this.getStatus();
 
-            case 0:
-                statusText = "PENDENTE";
-                break;
-            case 1:
-                statusText = "EM PROCESSAMENTO";
-                break;
-            case 2:
-                statusText = "COMPLETO";
-                break;
-            case 3:
-                statusText = "PAGAMENTO PENDENTE";
-                break;
-            case 4:
-                statusText = "CANCELADO";
-                break;
-            case 5:
-                statusText = "FECHADO";
-                break;
-        }
-        String statusExibicao = "";
-        if (isAdmin) {
-            statusExibicao = "STATUS: " + statusText;
-        } else {
-            if (this.getStatus() == 4) {
-                statusExibicao = "STATUS: " + statusText;
-            }
-        }
-
-        return statusExibicao + '\n' +
-                "Id: " + id + '\n' +
+        return
+                "Id: " + id + '\n' + statusExibicao + '\n' +
                 "Loja Vendedor: " + lojaVendedor + '\n' +
                 "Data: " + data + '\n' +
                 "Id Agente: " + idAgente + '\n' +

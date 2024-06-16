@@ -1,6 +1,7 @@
 package benicio.solucoes.cadastropedido.model;
 
 public class ProdutoModel {
+
     float estoque;
     String nome, sku;
     String preco;

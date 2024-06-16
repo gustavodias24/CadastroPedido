@@ -21,7 +21,11 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Filtrar Produto"
-            android:inputType="text" />
+            android:inputType="text"
+            android:lineSpacingMultiplier="10"
+            android:lines="5"
+            android:maxLines="5"
+            android:minLines="5" />
 
         <ImageButton
             android:id="@+id/btn_search"
@@ -52,12 +56,51 @@
             android:textSize="24sp"
             android:textStyle="bold"
             android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/textInfo"
+        <TableLayout
+            android:id="@+id/tableLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="." />
+            android:stretchColumns="*">
+
+            <TableRow android:id="@+id/row_principal"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nome"
+                    android:textStyle="bold"
+                    android:padding="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estoque"
+                    android:textStyle="bold"
+                    android:padding="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SKU"
+                    android:textStyle="bold"
+                    android:padding="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Preço"
+                    android:textStyle="bold"
+                    android:padding="8dp" />
+            </TableRow>
+
+        </TableLayout>
+
+
+<!--        <TextView-->
+<!--            android:id="@+id/textInfo"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="." />-->
 
         <ImageButton
             android:id="@+id/btn_limpar"

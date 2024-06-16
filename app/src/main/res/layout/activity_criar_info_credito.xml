@@ -117,12 +117,14 @@
         </LinearLayout>
 
 
-        <EditText
+        <com.vicmikhailau.maskededittext.MaskedEditText
             android:id="@+id/edtCNPJ"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="CNPJ" />
+            android:hint="CNPJ"
+            android:inputType="number|numberDecimal|numberSigned"
+            app:mask="##.###.###/####-##" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -289,7 +291,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Valor Solicitado"
-            android:inputType="text" />
+            android:inputType="number|numberDecimal|numberSigned" />
 
 
         <TextView

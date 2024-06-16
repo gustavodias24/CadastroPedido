@@ -35,12 +35,7 @@ import benicio.solucoes.cadastropedido.util.PedidosUtil;
 public class AdminActivity extends AppCompatActivity {
 
     private ActivityAdminBinding mainBinding;
-    private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
 
-    private Dialog dialogCarregando;
-    private RecyclerView recyclerUsuarios;
-    private List<UserModel> usuarios = new ArrayList<>();
-    private AdapterUsuarios adapterUsuarios;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +44,6 @@ public class AdminActivity extends AppCompatActivity {
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        configurarDialogCarregando();
-        configurarRecyclerUsuarios();
 
         getSupportActionBar().setTitle("Admin Manager");
 
@@ -64,48 +57,8 @@ public class AdminActivity extends AppCompatActivity {
             startActivity(i);
         });
 
-    }
+        mainBinding.btnVendedores.setOnClickListener(v -> startActivity(new Intent(this, VendedoresActivity.class)));
 
-    private void configurarDialogCarregando() {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setCancelable(false);
-        LoadingLayoutBinding dialogBinding = LoadingLayoutBinding.inflate(getLayoutInflater());
-        dialogCarregando = b.setView(dialogBinding.getRoot()).create();
-    }
-
-    private void configurarRecyclerUsuarios() {
-        recyclerUsuarios = mainBinding.recyclerVendedores;
-        recyclerUsuarios.setLayoutManager(new LinearLayoutManager(this));
-        recyclerUsuarios.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        recyclerUsuarios.setHasFixedSize(true);
-        configurarListener("");
-        adapterUsuarios = new AdapterUsuarios(usuarios, this);
-        recyclerUsuarios.setAdapter(adapterUsuarios);
-    }
-
-    private void configurarListener(String query) {
-        dialogCarregando.show();
-        refUsuarios.addValueEventListener(new ValueEventListener() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                dialogCarregando.dismiss();
-                if (snapshot.exists()) {
-                    usuarios.clear();
-                    for (DataSnapshot dado : snapshot.getChildren()) {
-                        usuarios.add(dado.getValue(UserModel.class));
-                    }
-
-                    adapterUsuarios.notifyDataSetChanged();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                dialogCarregando.dismiss();
-                Toast.makeText(AdminActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
 

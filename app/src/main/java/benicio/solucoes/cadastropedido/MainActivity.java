@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
         new Thread(() -> {
             produtosServices.atualizarBaseCliente().enqueue(new Callback<List<ClienteModel>>() {
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void onResponse(Call<List<ClienteModel>> call, Response<List<ClienteModel>> response) {
 

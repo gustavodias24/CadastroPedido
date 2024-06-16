@@ -76,7 +76,13 @@ public class AllPedidosActivity extends AppCompatActivity {
 //        configurarLoadingDialog();
         configurarRecyclerPedidos();
 
-        mainBinding.btnRelatorioPedidos.setOnClickListener(v -> CSVGenerator.gerarPedidoADMCSV(this, listaPedidos));
+        mainBinding.btnRelatorioPedidos.setOnClickListener(v -> {
+            try {
+                CSVGenerator.gerarPedidoADMCSV(this, listaPedidos);
+            } catch (Exception error) {
+                showDialogError(error.getMessage());
+            }
+        });
         mainBinding.filtrarPeriodo.setOnClickListener(v -> configurarListener("", true));
 
         mainBinding.pesquisarProduto.setOnClickListener(view -> {
@@ -84,10 +90,17 @@ public class AllPedidosActivity extends AppCompatActivity {
             configurarListener(pesquisa.toLowerCase().trim(), false);
         });
 
-        mainBinding.btnRelatorioCredito.setOnClickListener(v -> CSVGenerator.gerarCreditoADMCSV(
-                this,
-                listaCreditos
-        ));
+        mainBinding.btnRelatorioCredito.setOnClickListener(v -> {
+                    try {
+                        CSVGenerator.gerarCreditoADMCSV(
+                                this,
+                                listaCreditos
+                        );
+                    } catch (Exception error) {
+                        showDialogError(error.getMessage());
+                    }
+                }
+        );
 
 
     }
@@ -98,6 +111,14 @@ public class AllPedidosActivity extends AppCompatActivity {
 //        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
 //        loadingDialog = b.create();
 //    }
+
+    private void showDialogError(String msg) {
+        AlertDialog.Builder b = new AlertDialog.Builder(AllPedidosActivity.this);
+        b.setTitle("Seu dispositivo apresentou:");
+        b.setMessage(msg);
+        b.setPositiveButton("ok", null);
+        b.create().show();
+    }
 
     private void configurarRecyclerPedidos() {
         recyclerPedidos = mainBinding.recyclerPedidos;
