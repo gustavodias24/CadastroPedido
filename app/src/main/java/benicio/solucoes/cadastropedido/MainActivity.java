@@ -296,6 +296,7 @@ public class MainActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     listaPedidos.clear();
                     for (DataSnapshot dado : snapshot.getChildren()) {
+
                         PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
 
                         if (pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)) {
