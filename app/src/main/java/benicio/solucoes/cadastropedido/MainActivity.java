@@ -28,6 +28,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import benicio.solucoes.cadastropedido.adapter.AdapterPedidos;
@@ -198,7 +200,11 @@ public class MainActivity extends AppCompatActivity {
                         // ProdutosUtils.saveProdutos(getApplicationContext(), response.body());
 
                         runOnUiThread(() -> {
-                            Toast.makeText(MainActivity.this, "Base atualizada!", Toast.LENGTH_SHORT).show();
+                            AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
+                            b.setTitle("Atenção!");
+                            b.setMessage("Base de produtos atualizada!");
+                            b.setPositiveButton("OK", null);
+                            b.create().show();
                             mainBinding.ultimoUpdate.setText("Última Atualização: " + ultimoUpdateDatabase);
                             editor.putString("data", ultimoUpdateDatabase).apply();
                         });
@@ -332,6 +338,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     runOnUiThread(() -> {
+                        Collections.reverse(listaPedidos);
                         adapterPedidos.notifyDataSetChanged();
                         mainBinding.textCarregando.setVisibility(View.GONE);
                         mainBinding.recyclerPedidos.setVisibility(View.VISIBLE);

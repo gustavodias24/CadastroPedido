@@ -36,7 +36,6 @@ import benicio.solucoes.cadastropedido.util.MathUtils;
 
 public class EnviarEmailActivity extends AppCompatActivity {
 
-    private boolean enviouEmail = false;
     private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
     private DatabaseReference refCreditos = FirebaseDatabase.getInstance().getReference().getRoot().child("creditos");
     private DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
@@ -47,6 +46,9 @@ public class EnviarEmailActivity extends AppCompatActivity {
     private CreditoModel credito;
     private String idVendedor;
     private Dialog loadingDialog;
+
+    Dialog dialogJanela;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,43 +76,6 @@ public class EnviarEmailActivity extends AppCompatActivity {
 
         mainBinding.btnEnviarEmail.setOnClickListener(view -> enviarEmail());
 
-        mainBinding.btnFinalizar.setOnClickListener(view -> {
-
-            if (enviouEmail) {
-                assert b != null;
-                if (b.getBoolean("credito", false)) {
-                    credito.setIdVendedor(idVendedor);
-                    loadingDialog.show();
-                    refCreditos.child(credito.getId()).setValue(credito).addOnCompleteListener(task -> {
-                        loadingDialog.dismiss();
-                        if (task.isSuccessful()) {
-                            Toast.makeText(this, "Crédito Solicitado", Toast.LENGTH_SHORT).show();
-                            finish();
-                            startActivity(new Intent(this, MenuCreditoActivity.class));
-                        }
-                    });
-                } else {
-                    pedido.setIdVendedor(idVendedor);
-
-                    loadingDialog.show();
-
-                    refPedidos.child(pedido.getId()).setValue(pedido).addOnCompleteListener(task -> {
-                        loadingDialog.dismiss();
-                        if (task.isSuccessful()) {
-                            Toast.makeText(EnviarEmailActivity.this, "Pedido Criado!", Toast.LENGTH_SHORT).show();
-                            finish();
-                            startActivity(new Intent(EnviarEmailActivity.this, MainActivity.class));
-                        }
-                    });
-
-
-                }
-            } else {
-                Toast.makeText(this, "Envie o E-mail primeiro!", Toast.LENGTH_SHORT).show();
-            }
-
-        });
-
         ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 
         mainBinding.bodyEmail.setOnClickListener(view -> {
@@ -120,6 +85,37 @@ public class EnviarEmailActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void salvarPedido(){
+        assert b != null;
+        if (b.getBoolean("credito", false)) {
+            credito.setIdVendedor(idVendedor);
+            loadingDialog.show();
+            refCreditos.child(credito.getId()).setValue(credito).addOnCompleteListener(task -> {
+                loadingDialog.dismiss();
+                if (task.isSuccessful()) {
+                    Toast.makeText(this, "Crédito Solicitado", Toast.LENGTH_SHORT).show();
+                    finish();
+                    startActivity(new Intent(this, MenuCreditoActivity.class));
+                }
+            });
+        } else {
+            pedido.setIdVendedor(idVendedor);
+
+            loadingDialog.show();
+
+            refPedidos.child(pedido.getId()).setValue(pedido).addOnCompleteListener(task -> {
+                loadingDialog.dismiss();
+                if (task.isSuccessful()) {
+                    Toast.makeText(EnviarEmailActivity.this, "Pedido Criado!", Toast.LENGTH_SHORT).show();
+                    finish();
+                    startActivity(new Intent(EnviarEmailActivity.this, MainActivity.class));
+                }
+            });
+
+
+        }
     }
 
     private void configurarLoadingDialog() {
@@ -200,7 +196,7 @@ public class EnviarEmailActivity extends AppCompatActivity {
     }
 
     private void enviarEmail() {
-        enviouEmail = true;
+
         String email = mainBinding.edtEmailEnvio.getText().toString();
         String assunto = mainBinding.edtTituloEmail.getText().toString();
         String corpo = mainBinding.bodyEmail.getText().toString();
@@ -216,6 +212,18 @@ public class EnviarEmailActivity extends AppCompatActivity {
 
         startActivity(intent);
 
+        AlertDialog.Builder janelaEmailSalvo = new AlertDialog.Builder(EnviarEmailActivity.this);
+        janelaEmailSalvo.setTitle("Atenção");
+        janelaEmailSalvo.setMessage("Escolha uma opção:");
+        janelaEmailSalvo.setCancelable(false);
+        janelaEmailSalvo.setPositiveButton("Salvar", (d, i) -> salvarPedido());
+        janelaEmailSalvo.setNegativeButton("Enivar Novamente", (d,i) -> {
+            dialogJanela.dismiss();
+            enviarEmail();
+        });
+        janelaEmailSalvo.setNeutralButton("Voltar", (d,i) -> dialogJanela.dismiss());
+        dialogJanela = janelaEmailSalvo.create();
+        dialogJanela.show();
     }
 
 

@@ -147,6 +147,7 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private void addLinha(ProdutoModel produto) {
         TableRow tableRow = new TableRow(this);
         tableRow.setId(new Random().nextInt(1000));
@@ -170,7 +171,7 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
         textViewSKU.setGravity(Gravity.CENTER);
 
         TextView textViewPreco = new TextView(this);
-        textViewPreco.setText(produto.getPreco());
+        textViewPreco.setText(produto.getPrecoFormatado());
         textViewPreco.setPadding(8, 8, 8, 8);
         textViewPreco.setLayoutParams(new TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         textViewPreco.setGravity(Gravity.CENTER);
