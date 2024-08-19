@@ -13,6 +13,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +39,7 @@ import benicio.solucoes.cadastropedido.dblocal.ProdutosDAO;
 import benicio.solucoes.cadastropedido.model.ClienteModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
+import benicio.solucoes.cadastropedido.model.ProdutosResponseModel;
 import benicio.solucoes.cadastropedido.model.UserModel;
 import benicio.solucoes.cadastropedido.service.ProdutosServices;
 import benicio.solucoes.cadastropedido.util.CSVGenerator;
@@ -49,6 +51,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
+
+    // offset e limit para produtos
+    int offset = 0;
+    int limit = 1000;
+    boolean continuarBuscandoProdutos = true;
+    boolean fazendoBuscaProduto = false;
 
     private AdapterPedidos adapterPedidos;
     private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
@@ -139,7 +147,10 @@ public class MainActivity extends AppCompatActivity {
                         });
 
                     } else {
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, response.message(), Toast.LENGTH_SHORT).show());
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                                "Status: " + response.code()
+                                        + '\n' +
+                                        response.message(), Toast.LENGTH_SHORT).show());
                     }
                 }
 
@@ -176,55 +187,64 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+    @SuppressLint("SetTextI18n")
     private void atualizarBaseProdutos() {
 
         Toast.makeText(this, "Atualizando Aguarde!", Toast.LENGTH_SHORT).show();
         mainBinding.progressBarProdutos.setVisibility(View.VISIBLE);
 
+        ProdutosDAO produtosDAO = new ProdutosDAO(MainActivity.this);
+        produtosDAO.limparProdutos();
+
         new Thread(() -> {
-            produtosServices.atualizarBase().enqueue(new Callback<List<ProdutoModel>>() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onResponse(Call<List<ProdutoModel>> call, Response<List<ProdutoModel>> response) {
+            while (continuarBuscandoProdutos){
+                if ( !fazendoBuscaProduto ){
+                    fazendoBuscaProduto = true;
+                    produtosServices.retornarProdutos(offset, limit).enqueue(new Callback<ProdutosResponseModel>() {
+                        @Override
+                        public void onResponse(Call<ProdutosResponseModel> call, Response<ProdutosResponseModel> response) {
+                            if (response.isSuccessful()) {
+                                assert response.body() != null;
+                                List<ProdutoModel> produtos = response.body().getProdutos();
+                                for (ProdutoModel produtoModel : produtos) {
+                                    produtosDAO.inserirProduto(produtoModel);
+                                }
+                                offset += 1000;
+                                fazendoBuscaProduto = false;
 
-                    runOnUiThread(() -> mainBinding.progressBarProdutos.setVisibility(View.GONE));
-                    if (response.isSuccessful()) {
-
-                        ProdutosDAO produtosDAO = new ProdutosDAO(MainActivity.this);
-                        produtosDAO.limparProdutos();
-
-                        assert response.body() != null;
-                        for (ProdutoModel produtoModel : response.body()) {
-                            produtosDAO.inserirProduto(produtoModel);
+                                if (produtos.isEmpty()) {
+                                    continuarBuscandoProdutos = false;
+                                    runOnUiThread(() -> {
+                                        mainBinding.progressBarProdutos.setVisibility(View.GONE);
+                                        AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
+                                        b.setTitle("Atenção!");
+                                        b.setMessage("Base de produtos atualizada!");
+                                        b.setPositiveButton("OK", null);
+                                        b.create().show();
+                                        mainBinding.ultimoUpdate.setText("Última Atualização: " + ultimoUpdateDatabase);
+                                        editor.putString("data", ultimoUpdateDatabase).apply();
+                                    });
+                                }
+                            } else {
+                                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                                        "Status: " + response.code()
+                                                + '\n' +
+                                                response.message(), Toast.LENGTH_SHORT).show());
+                            }
                         }
-                        // ProdutosUtils.saveProdutos(getApplicationContext(), response.body());
-
-                        runOnUiThread(() -> {
-                            AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
-                            b.setTitle("Atenção!");
-                            b.setMessage("Base de produtos atualizada!");
-                            b.setPositiveButton("OK", null);
-                            b.create().show();
-                            mainBinding.ultimoUpdate.setText("Última Atualização: " + ultimoUpdateDatabase);
-                            editor.putString("data", ultimoUpdateDatabase).apply();
-                        });
-
-                    } else {
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, response.message(), Toast.LENGTH_SHORT).show());
-                    }
-
-                }
-
-                @Override
-                public void onFailure(Call<List<ProdutoModel>> call, Throwable t) {
-                    runOnUiThread(() -> {
-                        mainBinding.progressBarProdutos.setVisibility(View.GONE);
-                        Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
+                        @Override
+                        public void onFailure(Call<ProdutosResponseModel> call, Throwable t) {
+                            runOnUiThread(() -> {
+                                mainBinding.progressBarProdutos.setVisibility(View.GONE);
+                                Log.d("mayara", "onFailure: " + t.getMessage());
+                                Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
+                            });
+                        }
                     });
                 }
-            });
+            }
         }).start();
-
     }
 
     private void configurarIdVendedor() {

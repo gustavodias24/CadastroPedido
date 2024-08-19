@@ -10,6 +10,7 @@
     <protected-broadcast android:name="com.motorola.motocare.INTENT_TRIGGER" />
 
     <application
+        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
