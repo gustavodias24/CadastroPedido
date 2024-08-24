@@ -4,6 +4,7 @@ import java.util.List;
 
 import benicio.solucoes.cadastropedido.model.ClienteModel;
 import benicio.solucoes.cadastropedido.model.DistribuidorModel;
+import benicio.solucoes.cadastropedido.model.ImagemResponseModel;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
 import benicio.solucoes.cadastropedido.model.ProdutosResponseModel;
 import retrofit2.Call;
@@ -13,6 +14,9 @@ import retrofit2.http.Query;
 public interface ProdutosServices {
     @GET("produtos")
     Call<ProdutosResponseModel> retornarProdutos(@Query("offset") int offset, @Query("limit") int limit);
+
+    @GET("get/imagem/produto")
+    Call<ImagemResponseModel> retornarImagem(@Query("sku") String sku);
 
     @GET("clientes")
     Call<List<ClienteModel>> atualizarBaseCliente();

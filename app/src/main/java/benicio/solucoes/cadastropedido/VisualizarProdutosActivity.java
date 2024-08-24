@@ -1,20 +1,29 @@
 package benicio.solucoes.cadastropedido;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +32,15 @@ import java.util.Random;
 
 
 import benicio.solucoes.cadastropedido.databinding.ActivityVisualizarProdutosBinding;
+import benicio.solucoes.cadastropedido.databinding.ExpandirImagemBinding;
 import benicio.solucoes.cadastropedido.dblocal.ProdutosDAO;
+import benicio.solucoes.cadastropedido.model.ImagemResponseModel;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
+import benicio.solucoes.cadastropedido.service.ProdutosServices;
+import benicio.solucoes.cadastropedido.util.RetrofitUitl;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class VisualizarProdutosActivity extends AppCompatActivity {
 
@@ -33,11 +49,8 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
     private ActivityVisualizarProdutosBinding mainBinding;
     private List<ProdutoModel> listaProdutos = new ArrayList<>();
 
-    //    private List<ProdutoModel> listaNomeProdutosAdapter = new ArrayList<>();
-//    private List<ProdutoModel> listaNomeProdutosHelper = new ArrayList<>();
     private List<String> listaNomeProdutos = new ArrayList<>();
-
-//    private AdapterProdutoVisualizacao adapter;
+    private ProdutosServices produtosServices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +59,9 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
+        produtosServices = RetrofitUitl.criarService(
+                RetrofitUitl.criarRetrofit()
+        );
         Objects.requireNonNull(getSupportActionBar()).setTitle("Produtos");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -92,10 +108,10 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
                 mainBinding.autoCompleteFiltro.setOnItemClickListener((parent, view, position, id) -> {
                     String selectedFrase = (String) parent.getItemAtPosition(position);
 
-                    mainBinding.autoCompleteFiltro.setText((selectedFrase.contains("-F-") ?selectedFrase.split("-F-")[0]:selectedFrase).trim());
+                    mainBinding.autoCompleteFiltro.setText((selectedFrase.contains("-F-") ? selectedFrase.split("-F-")[0] : selectedFrase).trim());
 
                     for (ProdutoModel produtoModel : listaProdutos) {
-                        if (produtoModel.getNome().equals(selectedFrase.contains("-F-") ? selectedFrase.split("-F-")[0]:selectedFrase)) {
+                        if (produtoModel.getNome().equals(selectedFrase.contains("-F-") ? selectedFrase.split("-F-")[0] : selectedFrase)) {
                             addLinha(produtoModel);
                             break;
                         }
@@ -119,7 +135,7 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
                         String selectedFrase = mainBinding.autoCompleteFiltro.getText().toString();
 
                         if (!selectedFrase.isEmpty()) {
-                            List<ProdutoModel> info = new ArrayList<>(produtosDAO.buscarProduto(selectedFrase.contains("-F-") ? selectedFrase.split("-F-")[0]:selectedFrase));
+                            List<ProdutoModel> info = new ArrayList<>(produtosDAO.buscarProduto(selectedFrase.contains("-F-") ? selectedFrase.split("-F-")[0] : selectedFrase));
 
                             runOnUiThread(() -> {
                                 mainBinding.progressPesquisa.setVisibility(View.GONE);
@@ -141,7 +157,7 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
     private void removerLinha() {
         for (int i = 0; i < mainBinding.tableLayout.getChildCount(); i++) {
             TableRow tableRow = (TableRow) mainBinding.tableLayout.getChildAt(i);
-            if ( tableRow.getId() != mainBinding.rowPrincipal.getId()){
+            if (tableRow.getId() != mainBinding.rowPrincipal.getId()) {
                 mainBinding.tableLayout.removeViewAt(i);
             }
         }
@@ -151,6 +167,39 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
     private void addLinha(ProdutoModel produto) {
         TableRow tableRow = new TableRow(this);
         tableRow.setId(new Random().nextInt(1000));
+
+// Definindo o layout params específico para o ImageView dentro de um TableRow
+        TableRow.LayoutParams imageViewParams = new TableRow.LayoutParams(
+                100,  // largura em pixels
+                100   // altura em pixels
+        );
+        imageViewParams.gravity = Gravity.CENTER;  // Centralizar a imagem no TableRow
+
+        ImageView imageView = new ImageView(this);
+        imageView.setLayoutParams(imageViewParams);
+        imageView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.carregando));
+
+        produtosServices.retornarImagem(produto.getSku()).enqueue(new Callback<ImagemResponseModel>() {
+            @Override
+            public void onResponse(Call<ImagemResponseModel> call, Response<ImagemResponseModel> response) {
+                Picasso.get().load(response.body().getImg()).into(imageView);
+
+                imageView.setOnClickListener(v -> {
+                    AlertDialog.Builder expandirImagem = new AlertDialog.Builder(VisualizarProdutosActivity.this);
+                    ExpandirImagemBinding imagemBinding = ExpandirImagemBinding.inflate(getLayoutInflater());
+                    Picasso.get().load(response.body().getImg()).into(imagemBinding.imageView4);
+                    expandirImagem.setView(imagemBinding.getRoot());
+                    expandirImagem.setTitle("Imagem do Produto");
+                    expandirImagem.setNegativeButton("Fechar", null);
+                    expandirImagem.create().show();
+                });
+            }
+
+            @Override
+            public void onFailure(Call<ImagemResponseModel> call, Throwable t) {
+                // Tratar o erro aqui
+            }
+        });
 
         TextView textViewNome = new TextView(this);
         textViewNome.setText(produto.getNome());
@@ -176,13 +225,27 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
         textViewPreco.setLayoutParams(new TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         textViewPreco.setGravity(Gravity.CENTER);
 
+        tableRow.addView(imageView);
         tableRow.addView(textViewNome);
         tableRow.addView(textViewEstoque);
         tableRow.addView(textViewSKU);
         tableRow.addView(textViewPreco);
 
         mainBinding.tableLayout.addView(tableRow);
+        mainBinding.tableLayout.addView(createDivider());
 
+    }
+
+    private View createDivider() {
+        View divider = new View(this);
+        TableLayout.LayoutParams params = new TableLayout.LayoutParams(
+                TableLayout.LayoutParams.MATCH_PARENT,  // largura, ocupa todo o espaço disponível
+                2  // altura da linha divisória (em pixels)
+        );
+        params.setMargins(0, 8, 0, 8);  // adiciona margens (opcional)
+        divider.setLayoutParams(params);
+        divider.setBackgroundColor(Color.LTGRAY);  // define a cor da linha divisória
+        return divider;
     }
 
     @Override

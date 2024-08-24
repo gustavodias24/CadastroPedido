@@ -64,12 +64,20 @@
 
             <TableRow android:id="@+id/row_principal"
                 >
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Imagem"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
                     android:text="Nome"
-                    android:textStyle="bold"
-                    android:padding="8dp" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -91,6 +99,7 @@
                     android:text="Preço"
                     android:textStyle="bold"
                     android:padding="8dp" />
+
             </TableRow>
 
         </TableLayout>
