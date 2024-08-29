@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -132,7 +133,7 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
                     public void run() {
                         super.run();
 
-                        String selectedFrase = mainBinding.autoCompleteFiltro.getText().toString();
+                        String selectedFrase = mainBinding.autoCompleteFiltro.getText().toString().trim();
 
                         if (!selectedFrase.isEmpty()) {
                             List<ProdutoModel> info = new ArrayList<>(produtosDAO.buscarProduto(selectedFrase.contains("-F-") ? selectedFrase.split("-F-")[0] : selectedFrase));
@@ -155,34 +156,68 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
 
 
     private void removerLinha() {
-        for (int i = 0; i < mainBinding.tableLayout.getChildCount(); i++) {
-            TableRow tableRow = (TableRow) mainBinding.tableLayout.getChildAt(i);
-            if (tableRow.getId() != mainBinding.rowPrincipal.getId()) {
-                mainBinding.tableLayout.removeViewAt(i);
+        // Começa do final para evitar problemas ao remover views durante a iteração
+        for (int i = mainBinding.tableLayout.getChildCount() - 1; i >= 0; i--) {
+            View child = mainBinding.tableLayout.getChildAt(i);
+
+            // Verifica se o child é um TableRow e não é o rowPrincipal
+            if (child instanceof TableRow && child.getId() != mainBinding.rowPrincipal.getId()) {
+                mainBinding.tableLayout.removeViewAt(i); // Remove a linha
+                if (i > 0) { // Verifica se não é a primeira posição
+                    View previousChild = mainBinding.tableLayout.getChildAt(i - 1);
+                    if (!(previousChild instanceof TableRow)) {
+                        mainBinding.tableLayout.removeViewAt(i - 1); // Remove o divider logo acima da linha removida
+                    }
+                }
             }
         }
     }
 
-    @SuppressLint("SetTextI18n")
+
     private void addLinha(ProdutoModel produto) {
         TableRow tableRow = new TableRow(this);
         tableRow.setId(new Random().nextInt(1000));
 
-// Definindo o layout params específico para o ImageView dentro de um TableRow
+        // Definindo o layout params específico para o ImageView dentro de um TableRow
         TableRow.LayoutParams imageViewParams = new TableRow.LayoutParams(
                 100,  // largura em pixels
                 100   // altura em pixels
         );
         imageViewParams.gravity = Gravity.CENTER;  // Centralizar a imagem no TableRow
 
+        // Criar o ProgressBar
+        ProgressBar progressBar = new ProgressBar(this);
+        progressBar.setLayoutParams(imageViewParams);
+        progressBar.setIndeterminate(true);  // Definir como indeterminado
+
+        // Criar o ImageView
         ImageView imageView = new ImageView(this);
         imageView.setLayoutParams(imageViewParams);
-        imageView.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.carregando));
+        imageView.setVisibility(View.GONE);  // Inicialmente oculto até que a imagem seja carregada
 
+        // Adicionar o ProgressBar à tabela
+        tableRow.addView(imageView);
+        tableRow.addView(progressBar);
+
+        // Carregar a imagem com Picasso
         produtosServices.retornarImagem(produto.getSku()).enqueue(new Callback<ImagemResponseModel>() {
             @Override
             public void onResponse(Call<ImagemResponseModel> call, Response<ImagemResponseModel> response) {
-                Picasso.get().load(response.body().getImg()).into(imageView);
+                Picasso.get().load(response.body().getImg()).into(imageView, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        // Esconder o ProgressBar e mostrar a imagem
+                        progressBar.setVisibility(View.GONE);
+                        imageView.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        // Tratar erro de carregamento, talvez mostrar uma imagem de erro
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
+
 
                 imageView.setOnClickListener(v -> {
                     AlertDialog.Builder expandirImagem = new AlertDialog.Builder(VisualizarProdutosActivity.this);
@@ -198,6 +233,7 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ImagemResponseModel> call, Throwable t) {
                 // Tratar o erro aqui
+                progressBar.setVisibility(View.GONE);
             }
         });
 
@@ -225,7 +261,6 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
         textViewPreco.setLayoutParams(new TableRow.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
         textViewPreco.setGravity(Gravity.CENTER);
 
-        tableRow.addView(imageView);
         tableRow.addView(textViewNome);
         tableRow.addView(textViewEstoque);
         tableRow.addView(textViewSKU);
@@ -233,7 +268,6 @@ public class VisualizarProdutosActivity extends AppCompatActivity {
 
         mainBinding.tableLayout.addView(tableRow);
         mainBinding.tableLayout.addView(createDivider());
-
     }
 
     private View createDivider() {

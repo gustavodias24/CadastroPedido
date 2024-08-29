@@ -9,11 +9,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitUitl {
 
     public static Retrofit criarRetrofit() {
-        return new Retrofit.Builder().baseUrl("https://red-cloud-update-produtos.vercel.app/")
-                .addConverterFactory(GsonConverterFactory.create()).build();
-
-//        return new Retrofit.Builder().baseUrl("http://192.168.100.4:5052/")
+//        return new Retrofit.Builder().baseUrl("https://red-cloud-update-produtos.vercel.app/")
 //                .addConverterFactory(GsonConverterFactory.create()).build();
+
+        return new Retrofit.Builder().baseUrl("http://195.200.6.225:50345/")
+                .addConverterFactory(GsonConverterFactory.create()).build();
     }
 
     public static ProdutosServices criarService(Retrofit retrofit) {

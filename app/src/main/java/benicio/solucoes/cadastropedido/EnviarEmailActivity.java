@@ -87,7 +87,12 @@ public class EnviarEmailActivity extends AppCompatActivity {
 
     }
 
-    private void salvarPedido(){
+    private void irParaMenu() {
+        finish();
+        startActivity(new Intent(this, MenuCreditoActivity.class));
+    }
+
+    private void salvarPedido() {
         assert b != null;
         if (b.getBoolean("credito", false)) {
             credito.setIdVendedor(idVendedor);
@@ -96,8 +101,6 @@ public class EnviarEmailActivity extends AppCompatActivity {
                 loadingDialog.dismiss();
                 if (task.isSuccessful()) {
                     Toast.makeText(this, "Crédito Solicitado", Toast.LENGTH_SHORT).show();
-                    finish();
-                    startActivity(new Intent(this, MenuCreditoActivity.class));
                 }
             });
         } else {
@@ -109,8 +112,6 @@ public class EnviarEmailActivity extends AppCompatActivity {
                 loadingDialog.dismiss();
                 if (task.isSuccessful()) {
                     Toast.makeText(EnviarEmailActivity.this, "Pedido Criado!", Toast.LENGTH_SHORT).show();
-                    finish();
-                    startActivity(new Intent(EnviarEmailActivity.this, MainActivity.class));
                 }
             });
 
@@ -176,6 +177,8 @@ public class EnviarEmailActivity extends AppCompatActivity {
                 mainBinding.bodyEmail.setText(
                         pedido.toInformacao(false)
                 );
+
+                salvarPedido();
             }
 
             @Override
@@ -216,12 +219,12 @@ public class EnviarEmailActivity extends AppCompatActivity {
         janelaEmailSalvo.setTitle("Atenção");
         janelaEmailSalvo.setMessage("Escolha uma opção:");
         janelaEmailSalvo.setCancelable(false);
-        janelaEmailSalvo.setPositiveButton("Salvar", (d, i) -> salvarPedido());
-        janelaEmailSalvo.setNegativeButton("Enivar Novamente", (d,i) -> {
+        janelaEmailSalvo.setPositiveButton("Ir para Menu", (d, i) -> irParaMenu());
+        janelaEmailSalvo.setNegativeButton("Enivar Novamente", (d, i) -> {
             dialogJanela.dismiss();
             enviarEmail();
         });
-        janelaEmailSalvo.setNeutralButton("Voltar", (d,i) -> dialogJanela.dismiss());
+        janelaEmailSalvo.setNeutralButton("Voltar", (d, i) -> dialogJanela.dismiss());
         dialogJanela = janelaEmailSalvo.create();
         dialogJanela.show();
     }
