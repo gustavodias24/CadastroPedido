@@ -12,6 +12,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -25,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import benicio.solucoes.cadastropedido.databinding.ActivityEnviarEmailBinding;
@@ -68,6 +70,7 @@ public class EnviarEmailActivity extends AppCompatActivity {
         ArrayAdapter<String> adapterEmails = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesEmails);
         mainBinding.edtEmailEnvio.setAdapter(adapterEmails);
         mainBinding.edtEmailEnvio.setOnClickListener(view -> mainBinding.edtEmailEnvio.showDropDown());
+
         mainBinding.edtEmailEnvio.setOnItemClickListener((parent, view, position, id) -> {
             String selectedFrase = (String) parent.getItemAtPosition(position);
             mainBinding.edtEmailEnvio.setText(selectedFrase);
@@ -89,29 +92,80 @@ public class EnviarEmailActivity extends AppCompatActivity {
 
     private void irParaMenu() {
         finish();
-        startActivity(new Intent(this, MenuCreditoActivity.class));
+        startActivity(new Intent(this, MenuPedidoOrCreditoActivity.class));
     }
 
     private void salvarPedido() {
         assert b != null;
         if (b.getBoolean("credito", false)) {
+
             credito.setIdVendedor(idVendedor);
             loadingDialog.show();
-            refCreditos.child(credito.getId()).setValue(credito).addOnCompleteListener(task -> {
+            String idTemp = UUID.randomUUID().toString();
+            refCreditos.child(idTemp).setValue(credito).addOnCompleteListener(task -> {
                 loadingDialog.dismiss();
                 if (task.isSuccessful()) {
-                    Toast.makeText(this, "Crédito Solicitado", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Crédito Salvo", Toast.LENGTH_SHORT).show();
+
+                    refCreditos.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            int count = 0;
+                            for (DataSnapshot dado : snapshot.getChildren()) {
+                                count++;
+                            }
+
+                            loadingDialog.dismiss();
+                            credito.setId(MathUtils.formatarNumero(count));
+                            mainBinding.bodyEmail.setText(
+                                    credito.toString()
+                            );
+                            refCreditos.child(idTemp).setValue(credito);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                        }
+                    });
                 }
             });
+
+
         } else {
             pedido.setIdVendedor(idVendedor);
 
             loadingDialog.show();
 
-            refPedidos.child(pedido.getId()).setValue(pedido).addOnCompleteListener(task -> {
+            String idTemp = UUID.randomUUID().toString();
+            refPedidos.child(idTemp).setValue(pedido).addOnCompleteListener(task -> {
                 loadingDialog.dismiss();
                 if (task.isSuccessful()) {
-                    Toast.makeText(EnviarEmailActivity.this, "Pedido Criado!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EnviarEmailActivity.this, "Pedido Salvo", Toast.LENGTH_SHORT).show();
+
+                    loadingDialog.show();
+                    refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            int count = 0;
+                            for (DataSnapshot dado : snapshot.getChildren()) {
+                                count++;
+                            }
+
+                            loadingDialog.dismiss();
+                            pedido.setId(MathUtils.formatarNumero(count));
+                            mainBinding.bodyEmail.setText(
+                                    pedido.toInformacao(false)
+                            );
+
+                            refPedidos.child(idTemp).setValue(pedido);
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            loadingDialog.dismiss();
+                        }
+                    });
                 }
             });
 
@@ -129,6 +183,7 @@ public class EnviarEmailActivity extends AppCompatActivity {
     private void configurarIdVendedor() {
 
         loadingDialog.show();
+
         refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -162,39 +217,16 @@ public class EnviarEmailActivity extends AppCompatActivity {
         pedido = new Gson().fromJson(b.getString("dados", ""), new TypeToken<PedidoModel>() {
         }.getType());
 
+        salvarPedido();
 
-        loadingDialog.show();
-        refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                int count = 0;
-                for (DataSnapshot dado : snapshot.getChildren()) {
-                    count++;
-                }
 
-                loadingDialog.dismiss();
-                pedido.setId(MathUtils.formatarNumero(count));
-                mainBinding.bodyEmail.setText(
-                        pedido.toInformacao(false)
-                );
-
-                salvarPedido();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                loadingDialog.dismiss();
-            }
-        });
     }
 
     private void gerarIdCredito() {
         credito = new Gson().fromJson(b.getString("dados", ""), new TypeToken<CreditoModel>() {
         }.getType());
 
-        mainBinding.bodyEmail.setText(
-                credito.toString()
-        );
+        salvarPedido();
 
     }
 
