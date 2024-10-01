@@ -192,7 +192,7 @@ public class EnviarEmailActivity extends AppCompatActivity {
                 for (DataSnapshot dado : snapshot.getChildren()) {
                     UserModel userModel = dado.getValue(UserModel.class);
                     if (userModel.getEmail().toLowerCase().trim().equals(auth.getCurrentUser().getEmail().toLowerCase().trim())) {
-                        idVendedor = userModel.getId();
+//                        idVendedor = userModel.getId();
                         b = getIntent().getExtras();
                         assert b != null;
                         if (b.getBoolean("credito", false)) {

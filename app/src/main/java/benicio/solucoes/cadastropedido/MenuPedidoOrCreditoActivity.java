@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +19,9 @@ import benicio.solucoes.cadastropedido.databinding.ActivityMenuPedidoOrCreditoBi
 public class MenuPedidoOrCreditoActivity extends AppCompatActivity {
 
     ActivityMenuPedidoOrCreditoBinding mainBinding;
-    FirebaseAuth auth = FirebaseAuth.getInstance();
+    private SharedPreferences user_prefs;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +30,8 @@ public class MenuPedidoOrCreditoActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         getSupportActionBar().setTitle("Menu");
+        user_prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        editor = user_prefs.edit();
 
         mainBinding.pedido.setOnClickListener(view -> startActivity(new Intent(this, MainActivity.class)));
         mainBinding.fornecedor.setOnClickListener(view -> startActivity(new Intent(this, FornecedoresActivity.class)));
@@ -42,9 +47,9 @@ public class MenuPedidoOrCreditoActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if ( item.getItemId() == R.id.sair){
+        if (item.getItemId() == R.id.sair) {
             finish();
-            auth.signOut();
+            editor.remove("email").apply();
         }
         return super.onOptionsItemSelected(item);
     }

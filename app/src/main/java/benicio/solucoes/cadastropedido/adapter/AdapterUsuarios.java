@@ -61,14 +61,14 @@ public class AdapterUsuarios extends RecyclerView.Adapter<AdapterUsuarios.MyView
             b.setTitle("Atenção!");
             b.setMessage("Remover esse Usuário Permantemente?");
             b.setPositiveButton("Sim", (d, i) -> {
-                refUsuarios.child(user.getId()).setValue(null).addOnCompleteListener(task -> {
-                    dialodRm.dismiss();
-                    if (task.isSuccessful()) {
-                        Toast.makeText(c, "Usuário Removido!", Toast.LENGTH_SHORT).show();
-                    }else{
-                        Toast.makeText(c, "Tente Novamente!", Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                refUsuarios.child(user.getId()).setValue(null).addOnCompleteListener(task -> {
+//                    dialodRm.dismiss();
+//                    if (task.isSuccessful()) {
+//                        Toast.makeText(c, "Usuário Removido!", Toast.LENGTH_SHORT).show();
+//                    }else{
+//                        Toast.makeText(c, "Tente Novamente!", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
             });
             b.setNegativeButton("Não", null);
             dialodRm = b.create();
@@ -80,14 +80,14 @@ public class AdapterUsuarios extends RecyclerView.Adapter<AdapterUsuarios.MyView
         holder.btn_ver_pedidos_vendedores.setOnClickListener(view -> {
             Intent t = new Intent(c, PedidoVendedorActivity.class);
             t.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            t.putExtra("idUsuario", user.getId());
+//            t.putExtra("idUsuario", user.getId());
             c.startActivity(t);
         });
 
         holder.btn_ver_pedidos_creditos.setOnClickListener(v -> {
             Intent t = new Intent(c, PedidoVendedorActivity.class);
             t.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            t.putExtra("idUsuario", user.getId());
+//            t.putExtra("idUsuario", user.getId());
             t.putExtra("credito", true);
             c.startActivity(t);
         });

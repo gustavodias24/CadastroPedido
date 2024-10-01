@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -123,15 +124,13 @@ public class InfosActivity extends AppCompatActivity {
 
                 usuarioAtual.setIdAgente(idAgente);
 
-//                loadingDialog.show();
-                refUsuarios.child(usuarioAtual.getId()).setValue(usuarioAtual).addOnCompleteListener(task -> {
-//                    loadingDialog.dismiss();
-                    if (task.isSuccessful()) {
-                        startActivity(i);
-                    } else {
-                        Toast.makeText(this, "Tente novamente...", Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                refUsuarios.child(usuarioAtual.getId()).setValue(usuarioAtual).addOnCompleteListener(task -> {
+//                    if (task.isSuccessful()) {
+//                        startActivity(i);
+//                    } else {
+//                        Toast.makeText(this, "Tente novamente...", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
             }
         });
     }
@@ -262,16 +261,17 @@ public class InfosActivity extends AppCompatActivity {
 
     private void encontrarUsuarioAtual() {
         mainBinding.layoutCarregando.setVisibility(View.VISIBLE);
+
         try {
             refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     mainBinding.progressBarIdAgente.setVisibility(View.GONE);
                     for (DataSnapshot dado : snapshot.getChildren()) {
+                        Log.d("mayara", dado.getValue(UserModel.class).getEmail().trim().toLowerCase() + " : " + user.getEmail().trim().toLowerCase());
                         if (dado.getValue(UserModel.class).getEmail().trim().toLowerCase().equals(user.getEmail().trim().toLowerCase())) {
                             usuarioAtual = dado.getValue(UserModel.class);
                             mainBinding.edtAgente.setText(usuarioAtual.getIdAgente());
-
                             break;
                         }
                     }

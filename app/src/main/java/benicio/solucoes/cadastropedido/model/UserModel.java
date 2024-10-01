@@ -3,19 +3,19 @@ package benicio.solucoes.cadastropedido.model;
 public class UserModel {
     public UserModel() {
     }
-    String id,nome, email, senha;
+
+    String nome, email, senha;
     String idAgente;
 
     @Override
     public String toString() {
         return
                 "Nome: " + '\n' + nome + '\n' +
-                "E-mail: " + '\n' + email + '\n' +
-                "Senha: " + '\n' + senha ;
+                        "E-mail: " + '\n' + email + '\n' +
+                        "Senha: " + '\n' + senha;
     }
 
-    public UserModel(String id, String nome, String email, String senha) {
-        this.id = id;
+    public UserModel(String nome, String email, String senha) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
@@ -27,14 +27,6 @@ public class UserModel {
 
     public void setIdAgente(String idAgente) {
         this.idAgente = idAgente;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getNome() {

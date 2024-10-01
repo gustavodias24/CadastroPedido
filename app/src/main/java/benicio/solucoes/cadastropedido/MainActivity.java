@@ -259,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if (userModel.getEmail().trim().toLowerCase().equals(auth.getCurrentUser().getEmail().trim().toLowerCase())) {
 
-                        idUsuario = userModel.getId();
+//                        idUsuario = userModel.getId();
                         configurarRecyclerPedidos();
                         break;
                     }
