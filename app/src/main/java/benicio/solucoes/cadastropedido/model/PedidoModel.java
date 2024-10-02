@@ -5,13 +5,13 @@ import java.util.List;
 
 public class PedidoModel {
 
-
+    String tipo = "produto";
     String status = "Pendente";
-    String id, idVendedor;
-    String lojaVendedor, data, idAgente, nomeEstabelecimento, nomeComprador, email, tele, cnpj, inscriEstadual,
-            formaPagamento, enderecoCompleto, enderecoEntrega, obsEntrega;
+    String _id = "";
+    String lojaVendedor = "", data = "", idAgente = "", nomeEstabelecimento = "", nomeComprador = "", email = "", tele = "", cnpj = "", inscriEstadual = "",
+            formaPagamento = "", enderecoCompleto = "", enderecoEntrega = "", obsEntrega = "", emailVendedor = "";
     String cep = "";
-    String totalCompra;
+    String totalCompra = "";
     List<ItemCompra> produtos = new ArrayList<>();
 
     public PedidoModel() {
@@ -43,29 +43,29 @@ public class PedidoModel {
         String statusExibicao = "STATUS: " + this.getStatus();
 
         return
-                "Id: " + id + '\n' + statusExibicao + '\n' +
-                "Loja Vendedor: " + lojaVendedor + '\n' +
-                "Data: " + data + '\n' +
-                "Id Agente: " + idAgente + '\n' +
-                "Nome Estabelecimento: " + nomeEstabelecimento + '\n' +
-                "Nome Comprador: " + nomeComprador + '\n' +
-                "E-mail: " + email + '\n' +
-                "Telefone: " + tele + '\n' +
-                "CNPJ: " + cnpj + '\n' +
-                "Inscrição Estadual: " + inscriEstadual + '\n' +
-                "Forma de Pagamento: " + formaPagamento + '\n' +
-                "Endereço Completo: " + enderecoCompleto + '\n' +
-                "CEP: " + cep + '\n' +
-                "Endereço Entrega: " + enderecoEntrega + '\n' +
-                "Observação Entrega: " + obsEntrega + '\n' +
-                totalCompra + '\n' +
-                "Produtos: " + "\n\n" + produtosBuilder.toString();
+                "Id: " + _id + '\n' + statusExibicao + '\n' +
+                        "Loja Vendedor: " + lojaVendedor + '\n' +
+                        "Data: " + data + '\n' +
+                        "Id Agente: " + idAgente + '\n' +
+                        "Nome Estabelecimento: " + nomeEstabelecimento + '\n' +
+                        "Nome Comprador: " + nomeComprador + '\n' +
+                        "E-mail: " + email + '\n' +
+                        "Telefone: " + tele + '\n' +
+                        "CNPJ: " + cnpj + '\n' +
+                        "Inscrição Estadual: " + inscriEstadual + '\n' +
+                        "Forma de Pagamento: " + formaPagamento + '\n' +
+                        "Endereço Completo: " + enderecoCompleto + '\n' +
+                        "CEP: " + cep + '\n' +
+                        "Endereço Entrega: " + enderecoEntrega + '\n' +
+                        "Observação Entrega: " + obsEntrega + '\n' +
+                        totalCompra + '\n' +
+                        "Produtos: " + "\n\n" + produtosBuilder.toString();
     }
 
-    public PedidoModel(String lojaVendedor, String data, String idAgente, String nomeEstabelecimento, String nomeComprador, String email, String tele, String cnpj, String inscriEstadual, String formaPagamento, String enderecoCompleto, String enderecoEntrega, String obsEntrega, List<ItemCompra> produtos, String cep) {
+    public PedidoModel(String lojaVendedor, String data, String emailVendedor, String nomeEstabelecimento, String nomeComprador, String email, String tele, String cnpj, String inscriEstadual, String formaPagamento, String enderecoCompleto, String enderecoEntrega, String obsEntrega, List<ItemCompra> produtos, String cep) {
         this.lojaVendedor = lojaVendedor;
         this.data = data;
-        this.idAgente = idAgente;
+        this.emailVendedor = emailVendedor;
         this.nomeEstabelecimento = nomeEstabelecimento;
         this.nomeComprador = nomeComprador;
         this.email = email;
@@ -78,22 +78,23 @@ public class PedidoModel {
         this.obsEntrega = obsEntrega;
         this.produtos = produtos;
         this.cep = cep;
+
+    }
+
+    public String getEmailVendedor() {
+        return emailVendedor;
+    }
+
+    public void setEmailVendedor(String emailVendedor) {
+        this.emailVendedor = emailVendedor;
     }
 
     public String getId() {
-        return id;
+        return _id;
     }
 
     public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getIdVendedor() {
-        return idVendedor;
-    }
-
-    public void setIdVendedor(String idVendedor) {
-        this.idVendedor = idVendedor;
+        this._id = id;
     }
 
     public String getLojaVendedor() {

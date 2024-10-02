@@ -26,22 +26,6 @@ public class MathUtils {
         return formatoMoeda.format(valor);
     }
 
-    public static String padWithZeros(String input, int desiredLength) {
-        StringBuilder result = new StringBuilder(input);
-
-        while (result.length() < desiredLength) {
-            result.insert(0, "0");
-        }
-
-        return result.toString();
-    }
-
-    public static String formatarNumero(int numero) {
-        // Formata o número como string preenchendo com zeros à esquerda
-        String numeroFormatado = String.format("%06d", numero);
-        // Retorna a string formatada com o prefixo "RC"
-        return "RC" + numeroFormatado;
-    }
 }
 
         

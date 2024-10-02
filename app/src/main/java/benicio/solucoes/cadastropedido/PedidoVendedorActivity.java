@@ -165,26 +165,26 @@ public class PedidoVendedorActivity extends AppCompatActivity {
 
                             PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
 
-                            if (pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)) {
-                                if (query.isEmpty()) {
-                                    listaPedidos.add(pedidoModel);
-                                } else {
-                                    assert pedidoModel != null;
-                                    if (
-                                            pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
-                                                    pedidoModel.getData().toLowerCase().trim().contains(query) ||
-                                                    pedidoModel.getIdAgente().toLowerCase().trim().contains(query) ||
-                                                    pedidoModel.getNomeEstabelecimento().toLowerCase().trim().contains(query) ||
-                                                    pedidoModel.getNomeComprador().toLowerCase().trim().contains(query) ||
-                                                    pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
-                                                    pedidoModel.getTele().toLowerCase().trim().contains(query) ||
-                                                    pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
-                                                    pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
-                                    ) {
-                                        listaPedidos.add(pedidoModel);
-                                    }
-                                }
-                            }
+//                            if (pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)) {
+//                                if (query.isEmpty()) {
+//                                    listaPedidos.add(pedidoModel);
+//                                } else {
+//                                    assert pedidoModel != null;
+//                                    if (
+//                                            pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
+//                                                    pedidoModel.getData().toLowerCase().trim().contains(query) ||
+//                                                    pedidoModel.getIdAgente().toLowerCase().trim().contains(query) ||
+//                                                    pedidoModel.getNomeEstabelecimento().toLowerCase().trim().contains(query) ||
+//                                                    pedidoModel.getNomeComprador().toLowerCase().trim().contains(query) ||
+//                                                    pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
+//                                                    pedidoModel.getTele().toLowerCase().trim().contains(query) ||
+//                                                    pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
+//                                                    pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
+//                                    ) {
+//                                        listaPedidos.add(pedidoModel);
+//                                    }
+//                                }
+//                            }
                         }
 
                         adapterPedidos.notifyDataSetChanged();

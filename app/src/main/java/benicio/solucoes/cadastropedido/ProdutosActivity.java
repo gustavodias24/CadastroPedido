@@ -43,9 +43,9 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class ProdutosActivity extends AppCompatActivity {
-    private boolean jaTemRegra = false;
-    //    private Dialog loadingDialog;
+
     private int valorMinimo = 0;
+    private boolean jaTemRegra = false;
     private RecyclerView r;
     private ActivityProdutosBinding mainBinding;
     private Bundle b;
@@ -70,7 +70,6 @@ public class ProdutosActivity extends AppCompatActivity {
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-//        configurarLoadingDialog();
 
         retrofit = RetrofitUitl.criarRetrofit();
         services = RetrofitUitl.criarService(retrofit);
@@ -81,7 +80,6 @@ public class ProdutosActivity extends AppCompatActivity {
 
         configurarRecycler();
 
-//        loadingDialog.show();
         new Thread() {
             @Override
             public void run() {
@@ -104,7 +102,6 @@ public class ProdutosActivity extends AppCompatActivity {
                 String[] sugestoesSKU = listaNomeSKU.toArray(new String[0]);
 
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(ProdutosActivity.this, R.layout.custom_dropdown_item, R.id.textoProdutos, sugestoes);
-//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoes);
                 ArrayAdapter<String> adapterSKU = new ArrayAdapter<>(ProdutosActivity.this, android.R.layout.simple_dropdown_item_1line, sugestoesSKU);
 
                 runOnUiThread(() -> {
@@ -218,7 +215,6 @@ public class ProdutosActivity extends AppCompatActivity {
                 somaCompra += Double.parseDouble(item.getValorTotalFinal().replace(",", "").replace("R$", "").replace(" ", "").replace(" ", ""));
             }
 
-//            if (somaCompra >= valorMinimo) {
             if (true) {
                 startActivity(i);
                 finish();

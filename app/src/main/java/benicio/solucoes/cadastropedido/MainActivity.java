@@ -19,17 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,17 +32,23 @@ import benicio.solucoes.cadastropedido.model.ClienteModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
 import benicio.solucoes.cadastropedido.model.ProdutosResponseModel;
+import benicio.solucoes.cadastropedido.model.ResponseModel;
+import benicio.solucoes.cadastropedido.model.ResponseModelListPedidoProduto;
 import benicio.solucoes.cadastropedido.model.UserModel;
+import benicio.solucoes.cadastropedido.service.ApiServices;
 import benicio.solucoes.cadastropedido.service.ProdutosServices;
 import benicio.solucoes.cadastropedido.util.CSVGenerator;
 import benicio.solucoes.cadastropedido.util.ClientesUtil;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
+import benicio.solucoes.cadastropedido.util.RetrofitApiApp;
 import benicio.solucoes.cadastropedido.util.RetrofitUitl;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
+
+    private ApiServices apiServices;
 
     // offset e limit para produtos
     int offset = 0;
@@ -59,21 +57,17 @@ public class MainActivity extends AppCompatActivity {
     boolean fazendoBuscaProduto = false;
 
     private AdapterPedidos adapterPedidos;
-    private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
-    private DatabaseReference refUpdate = FirebaseDatabase.getInstance().getReference().getRoot().child("info");
     private String ultimoUpdateDatabase = "";
-    private DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
-    private FirebaseAuth auth = FirebaseAuth.getInstance();
     private RecyclerView recyclerPedidos;
     List<PedidoModel> listaPedidos = new ArrayList<>();
 
     private ActivityMainBinding mainBinding;
     private ProdutosServices produtosServices;
-    //    private Dialog loadingDialog;
     private SharedPreferences updatePrefs;
     private SharedPreferences.Editor editor;
 
-    private String idUsuario;
+    private SharedPreferences user_prefs;
+    private SharedPreferences.Editor editor_user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,11 +76,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
+
+        apiServices = RetrofitApiApp.criarService(
+                RetrofitApiApp.criarRetrofit()
+        );
+
         getSupportActionBar().setTitle("Tela principal");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-//        configurarLoadingDialog();
         configurarPrefs();
 
         new Thread() {
@@ -121,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
                 this,
                 listaPedidos
         ));
+
+        configurarRecyclerPedidos();
     }
 
     private void atualizarBaseClientes() {
@@ -167,21 +167,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void verificarUpdates() {
-        refUpdate.child("dataHora").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                ultimoUpdateDatabase = task.getResult().getValue(String.class);
 
-                if (!ultimoUpdateDatabase.equals(updatePrefs.getString("data", ""))) {
-                    AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
-                    b.setTitle("Aviso!");
-                    b.setCancelable(false);
-                    b.setMessage("Clique em OK para atualizar a base");
-//                    b.setMessage("Sua base de dados está desatualizada! o último update foi " + ultimoUpdateDatabase + ", clique em OK para atualizar!");
-                    b.setPositiveButton("ok", (dialogInterface, i) -> atualizarBaseProdutos());
-                    b.create().show();
+        apiServices.getLastUpdateDataHora().enqueue(new Callback<ResponseModel>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseModel> call, @NonNull Response<ResponseModel> response) {
+                if (response.isSuccessful()) {
+                    assert response.body() != null;
+                    ultimoUpdateDatabase = response.body().getMsg();
+
+                    if (!ultimoUpdateDatabase.equals(updatePrefs.getString("data", ""))) {
+                        AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.this);
+                        b.setTitle("Aviso!");
+                        b.setCancelable(false);
+                        b.setMessage("Clique em OK para atualizar a base");
+                        b.setPositiveButton("ok", (dialogInterface, i) -> atualizarBaseProdutos());
+                        b.create().show();
+                    }
                 }
+            }
 
-                configurarIdVendedor();
+            @Override
+            public void onFailure(@NonNull Call<ResponseModel> call, @NonNull Throwable t) {
 
             }
         });
@@ -198,8 +204,8 @@ public class MainActivity extends AppCompatActivity {
         produtosDAO.limparProdutos();
 
         new Thread(() -> {
-            while (continuarBuscandoProdutos){
-                if ( !fazendoBuscaProduto ){
+            while (continuarBuscandoProdutos) {
+                if (!fazendoBuscaProduto) {
                     fazendoBuscaProduto = true;
                     produtosServices.retornarProdutos(offset, limit).enqueue(new Callback<ProdutosResponseModel>() {
                         @Override
@@ -233,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
                                                 response.message(), Toast.LENGTH_SHORT).show());
                             }
                         }
+
                         @Override
                         public void onFailure(Call<ProdutosResponseModel> call, Throwable t) {
                             runOnUiThread(() -> {
@@ -246,35 +253,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
     }
-
-    private void configurarIdVendedor() {
-//        runOnUiThread(() -> loadingDialog.show());
-
-        refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                for (DataSnapshot dado : snapshot.getChildren()) {
-                    UserModel userModel = dado.getValue(UserModel.class);
-
-                    if (userModel.getEmail().trim().toLowerCase().equals(auth.getCurrentUser().getEmail().trim().toLowerCase())) {
-
-//                        idUsuario = userModel.getId();
-                        configurarRecyclerPedidos();
-                        break;
-                    }
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-//                loadingDialog.dismiss();
-            }
-        });
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -303,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.sair) {
             finish();
             startActivity(new Intent(this, CadastroLoginActivity.class));
-            auth.signOut();
+            editor_user.remove("email").apply();
         } else if (item.getItemId() == android.R.id.home) {
             startActivity(new Intent(this, MenuPedidoOrCreditoActivity.class));
             finish();
@@ -315,17 +293,19 @@ public class MainActivity extends AppCompatActivity {
 
         mainBinding.textCarregando.setVisibility(View.VISIBLE);
         mainBinding.recyclerPedidos.setVisibility(View.INVISIBLE);
-        refPedidos.orderByChild("idVendedor").equalTo(idUsuario).addListenerForSingleValueEvent(new ValueEventListener() {
+
+        apiServices.getPedidosProdutos(new UserModel(user_prefs.getString("email", ""))).enqueue(new Callback<ResponseModelListPedidoProduto>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
+            public void onResponse(@NonNull Call<ResponseModelListPedidoProduto> call, @NonNull Response<ResponseModelListPedidoProduto> response) {
+                if (response.isSuccessful()) {
                     listaPedidos.clear();
-                    for (DataSnapshot dado : snapshot.getChildren()) {
+                    assert response.body() != null;
 
-                        PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
-
-                        if (pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)) {
+                    if (!filterPeriodo && query.isEmpty()) {
+                        listaPedidos.addAll(response.body().getMsg());
+                    } else {
+                        for (PedidoModel pedidoModel : response.body().getMsg()) {
                             if (query.isEmpty()) {
                                 if (filterPeriodo) {
                                     if (PedidosUtil.verificarIntervalo(
@@ -339,7 +319,6 @@ public class MainActivity extends AppCompatActivity {
                                     listaPedidos.add(pedidoModel);
                                 }
                             } else {
-                                assert pedidoModel != null;
                                 if (
                                         pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
                                                 pedidoModel.getData().toLowerCase().trim().contains(query) ||
@@ -357,25 +336,19 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
-                    runOnUiThread(() -> {
-                        Collections.reverse(listaPedidos);
-                        adapterPedidos.notifyDataSetChanged();
-                        mainBinding.textCarregando.setVisibility(View.GONE);
-                        mainBinding.recyclerPedidos.setVisibility(View.VISIBLE);
-                    });
 
+                    Collections.reverse(listaPedidos);
+                    adapterPedidos.notifyDataSetChanged();
+                    mainBinding.textCarregando.setVisibility(View.GONE);
+                    mainBinding.recyclerPedidos.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                runOnUiThread(() -> {
-                    mainBinding.textCarregando.setVisibility(View.GONE);
-                    Toast.makeText(MainActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
-                });
+            public void onFailure(@NonNull Call<ResponseModelListPedidoProduto> call, @NonNull Throwable t) {
+
             }
         });
-
     }
 
     private void configurarRecyclerPedidos() {
@@ -392,17 +365,10 @@ public class MainActivity extends AppCompatActivity {
     private void configurarPrefs() {
         updatePrefs = getSharedPreferences("updates_prefs", MODE_PRIVATE);
         editor = updatePrefs.edit();
-
+        user_prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        editor_user = user_prefs.edit();
         mainBinding.ultimoUpdate.setText("Última Atualização: " + updatePrefs.getString("data", ""));
         mainBinding.ultimoUpdateCliente.setText("Última Atualização: " + updatePrefs.getString("dataCliente", ""));
     }
-
-//    private void configurarLoadingDialog() {
-//        AlertDialog.Builder b = new AlertDialog.Builder(this);
-//        b.setCancelable(false);
-//        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
-//        loadingDialog = b.create();
-//    }
-
 }
 

@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -28,21 +29,29 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import benicio.solucoes.cadastropedido.databinding.ActivityInfosBinding;
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.ClienteModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.ProdutoModel;
+import benicio.solucoes.cadastropedido.model.ResponseModelUser;
 import benicio.solucoes.cadastropedido.model.UserModel;
+import benicio.solucoes.cadastropedido.service.ApiServices;
 import benicio.solucoes.cadastropedido.util.ClientesUtil;
+import benicio.solucoes.cadastropedido.util.RetrofitApiApp;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class InfosActivity extends AppCompatActivity {
 
+    private ApiServices apiServices;
+
+    private SharedPreferences user_prefs;
+
     private UserModel usuarioAtual;
-    private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
-    //    private Dialog loadingDialog;
-    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private ActivityInfosBinding mainBinding;
     private List<ClienteModel> clientes = new ArrayList<>();
     private List<String> nomesEstabelecimentos = new ArrayList<>();
@@ -58,7 +67,12 @@ public class InfosActivity extends AppCompatActivity {
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        getSupportActionBar().setTitle("Pedido");
+        apiServices = RetrofitApiApp.criarService(
+                RetrofitApiApp.criarRetrofit()
+        );
+
+        user_prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Pedido");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -83,7 +97,7 @@ public class InfosActivity extends AppCompatActivity {
 
             if (
                     mainBinding.edtLoja.getText().toString().isEmpty() ||
-                            mainBinding.edtData.getText().toString().isEmpty() ||
+                            Objects.requireNonNull(mainBinding.edtData.getText()).toString().isEmpty() ||
                             mainBinding.edtEstabelecimento.getText().toString().isEmpty() ||
                             mainBinding.edtComprador.getText().toString().isEmpty() ||
                             mainBinding.edtEmail.getText().toString().isEmpty() ||
@@ -98,13 +112,12 @@ public class InfosActivity extends AppCompatActivity {
                 Toast.makeText(this, "Preencha Todos os Dados Obrigatórios!", Toast.LENGTH_LONG).show();
 
             } else {
-                String idAgente = mainBinding.edtAgente.getText().toString();
 
                 String dadosPedido = gson.toJson(
                         new PedidoModel(
                                 mainBinding.edtLoja.getText().toString(),
                                 mainBinding.edtData.getText().toString(),
-                                idAgente,
+                                user_prefs.getString("email", ""),
                                 mainBinding.edtEstabelecimento.getText().toString(),
                                 mainBinding.edtComprador.getText().toString(),
                                 mainBinding.edtEmail.getText().toString().toLowerCase().trim(),
@@ -122,15 +135,8 @@ public class InfosActivity extends AppCompatActivity {
 
                 i.putExtra("dadosPedido", dadosPedido);
 
-                usuarioAtual.setIdAgente(idAgente);
+                startActivity(i);
 
-//                refUsuarios.child(usuarioAtual.getId()).setValue(usuarioAtual).addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        startActivity(i);
-//                    } else {
-//                        Toast.makeText(this, "Tente novamente...", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
             }
         });
     }
@@ -262,30 +268,22 @@ public class InfosActivity extends AppCompatActivity {
     private void encontrarUsuarioAtual() {
         mainBinding.layoutCarregando.setVisibility(View.VISIBLE);
 
-        try {
-            refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+        apiServices.getUser(new UserModel(user_prefs.getString("email", ""))).enqueue(new Callback<ResponseModelUser>() {
+            @Override
+            public void onResponse(@NonNull Call<ResponseModelUser> call, @NonNull Response<ResponseModelUser> response) {
+                if (response.isSuccessful()) {
                     mainBinding.progressBarIdAgente.setVisibility(View.GONE);
-                    for (DataSnapshot dado : snapshot.getChildren()) {
-                        Log.d("mayara", dado.getValue(UserModel.class).getEmail().trim().toLowerCase() + " : " + user.getEmail().trim().toLowerCase());
-                        if (dado.getValue(UserModel.class).getEmail().trim().toLowerCase().equals(user.getEmail().trim().toLowerCase())) {
-                            usuarioAtual = dado.getValue(UserModel.class);
-                            mainBinding.edtAgente.setText(usuarioAtual.getIdAgente());
-                            break;
-                        }
-                    }
+                    assert response.body() != null;
+                    usuarioAtual = response.body().getMsg();
+                    mainBinding.edtAgente.setText(usuarioAtual.getIdAgente());
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    mainBinding.progressBarIdAgente.setVisibility(View.GONE);
-                }
-            });
-        } catch (Exception ignored) {
-            mainBinding.progressBarIdAgente.setVisibility(View.GONE);
-        }
-
+            @Override
+            public void onFailure(@NonNull Call<ResponseModelUser> call, @NonNull Throwable t) {
+                mainBinding.progressBarIdAgente.setVisibility(View.GONE);
+            }
+        });
     }
 
 
@@ -298,11 +296,4 @@ public class InfosActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-//    private void configurarLoadingDialog() {
-//        AlertDialog.Builder b = new AlertDialog.Builder(this);
-//        b.setCancelable(false);
-//        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
-//        loadingDialog = b.create();
-//    }
 }

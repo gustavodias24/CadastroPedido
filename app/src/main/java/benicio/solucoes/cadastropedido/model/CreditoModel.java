@@ -2,7 +2,7 @@ package benicio.solucoes.cadastropedido.model;
 
 public class CreditoModel {
 
-    String id, idVendedor;
+    String _id, idVendedor;
 
     String idAgent = "";
     String status = "pendente", distribuidor;
@@ -22,7 +22,7 @@ public class CreditoModel {
 
     @Override
     public String toString() {
-        return "id: " + id + "\n" +
+        return "id: " + _id + "\n" +
                 "data: " + data + "\n" +
                 "Status: " + status.toUpperCase() + "\n" +
                 "Distribuidor: " + distribuidor + "\n" +
@@ -67,11 +67,11 @@ public class CreditoModel {
     }
 
     public String getId() {
-        return id;
+        return _id;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this._id = id;
     }
 
     public CreditoModel(String nome, String razaoSocial, String cnpj, String inscricaoEstadual, String email, String telefone, String endereco, String prazoSocilitado, String valorSolicitado, String distribuidor, String status, String data, String idAgent) {

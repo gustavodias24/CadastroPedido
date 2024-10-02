@@ -15,6 +15,10 @@ public class UserModel {
                         "Senha: " + '\n' + senha;
     }
 
+    public UserModel(String email) {
+        this.email = email;
+    }
+
     public UserModel(String nome, String email, String senha) {
         this.nome = nome;
         this.email = email;

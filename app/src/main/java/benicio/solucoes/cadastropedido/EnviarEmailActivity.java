@@ -33,20 +33,25 @@ import benicio.solucoes.cadastropedido.databinding.ActivityEnviarEmailBinding;
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
+import benicio.solucoes.cadastropedido.model.ResponseModel;
+import benicio.solucoes.cadastropedido.model.ResponseModelPedidoCredito;
+import benicio.solucoes.cadastropedido.model.ResponseModelPedidoProduto;
 import benicio.solucoes.cadastropedido.model.UserModel;
+import benicio.solucoes.cadastropedido.service.ApiServices;
 import benicio.solucoes.cadastropedido.util.MathUtils;
+import benicio.solucoes.cadastropedido.util.RetrofitApiApp;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class EnviarEmailActivity extends AppCompatActivity {
 
-    private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
-    private DatabaseReference refCreditos = FirebaseDatabase.getInstance().getReference().getRoot().child("creditos");
-    private DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
-    private FirebaseAuth auth = FirebaseAuth.getInstance();
+    private ApiServices apiServices;
+
     private ActivityEnviarEmailBinding mainBinding;
     private Bundle b;
     private PedidoModel pedido;
     private CreditoModel credito;
-    private String idVendedor;
     private Dialog loadingDialog;
 
     Dialog dialogJanela;
@@ -59,12 +64,15 @@ public class EnviarEmailActivity extends AppCompatActivity {
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        getSupportActionBar().setTitle("Enviar E-mail");
+        apiServices = RetrofitApiApp.criarService(
+                RetrofitApiApp.criarRetrofit()
+        );
+
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Enviar E-mail");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         configurarLoadingDialog();
-        configurarIdVendedor();
 
         String[] sugestoesEmails = {"pedidos@redcloudtechnology.com", "credito@redcloudtechnology.com"};
         ArrayAdapter<String> adapterEmails = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, sugestoesEmails);
@@ -87,6 +95,16 @@ public class EnviarEmailActivity extends AppCompatActivity {
             Toast.makeText(this, "Copiado!", Toast.LENGTH_SHORT).show();
         });
 
+        b = getIntent().getExtras();
+        if (b.getBoolean("credito", false)) {
+
+        } else {
+            pedido = new Gson().fromJson(b.getString("dados", ""), new TypeToken<PedidoModel>() {
+            }.getType());
+
+        }
+
+        salvarPedido();
 
     }
 
@@ -96,79 +114,44 @@ public class EnviarEmailActivity extends AppCompatActivity {
     }
 
     private void salvarPedido() {
-        assert b != null;
+        loadingDialog.show();
+
         if (b.getBoolean("credito", false)) {
+            apiServices.salvarPedidoCredito(credito).enqueue(new Callback<ResponseModelPedidoCredito>() {
+                @Override
+                public void onResponse(@NonNull Call<ResponseModelPedidoCredito> call, @NonNull Response<ResponseModelPedidoCredito> response) {
+                    loadingDialog.dismiss();
+                    if (response.isSuccessful()) {
+                        assert response.body() != null;
+                        Toast.makeText(EnviarEmailActivity.this, "Pedido Salvo", Toast.LENGTH_SHORT).show();
+                        mainBinding.bodyEmail.setText(response.body().getMsg().toString());
+                    }
+                }
 
-            credito.setIdVendedor(idVendedor);
-            loadingDialog.show();
-            String idTemp = UUID.randomUUID().toString();
-            refCreditos.child(idTemp).setValue(credito).addOnCompleteListener(task -> {
-                loadingDialog.dismiss();
-                if (task.isSuccessful()) {
-                    Toast.makeText(getApplicationContext(), "Crédito Salvo", Toast.LENGTH_SHORT).show();
-
-                    refCreditos.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            int count = 0;
-                            for (DataSnapshot dado : snapshot.getChildren()) {
-                                count++;
-                            }
-
-                            loadingDialog.dismiss();
-                            credito.setId(MathUtils.formatarNumero(count));
-                            mainBinding.bodyEmail.setText(
-                                    credito.toString()
-                            );
-                            refCreditos.child(idTemp).setValue(credito);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                        }
-                    });
+                @Override
+                public void onFailure(@NonNull Call<ResponseModelPedidoCredito> call, @NonNull Throwable t) {
+                    Toast.makeText(EnviarEmailActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                    loadingDialog.dismiss();
                 }
             });
-
-
         } else {
-            pedido.setIdVendedor(idVendedor);
+            apiServices.salvarPedidoProduto(pedido).enqueue(new Callback<ResponseModelPedidoProduto>() {
+                @Override
+                public void onResponse(@NonNull Call<ResponseModelPedidoProduto> call, @NonNull Response<ResponseModelPedidoProduto> response) {
+                    loadingDialog.dismiss();
+                    if (response.isSuccessful()) {
+                        assert response.body() != null;
+                        Toast.makeText(EnviarEmailActivity.this, "Pedido Salvo", Toast.LENGTH_SHORT).show();
+                        mainBinding.bodyEmail.setText(response.body().getMsg().toInformacao(false));
+                    }
+                }
 
-            loadingDialog.show();
-
-            String idTemp = UUID.randomUUID().toString();
-            refPedidos.child(idTemp).setValue(pedido).addOnCompleteListener(task -> {
-                loadingDialog.dismiss();
-                if (task.isSuccessful()) {
-                    Toast.makeText(EnviarEmailActivity.this, "Pedido Salvo", Toast.LENGTH_SHORT).show();
-
-                    loadingDialog.show();
-                    refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            int count = 0;
-                            for (DataSnapshot dado : snapshot.getChildren()) {
-                                count++;
-                            }
-
-                            loadingDialog.dismiss();
-                            pedido.setId(MathUtils.formatarNumero(count));
-                            mainBinding.bodyEmail.setText(
-                                    pedido.toInformacao(false)
-                            );
-
-                            refPedidos.child(idTemp).setValue(pedido);
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            loadingDialog.dismiss();
-                        }
-                    });
+                @Override
+                public void onFailure(@NonNull Call<ResponseModelPedidoProduto> call, @NonNull Throwable t) {
+                    Toast.makeText(EnviarEmailActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                    loadingDialog.dismiss();
                 }
             });
-
 
         }
     }
@@ -178,56 +161,6 @@ public class EnviarEmailActivity extends AppCompatActivity {
         b.setCancelable(false);
         b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
         loadingDialog = b.create();
-    }
-
-    private void configurarIdVendedor() {
-
-        loadingDialog.show();
-
-        refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                loadingDialog.dismiss();
-
-                for (DataSnapshot dado : snapshot.getChildren()) {
-                    UserModel userModel = dado.getValue(UserModel.class);
-                    if (userModel.getEmail().toLowerCase().trim().equals(auth.getCurrentUser().getEmail().toLowerCase().trim())) {
-//                        idVendedor = userModel.getId();
-                        b = getIntent().getExtras();
-                        assert b != null;
-                        if (b.getBoolean("credito", false)) {
-                            gerarIdCredito();
-                        } else {
-                            gerarIdPedido();
-                        }
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                loadingDialog.dismiss();
-            }
-        });
-    }
-
-    private void gerarIdPedido() {
-
-        pedido = new Gson().fromJson(b.getString("dados", ""), new TypeToken<PedidoModel>() {
-        }.getType());
-
-        salvarPedido();
-
-
-    }
-
-    private void gerarIdCredito() {
-        credito = new Gson().fromJson(b.getString("dados", ""), new TypeToken<CreditoModel>() {
-        }.getType());
-
-        salvarPedido();
-
     }
 
     private void enviarEmail() {

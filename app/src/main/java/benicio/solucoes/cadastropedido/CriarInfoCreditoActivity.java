@@ -100,7 +100,6 @@ public class CriarInfoCreditoActivity extends AppCompatActivity {
                                 count++;
                             }
                         }
-                        creditoModel.setId(MathUtils.formatarNumero(count));
                         String dadosCredito = gson.toJson(creditoModel);
 
                         i.putExtra("dados", dadosCredito);
