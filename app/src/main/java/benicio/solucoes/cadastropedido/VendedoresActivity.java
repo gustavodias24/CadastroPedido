@@ -31,13 +31,19 @@ import benicio.solucoes.cadastropedido.adapter.AdapterUsuarios;
 import benicio.solucoes.cadastropedido.databinding.ActivityAdminBinding;
 import benicio.solucoes.cadastropedido.databinding.ActivityVendedoresBinding;
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
+import benicio.solucoes.cadastropedido.model.ResponseModelListUsers;
 import benicio.solucoes.cadastropedido.model.UserModel;
+import benicio.solucoes.cadastropedido.service.ApiServices;
+import benicio.solucoes.cadastropedido.util.RetrofitApiApp;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class VendedoresActivity extends AppCompatActivity {
+    private ApiServices apiServices;
+
 
     private ActivityVendedoresBinding mainBinding;
-    private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
-
     private Dialog dialogCarregando;
 
     private RecyclerView recyclerUsuarios;
@@ -51,11 +57,14 @@ public class VendedoresActivity extends AppCompatActivity {
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        try{
+        apiServices = RetrofitApiApp.criarService(RetrofitApiApp.criarRetrofit());
+
+        try {
             getSupportActionBar().setTitle("Vendedores");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
 
 
         configurarDialogCarregando();
@@ -73,25 +82,21 @@ public class VendedoresActivity extends AppCompatActivity {
 
     private void configurarListener(String query) {
         dialogCarregando.show();
-        refUsuarios.addValueEventListener(new ValueEventListener() {
+
+        apiServices.getUsuarios().enqueue(new Callback<ResponseModelListUsers>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onResponse(Call<ResponseModelListUsers> call, Response<ResponseModelListUsers> response) {
                 dialogCarregando.dismiss();
-                if (snapshot.exists()) {
-                    usuarios.clear();
-                    for (DataSnapshot dado : snapshot.getChildren()) {
-                        usuarios.add(dado.getValue(UserModel.class));
-                    }
-
-                    adapterUsuarios.notifyDataSetChanged();
-                }
+                usuarios.clear();
+                usuarios.addAll(response.body().getMsg());
+                adapterUsuarios.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onFailure(Call<ResponseModelListUsers> call, Throwable t) {
                 dialogCarregando.dismiss();
-                Toast.makeText(VendedoresActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
+
             }
         });
     }

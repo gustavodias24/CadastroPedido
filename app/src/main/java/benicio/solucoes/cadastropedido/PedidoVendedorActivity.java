@@ -32,22 +32,29 @@ import benicio.solucoes.cadastropedido.databinding.ActivityPedidoVendedorBinding
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
+import benicio.solucoes.cadastropedido.model.ResponseModelListPedidoCredito;
+import benicio.solucoes.cadastropedido.model.ResponseModelListPedidoProduto;
+import benicio.solucoes.cadastropedido.model.UserModel;
+import benicio.solucoes.cadastropedido.service.ApiServices;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
+import benicio.solucoes.cadastropedido.util.RetrofitApiApp;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PedidoVendedorActivity extends AppCompatActivity {
 
-    public static DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
-    public static DatabaseReference refCreditos = FirebaseDatabase.getInstance().getReference().getRoot().child("creditos");
+    public static ApiServices apiServices;
+
     public static AdapterPedidos adapterPedidos;
     public static AdapterCredito adapterCredito;
     public static List<PedidoModel> listaPedidos = new ArrayList<>();
     public static List<CreditoModel> listaCreditos = new ArrayList<>();
-//    public static Dialog loadingDialog;
     public static ActivityPedidoVendedorBinding mainBinding;
     private RecyclerView recyclerPedidos;
     public static String idUsuario;
-    private Bundle b;
-    static  boolean isCredito = false;
+    public static Bundle b;
+    static boolean isCredito = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +62,8 @@ public class PedidoVendedorActivity extends AppCompatActivity {
         mainBinding = ActivityPedidoVendedorBinding.inflate(getLayoutInflater());
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+        apiServices = RetrofitApiApp.criarService(RetrofitApiApp.criarRetrofit());
 
         getSupportActionBar().setTitle("Pedidos");
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -65,8 +74,8 @@ public class PedidoVendedorActivity extends AppCompatActivity {
 
         isCredito = b.getBoolean("credito", false);
 
-//        configurarLoadingDialog();
         configurarRecyclerPedidos();
+
     }
 
     @Override
@@ -82,7 +91,6 @@ public class PedidoVendedorActivity extends AppCompatActivity {
         recyclerPedidos.setLayoutManager(new LinearLayoutManager(this));
         recyclerPedidos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerPedidos.setHasFixedSize(true);
-//        listaPedidos.addAll(PedidosUtil.returnPedidos(this));
 
 
         if (isCredito) {
@@ -97,107 +105,92 @@ public class PedidoVendedorActivity extends AppCompatActivity {
 
     }
 
-//    private void configurarLoadingDialog() {
-//        AlertDialog.Builder b = new AlertDialog.Builder(this);
-//        b.setCancelable(false);
-//        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
-//        loadingDialog = b.create();
-//    }
-
     public static void configurarListener(String query, Context c) {
         mainBinding.carregandoLayout.setVisibility(View.VISIBLE);
-        
-        if (isCredito){
-            refCreditos.addValueEventListener(new ValueEventListener() {
+
+        if (isCredito) {
+            apiServices.getPedidosCredito(new UserModel(b.getString("email", ""))).enqueue(new Callback<ResponseModelListPedidoCredito>() {
                 @SuppressLint("NotifyDataSetChanged")
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onResponse(Call<ResponseModelListPedidoCredito> call, Response<ResponseModelListPedidoCredito> response) {
                     mainBinding.carregandoLayout.setVisibility(View.GONE);
 
-                    if (snapshot.exists()) {
+                    if (response.isSuccessful()) {
                         listaCreditos.clear();
-                        for (DataSnapshot dado : snapshot.getChildren()) {
 
-                            CreditoModel creditoModel = dado.getValue(CreditoModel.class);
-
-                            if (creditoModel.getIdVendedor() != null && creditoModel.getIdVendedor().equals(idUsuario)) {
-                                if (query.isEmpty()) {
-                                    listaCreditos.add(creditoModel);
-                                } else {
-                                    assert creditoModel != null;
-                                    if (
-                                            creditoModel.getDistribuidor().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getStatus().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getValorSolicitado().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getNome().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getRazaoSocial().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getEmail().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getTelefone().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getCnpj().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getPrazoSocilitado().toLowerCase().trim().contains(query)
-                                    ) {
+                        if (query.isEmpty()) {
+                            listaCreditos.addAll(response.body().getMsg());
+                        } else {
+                            for (CreditoModel creditoModel : response.body().getMsg()) {
+                                if (creditoModel.getIdVendedor() != null && creditoModel.getIdVendedor().equals(idUsuario)) {
+                                    if (query.isEmpty()) {
                                         listaCreditos.add(creditoModel);
+                                    } else {
+                                        if (
+                                                creditoModel.getDistribuidor().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getStatus().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getValorSolicitado().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getNome().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getRazaoSocial().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getEmail().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getTelefone().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getCnpj().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getPrazoSocilitado().toLowerCase().trim().contains(query)
+                                        ) {
+                                            listaCreditos.add(creditoModel);
+                                        }
                                     }
                                 }
                             }
                         }
 
                         adapterCredito.notifyDataSetChanged();
+
                     }
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onFailure(Call<ResponseModelListPedidoCredito> call, Throwable t) {
                     mainBinding.carregandoLayout.setVisibility(View.GONE);
-                    Toast.makeText(c, "Sem Conexão", Toast.LENGTH_LONG).show();
+
                 }
             });
-        }else{
-            refPedidos.addValueEventListener(new ValueEventListener() {
+        } else {
+
+            apiServices.getPedidosProdutos(new UserModel(b.getString("email", ""))).enqueue(new Callback<ResponseModelListPedidoProduto>() {
                 @SuppressLint("NotifyDataSetChanged")
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onResponse(Call<ResponseModelListPedidoProduto> call, Response<ResponseModelListPedidoProduto> response) {
                     mainBinding.carregandoLayout.setVisibility(View.GONE);
 
-                    if (snapshot.exists()) {
-                        listaPedidos.clear();
-                        for (DataSnapshot dado : snapshot.getChildren()) {
-
-                            PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
-
-//                            if (pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)) {
-//                                if (query.isEmpty()) {
-//                                    listaPedidos.add(pedidoModel);
-//                                } else {
-//                                    assert pedidoModel != null;
-//                                    if (
-//                                            pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
-//                                                    pedidoModel.getData().toLowerCase().trim().contains(query) ||
-//                                                    pedidoModel.getIdAgente().toLowerCase().trim().contains(query) ||
-//                                                    pedidoModel.getNomeEstabelecimento().toLowerCase().trim().contains(query) ||
-//                                                    pedidoModel.getNomeComprador().toLowerCase().trim().contains(query) ||
-//                                                    pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
-//                                                    pedidoModel.getTele().toLowerCase().trim().contains(query) ||
-//                                                    pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
-//                                                    pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
-//                                    ) {
-//                                        listaPedidos.add(pedidoModel);
-//                                    }
-//                                }
-//                            }
+                    if (query.isEmpty()) {
+                        listaPedidos.addAll(response.body().getMsg());
+                    } else {
+                        for (PedidoModel pedidoModel : response.body().getMsg()) {
+                            if (
+                                    pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
+                                            pedidoModel.getData().toLowerCase().trim().contains(query) ||
+                                            pedidoModel.getIdAgente().toLowerCase().trim().contains(query) ||
+                                            pedidoModel.getNomeEstabelecimento().toLowerCase().trim().contains(query) ||
+                                            pedidoModel.getNomeComprador().toLowerCase().trim().contains(query) ||
+                                            pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
+                                            pedidoModel.getTele().toLowerCase().trim().contains(query) ||
+                                            pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
+                                            pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
+                            ) {
+                                listaPedidos.add(pedidoModel);
+                            }
                         }
-
-                        adapterPedidos.notifyDataSetChanged();
                     }
+                    adapterPedidos.notifyDataSetChanged();
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onFailure(Call<ResponseModelListPedidoProduto> call, Throwable t) {
                     mainBinding.carregandoLayout.setVisibility(View.GONE);
-                    Toast.makeText(c, "Sem Conexão", Toast.LENGTH_LONG).show();
+
                 }
             });
         }
-
     }
 }

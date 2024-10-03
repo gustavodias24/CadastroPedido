@@ -56,7 +56,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Senha"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:password="true" />
 
         <Button
             android:id="@+id/btn_fazer_login"

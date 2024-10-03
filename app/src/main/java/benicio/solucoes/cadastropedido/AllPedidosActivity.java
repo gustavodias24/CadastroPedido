@@ -34,20 +34,27 @@ import benicio.solucoes.cadastropedido.databinding.ActivityPedidoVendedorBinding
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
+import benicio.solucoes.cadastropedido.model.ResponseModelListPedidoCredito;
+import benicio.solucoes.cadastropedido.model.ResponseModelListPedidoProduto;
+import benicio.solucoes.cadastropedido.model.UserModel;
+import benicio.solucoes.cadastropedido.service.ApiServices;
 import benicio.solucoes.cadastropedido.util.CSVGenerator;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
+import benicio.solucoes.cadastropedido.util.RetrofitApiApp;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AllPedidosActivity extends AppCompatActivity {
 
+    private ApiServices apiServices;
+
     ActivityAllPedidosBinding mainBinding;
     private RecyclerView recyclerPedidos;
-    //    public static Dialog loadingDialog;
     public static List<PedidoModel> listaPedidos = new ArrayList<>();
     public static List<CreditoModel> listaCreditos = new ArrayList<>();
     public static AdapterPedidos adapterPedidos;
     public static AdapterCredito adapterCredito;
-    public static DatabaseReference refPedidos = FirebaseDatabase.getInstance().getReference().getRoot().child("pedidos");
-    public static DatabaseReference refCreditos = FirebaseDatabase.getInstance().getReference().getRoot().child("creditos");
 
     public static boolean isCredito = false;
     public Bundle bundle;
@@ -58,6 +65,10 @@ public class AllPedidosActivity extends AppCompatActivity {
         mainBinding = ActivityAllPedidosBinding.inflate(getLayoutInflater());
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
+        apiServices = RetrofitApiApp.criarService(
+                RetrofitApiApp.criarRetrofit()
+        );
 
         getSupportActionBar().setTitle("Últimos Pedidos");
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -73,7 +84,6 @@ public class AllPedidosActivity extends AppCompatActivity {
             }
         }
 
-//        configurarLoadingDialog();
         configurarRecyclerPedidos();
 
         mainBinding.btnRelatorioPedidos.setOnClickListener(v -> {
@@ -105,13 +115,6 @@ public class AllPedidosActivity extends AppCompatActivity {
 
     }
 
-//    private void configurarLoadingDialog() {
-//        AlertDialog.Builder b = new AlertDialog.Builder(this);
-//        b.setCancelable(false);
-//        b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
-//        loadingDialog = b.create();
-//    }
-
     private void showDialogError(String msg) {
         AlertDialog.Builder b = new AlertDialog.Builder(AllPedidosActivity.this);
         b.setTitle("Seu dispositivo apresentou:");
@@ -126,7 +129,6 @@ public class AllPedidosActivity extends AppCompatActivity {
         recyclerPedidos.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         recyclerPedidos.setHasFixedSize(true);
 
-//        listaPedidos.addAll(PedidosUtil.returnPedidos(this));
 
         if (isCredito) {
             adapterCredito = new AdapterCredito(listaCreditos, this);
@@ -152,113 +154,121 @@ public class AllPedidosActivity extends AppCompatActivity {
         mainBinding.carregandoLayout.setVisibility(View.VISIBLE);
 
         if (isCredito) {
-            refCreditos.addListenerForSingleValueEvent(new ValueEventListener() {
-                @SuppressLint("NotifyDataSetChanged")
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    mainBinding.carregandoLayout.setVisibility(View.GONE);
-                    if (snapshot.exists()) {
-                        listaCreditos.clear();
-                        for (DataSnapshot dado : snapshot.getChildren()) {
-                            CreditoModel creditoModel = dado.getValue(CreditoModel.class);
 
-                            if (query.isEmpty()) {
-//                                listaCreditos.add(creditoModel);
-                                if (filterPeriodo) {
-                                    if (PedidosUtil.verificarIntervalo(
-                                            creditoModel.getData(),
-                                            mainBinding.edtDataInicial.getText().toString(),
-                                            mainBinding.edtDataFinal.getText().toString()
-                                    )) {
+            apiServices.getPedidosCredito(new UserModel("")).enqueue(new Callback<ResponseModelListPedidoCredito>() {
+                @SuppressLint({"NotifyDataSetChanged", "SetTextI18n"})
+                @Override
+                public void onResponse(Call<ResponseModelListPedidoCredito> call, Response<ResponseModelListPedidoCredito> response) {
+                    mainBinding.carregandoLayout.setVisibility(View.GONE);
+
+                    if (response.isSuccessful()) {
+                        listaCreditos.clear();
+                        if (query.isEmpty() && !filterPeriodo) {
+                            listaCreditos.addAll(response.body().getMsg());
+                        } else {
+                            for (CreditoModel creditoModel : response.body().getMsg()) {
+                                if (query.isEmpty()) {
+                                    if (filterPeriodo) {
+                                        if (PedidosUtil.verificarIntervalo(
+                                                creditoModel.getData(),
+                                                mainBinding.edtDataInicial.getText().toString(),
+                                                mainBinding.edtDataFinal.getText().toString()
+                                        )) {
+                                            listaCreditos.add(creditoModel);
+                                        }
+                                    } else {
                                         listaCreditos.add(creditoModel);
                                     }
                                 } else {
-                                    listaCreditos.add(creditoModel);
-                                }
-                            } else {
-                                assert creditoModel != null;
-                                try {
-                                    if (
-                                            creditoModel.getDistribuidor().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getStatus().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getValorSolicitado().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getNome().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getRazaoSocial().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getEmail().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getTelefone().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getCnpj().toLowerCase().trim().contains(query) ||
-                                                    creditoModel.getPrazoSocilitado().toLowerCase().trim().contains(query)
-                                    ) {
-                                        listaCreditos.add(creditoModel);
+                                    assert creditoModel != null;
+                                    try {
+                                        if (
+                                                creditoModel.getDistribuidor().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getStatus().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getValorSolicitado().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getNome().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getRazaoSocial().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getEmail().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getTelefone().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getCnpj().toLowerCase().trim().contains(query) ||
+                                                        creditoModel.getPrazoSocilitado().toLowerCase().trim().contains(query)
+                                        ) {
+                                            listaCreditos.add(creditoModel);
+                                        }
+                                    } catch (Exception ignored) {
                                     }
-                                } catch (Exception ignored) {
                                 }
-
                             }
                         }
-
                         adapterCredito.notifyDataSetChanged();
                         mainBinding.totalizador.setText("Total: " + listaCreditos.size());
                     }
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onFailure(Call<ResponseModelListPedidoCredito> call, Throwable t) {
                     mainBinding.carregandoLayout.setVisibility(View.GONE);
-                    Toast.makeText(AllPedidosActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
+
                 }
             });
         } else {
-            refPedidos.addListenerForSingleValueEvent(new ValueEventListener() {
-                @SuppressLint("NotifyDataSetChanged")
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    mainBinding.carregandoLayout.setVisibility(View.GONE);
-                    if (snapshot.exists()) {
-                        listaPedidos.clear();
-                        for (DataSnapshot dado : snapshot.getChildren()) {
-                            PedidoModel pedidoModel = dado.getValue(PedidoModel.class);
 
-                            if (query.isEmpty()) {
-                                if (filterPeriodo) {
-                                    if (PedidosUtil.verificarIntervalo(
-                                            pedidoModel.getData(),
-                                            mainBinding.edtDataInicial.getText().toString(),
-                                            mainBinding.edtDataFinal.getText().toString()
-                                    )) {
+            apiServices.getPedidosProdutos(new UserModel("")).enqueue(new Callback<ResponseModelListPedidoProduto>() {
+                @SuppressLint({"NotifyDataSetChanged", "SetTextI18n"})
+                @Override
+                public void onResponse(Call<ResponseModelListPedidoProduto> call, Response<ResponseModelListPedidoProduto> response) {
+                    mainBinding.carregandoLayout.setVisibility(View.GONE);
+
+
+                    if (response.isSuccessful()) {
+                        listaPedidos.clear();
+
+
+                        if (query.isEmpty() && !filterPeriodo) {
+                            listaPedidos.addAll(response.body().getMsg());
+                        } else {
+                            for (PedidoModel pedidoModel : response.body().getMsg()) {
+                                if (query.isEmpty()) {
+                                    if (filterPeriodo) {
+                                        if (PedidosUtil.verificarIntervalo(
+                                                pedidoModel.getData(),
+                                                mainBinding.edtDataInicial.getText().toString(),
+                                                mainBinding.edtDataFinal.getText().toString()
+                                        )) {
+                                            listaPedidos.add(pedidoModel);
+                                        }
+                                    } else {
                                         listaPedidos.add(pedidoModel);
                                     }
                                 } else {
-                                    listaPedidos.add(pedidoModel);
-                                }
-                            } else {
-                                assert pedidoModel != null;
-                                if (
-                                        pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
-                                                String.valueOf(pedidoModel.getStatus()).toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getData().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getIdAgente().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getNomeEstabelecimento().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getNomeComprador().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getTele().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
-                                                pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
-                                ) {
-                                    listaPedidos.add(pedidoModel);
+                                    assert pedidoModel != null;
+                                    if (
+                                            pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
+                                                    String.valueOf(pedidoModel.getStatus()).toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getData().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getIdAgente().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getNomeEstabelecimento().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getNomeComprador().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getTele().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
+                                                    pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
+                                    ) {
+                                        listaPedidos.add(pedidoModel);
+                                    }
                                 }
                             }
                         }
 
-                        adapterPedidos.notifyDataSetChanged();
-                        mainBinding.totalizador.setText("Total: " + listaPedidos.size());
                     }
+                    adapterPedidos.notifyDataSetChanged();
+                    mainBinding.totalizador.setText("Total: " + listaPedidos.size());
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                public void onFailure(Call<ResponseModelListPedidoProduto> call, Throwable t) {
                     mainBinding.carregandoLayout.setVisibility(View.GONE);
-                    Toast.makeText(AllPedidosActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
+
                 }
             });
         }

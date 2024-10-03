@@ -14,6 +14,10 @@ public class PedidoModel {
     String totalCompra = "";
     List<ItemCompra> produtos = new ArrayList<>();
 
+    public PedidoModel(String emailVendedor) {
+        this.emailVendedor = emailVendedor;
+    }
+
     public PedidoModel() {
     }
 

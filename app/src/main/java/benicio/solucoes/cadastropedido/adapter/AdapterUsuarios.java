@@ -1,5 +1,6 @@
 package benicio.solucoes.cadastropedido.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -23,10 +24,16 @@ import java.util.List;
 
 import benicio.solucoes.cadastropedido.PedidoVendedorActivity;
 import benicio.solucoes.cadastropedido.R;
+import benicio.solucoes.cadastropedido.model.ResponseModel;
 import benicio.solucoes.cadastropedido.model.UserModel;
+import benicio.solucoes.cadastropedido.service.ApiServices;
+import benicio.solucoes.cadastropedido.util.RetrofitApiApp;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AdapterUsuarios extends RecyclerView.Adapter<AdapterUsuarios.MyViewHolder> {
-    private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
+    private final ApiServices apiServices = RetrofitApiApp.criarService(RetrofitApiApp.criarRetrofit());
     List<UserModel> usuarios;
     Activity c;
 
@@ -61,18 +68,28 @@ public class AdapterUsuarios extends RecyclerView.Adapter<AdapterUsuarios.MyView
             b.setTitle("Atenção!");
             b.setMessage("Remover esse Usuário Permantemente?");
             b.setPositiveButton("Sim", (d, i) -> {
-//                refUsuarios.child(user.getId()).setValue(null).addOnCompleteListener(task -> {
-//                    dialodRm.dismiss();
-//                    if (task.isSuccessful()) {
-//                        Toast.makeText(c, "Usuário Removido!", Toast.LENGTH_SHORT).show();
-//                    }else{
-//                        Toast.makeText(c, "Tente Novamente!", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
+                apiServices.deleteUsuario(new UserModel(user.getEmail())).enqueue(new Callback<ResponseModel>() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(c, "Usuário Removido!", Toast.LENGTH_SHORT).show();
+                            usuarios.remove(position);
+                            notifyDataSetChanged();
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseModel> call, Throwable t) {
+
+                    }
+                });
             });
             b.setNegativeButton("Não", null);
             dialodRm = b.create();
             dialodRm.show();
+
         });
 
 
@@ -80,14 +97,14 @@ public class AdapterUsuarios extends RecyclerView.Adapter<AdapterUsuarios.MyView
         holder.btn_ver_pedidos_vendedores.setOnClickListener(view -> {
             Intent t = new Intent(c, PedidoVendedorActivity.class);
             t.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            t.putExtra("idUsuario", user.getId());
+            t.putExtra("email", user.getEmail());
             c.startActivity(t);
         });
 
         holder.btn_ver_pedidos_creditos.setOnClickListener(v -> {
             Intent t = new Intent(c, PedidoVendedorActivity.class);
             t.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            t.putExtra("idUsuario", user.getId());
+            t.putExtra("email", user.getEmail());
             t.putExtra("credito", true);
             c.startActivity(t);
         });
