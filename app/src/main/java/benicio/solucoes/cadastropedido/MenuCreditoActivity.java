@@ -11,6 +11,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,38 +34,51 @@ import benicio.solucoes.cadastropedido.databinding.ActivityMenuCreditoBinding;
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
+import benicio.solucoes.cadastropedido.model.ResponseModelListPedidoCredito;
 import benicio.solucoes.cadastropedido.model.UserModel;
+import benicio.solucoes.cadastropedido.service.ApiServices;
 import benicio.solucoes.cadastropedido.util.CSVGenerator;
 import benicio.solucoes.cadastropedido.util.PedidosUtil;
+import benicio.solucoes.cadastropedido.util.RetrofitApiApp;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MenuCreditoActivity extends AppCompatActivity {
 
-    private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
-    private DatabaseReference refCreditos = FirebaseDatabase.getInstance().getReference().getRoot().child("creditos");
+    private ApiServices apiServices;
+    private SharedPreferences user_prefs;
+    private SharedPreferences.Editor editor;
+
+
     private ActivityMenuCreditoBinding mainBinding;
     private RecyclerView recyclerPedidos;
     private List<CreditoModel> lista = new ArrayList<>();
     private AdapterCredito adapterCredito;
     private Dialog loadingDialog;
-    private String idUsuario;
-    private FirebaseAuth auth = FirebaseAuth.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainBinding = ActivityMenuCreditoBinding.inflate(getLayoutInflater());
         setContentView(mainBinding.getRoot());
 
+        apiServices = RetrofitApiApp.criarService(
+                RetrofitApiApp.criarRetrofit()
+        );
+        user_prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        editor = user_prefs.edit();
+
         getSupportActionBar().setTitle("Tela principal");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        mainBinding.btnFazerPedido.setOnClickListener( view -> {
+        mainBinding.btnFazerPedido.setOnClickListener(view -> {
             finish();
             startActivity(new Intent(this, CriarInfoCreditoActivity.class));
         });
 
         configurarLoadingDialog();
-        configurarIdVendedor();
         configurarRecyclerPedidos();
 
         mainBinding.pesquisarProduto.setOnClickListener(view -> {
@@ -72,7 +86,7 @@ public class MenuCreditoActivity extends AppCompatActivity {
             configurarListener(query, false);
         });
 
-        mainBinding.filtrarPeriodo.setOnClickListener( v -> configurarListener("", true));
+        mainBinding.filtrarPeriodo.setOnClickListener(v -> configurarListener("", true));
 
         mainBinding.btnGerarRelatorio.setOnClickListener(v -> CSVGenerator.gerarCreditoADMCSV(this, lista));
     }
@@ -82,10 +96,9 @@ public class MenuCreditoActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             startActivity(new Intent(this, MenuPedidoOrCreditoActivity.class));
             finish();
-        }
-        else if( item.getItemId() == R.id.sair){
+        } else if (item.getItemId() == R.id.sair) {
             finish();
-            auth.signOut();
+            editor.remove("email").apply();
         }
 
         return super.onOptionsItemSelected(item);
@@ -126,19 +139,21 @@ public class MenuCreditoActivity extends AppCompatActivity {
 
     private void configurarListener(String query, boolean filterPeriodo) {
         loadingDialog.show();
-        refCreditos.addListenerForSingleValueEvent(new ValueEventListener() {
+        apiServices.getPedidosCredito(new UserModel(user_prefs.getString("email", ""))).enqueue(new Callback<ResponseModelListPedidoCredito>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onResponse(Call<ResponseModelListPedidoCredito> call, Response<ResponseModelListPedidoCredito> response) {
                 loadingDialog.dismiss();
-                if (snapshot.exists()) {
-                    lista.clear();
-                    for (DataSnapshot dado : snapshot.getChildren()) {
-                        CreditoModel pedidoModel = dado.getValue(CreditoModel.class);
+                lista.clear();
 
-                        if (pedidoModel.getIdVendedor() != null && pedidoModel.getIdVendedor().equals(idUsuario)) {
+                if (response.isSuccessful()) {
+                    if (query.isEmpty() && !filterPeriodo) {
+                        assert response.body() != null;
+                        lista.addAll(response.body().getMsg());
+                    } else {
+                        assert response.body() != null;
+                        for (CreditoModel pedidoModel : response.body().getMsg()) {
                             if (query.isEmpty()) {
-//                                lista.add(pedidoModel);
                                 if (filterPeriodo) {
                                     if (PedidosUtil.verificarIntervalo(
                                             pedidoModel.getData(),
@@ -153,7 +168,7 @@ public class MenuCreditoActivity extends AppCompatActivity {
                             } else {
                                 assert pedidoModel != null;
                                 if (
-                                                pedidoModel.getId().toLowerCase().trim().contains(query) ||
+                                        pedidoModel.getId().toLowerCase().trim().contains(query) ||
                                                 pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
                                                 pedidoModel.getDistribuidor().toLowerCase().trim().contains(query) ||
                                                 pedidoModel.getRazaoSocial().toLowerCase().trim().contains(query) ||
@@ -168,15 +183,18 @@ public class MenuCreditoActivity extends AppCompatActivity {
                             }
                         }
                     }
-                    Collections.reverse(lista);
-                    adapterCredito.notifyDataSetChanged();
+
                 }
+
+                Collections.reverse(lista);
+                adapterCredito.notifyDataSetChanged();
+
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onFailure(Call<ResponseModelListPedidoCredito> call, Throwable t) {
                 loadingDialog.dismiss();
-                Toast.makeText(MenuCreditoActivity.this, "Sem Conexão", Toast.LENGTH_LONG).show();
+
             }
         });
     }
@@ -187,33 +205,5 @@ public class MenuCreditoActivity extends AppCompatActivity {
         b.setView(LoadingLayoutBinding.inflate(getLayoutInflater()).getRoot());
         loadingDialog = b.create();
     }
-
-    private void configurarIdVendedor() {
-
-        loadingDialog.show();
-        refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                loadingDialog.dismiss();
-
-                for (DataSnapshot dado : snapshot.getChildren()) {
-                    UserModel userModel = dado.getValue(UserModel.class);
-                    if (userModel.getEmail().trim().toLowerCase().equals(auth.getCurrentUser().getEmail().trim().toLowerCase())) {
-//                        idUsuario = userModel.getId();
-                        break;
-                    }
-                }
-
-                configurarListener("", false);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                loadingDialog.dismiss();
-            }
-        });
-    }
-
 
 }

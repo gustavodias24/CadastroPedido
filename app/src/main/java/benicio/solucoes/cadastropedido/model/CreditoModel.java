@@ -7,7 +7,7 @@ public class CreditoModel {
     String idAgent = "";
     String status = "pendente", distribuidor;
     String nome = "", razaoSocial = "", cnpj = "", inscricaoEstadual = "", email = "", telefone = "", endereco = "", prazoSocilitado = "",
-            valorSolicitado = "", data = "";
+            valorSolicitado = "", data = "", emailVendedor = "";;
 
     String enviarEmAnexo =
             "Documentos Solicitados dos sócios e da empresa: Enviar no anexo deste email: \n" +
@@ -36,6 +36,14 @@ public class CreditoModel {
                 "Prado Solicitado: " + prazoSocilitado + "\n" +
                 "Valor Solicitado: " + valorSolicitado + "\n" +
                 "\n" + "\n" + enviarEmAnexo + "\n";
+    }
+
+    public String getEmailVendedor() {
+        return emailVendedor;
+    }
+
+    public void setEmailVendedor(String emailVendedor) {
+        this.emailVendedor = emailVendedor;
     }
 
     public String getData() {
@@ -74,7 +82,7 @@ public class CreditoModel {
         this._id = id;
     }
 
-    public CreditoModel(String nome, String razaoSocial, String cnpj, String inscricaoEstadual, String email, String telefone, String endereco, String prazoSocilitado, String valorSolicitado, String distribuidor, String status, String data, String idAgent) {
+    public CreditoModel(String nome, String razaoSocial, String cnpj, String inscricaoEstadual, String email, String telefone, String endereco, String prazoSocilitado, String valorSolicitado, String distribuidor, String status, String data, String emailVendedor) {
         this.nome = nome;
         this.razaoSocial = razaoSocial;
         this.cnpj = cnpj;
@@ -87,7 +95,7 @@ public class CreditoModel {
         this.distribuidor = distribuidor;
         this.status = status;
         this.data = data;
-        this.idAgent = idAgent;
+        this.emailVendedor = emailVendedor;
     }
 
     public String getIdAgent() {

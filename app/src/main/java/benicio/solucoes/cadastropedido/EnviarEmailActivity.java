@@ -26,6 +26,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.commons.logging.LogFactory;
+
 import java.util.Objects;
 import java.util.UUID;
 
@@ -46,6 +48,7 @@ import retrofit2.Response;
 
 public class EnviarEmailActivity extends AppCompatActivity {
 
+    private static final org.apache.commons.logging.Log log = LogFactory.getLog(EnviarEmailActivity.class);
     private ApiServices apiServices;
 
     private ActivityEnviarEmailBinding mainBinding;
@@ -96,8 +99,10 @@ public class EnviarEmailActivity extends AppCompatActivity {
         });
 
         b = getIntent().getExtras();
+        assert b != null;
         if (b.getBoolean("credito", false)) {
-
+            credito = new Gson().fromJson(b.getString("dados", ""), new TypeToken<CreditoModel>() {
+            }.getType());
         } else {
             pedido = new Gson().fromJson(b.getString("dados", ""), new TypeToken<PedidoModel>() {
             }.getType());

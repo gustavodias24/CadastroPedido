@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,15 +30,16 @@ import benicio.solucoes.cadastropedido.databinding.ActivityCriarInfoCreditoBindi
 import benicio.solucoes.cadastropedido.databinding.LoadingLayoutBinding;
 import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.UserModel;
+import benicio.solucoes.cadastropedido.service.ApiServices;
 import benicio.solucoes.cadastropedido.util.MathUtils;
+import benicio.solucoes.cadastropedido.util.RetrofitApiApp;
 
 public class CriarInfoCreditoActivity extends AppCompatActivity {
-    private DatabaseReference refUsuarios = FirebaseDatabase.getInstance().getReference().getRoot().child("usuarios");
-    //    private Dialog loadingDialog;
-    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    private String idAgent = "";
+
+    private ApiServices apiServices;
+    private SharedPreferences user_prefs;
+
     private ActivityCriarInfoCreditoBinding mainBinding;
-    private DatabaseReference refCreditos = FirebaseDatabase.getInstance().getReference().getRoot().child("creditos");
 
     private Dialog loadingDialog;
 
@@ -47,7 +49,11 @@ public class CriarInfoCreditoActivity extends AppCompatActivity {
         mainBinding = ActivityCriarInfoCreditoBinding.inflate(getLayoutInflater());
         setContentView(mainBinding.getRoot());
 
-        encontrarUsuarioAtual();
+        apiServices = RetrofitApiApp.criarService(
+                RetrofitApiApp.criarRetrofit()
+        );
+        user_prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+
         configurarLoadingDialog();
 
         getSupportActionBar().setTitle("Pedido de Crédito");
@@ -86,59 +92,17 @@ public class CriarInfoCreditoActivity extends AppCompatActivity {
                         mainBinding.edtDistribuidor.getText().toString(),
                         "pendente",
                         new SimpleDateFormat("dd/MM/yyyy").format(new Date()),
-                        idAgent
+                        user_prefs.getString("email", "")
                 );
 
-                loadingDialog.show();
-                refCreditos.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        int count = 1;
-                        loadingDialog.dismiss();
-                        if (snapshot.exists()) {
-                            for (DataSnapshot dado : snapshot.getChildren()) {
-                                count++;
-                            }
-                        }
-                        String dadosCredito = gson.toJson(creditoModel);
+                String dadosCredito = gson.toJson(creditoModel);
 
-                        i.putExtra("dados", dadosCredito);
-                        startActivity(i);
-                        finish();
-                    }
+                i.putExtra("dados", dadosCredito);
+                startActivity(i);
+                finish();
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        loadingDialog.dismiss();
-                        Toast.makeText(CriarInfoCreditoActivity.this, "Tente Novamente...", Toast.LENGTH_SHORT).show();
-                    }
-                });
             }
         });
-    }
-
-
-    private void encontrarUsuarioAtual() {
-        try {
-            refUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                    for (DataSnapshot dado : snapshot.getChildren()) {
-                        if (dado.getValue(UserModel.class).getEmail().trim().toLowerCase().equals(user.getEmail().trim().toLowerCase())) {
-                            idAgent = dado.getValue(UserModel.class).getIdAgente();
-                            break;
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                }
-            });
-        } catch (Exception ignored) {
-        }
-
     }
 
     @Override

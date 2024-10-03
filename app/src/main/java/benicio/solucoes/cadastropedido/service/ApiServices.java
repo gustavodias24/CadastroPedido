@@ -3,6 +3,7 @@ package benicio.solucoes.cadastropedido.service;
 import benicio.solucoes.cadastropedido.model.CreditoModel;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
 import benicio.solucoes.cadastropedido.model.ResponseModel;
+import benicio.solucoes.cadastropedido.model.ResponseModelListPedidoCredito;
 import benicio.solucoes.cadastropedido.model.ResponseModelListPedidoProduto;
 import benicio.solucoes.cadastropedido.model.ResponseModelPedidoCredito;
 import benicio.solucoes.cadastropedido.model.ResponseModelPedidoProduto;
@@ -26,6 +27,9 @@ public interface ApiServices {
 
     @POST("pedidos_produtos")
     Call<ResponseModelListPedidoProduto> getPedidosProdutos(@Body UserModel userModel);
+
+    @POST("pedidos_creditos")
+    Call<ResponseModelListPedidoCredito> getPedidosCredito(@Body UserModel userModel);
 
     @POST("get_info_user")
     Call<ResponseModelUser> getUser(@Body UserModel userModel);
