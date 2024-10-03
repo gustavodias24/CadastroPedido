@@ -66,7 +66,7 @@ public class PedidoModel {
                         "Produtos: " + "\n\n" + produtosBuilder.toString();
     }
 
-    public PedidoModel(String lojaVendedor, String data, String emailVendedor, String nomeEstabelecimento, String nomeComprador, String email, String tele, String cnpj, String inscriEstadual, String formaPagamento, String enderecoCompleto, String enderecoEntrega, String obsEntrega, List<ItemCompra> produtos, String cep) {
+    public PedidoModel(String lojaVendedor, String data, String emailVendedor, String nomeEstabelecimento, String nomeComprador, String email, String tele, String cnpj, String inscriEstadual, String formaPagamento, String enderecoCompleto, String enderecoEntrega, String obsEntrega, List<ItemCompra> produtos, String cep, String idAgente) {
         this.lojaVendedor = lojaVendedor;
         this.data = data;
         this.emailVendedor = emailVendedor;
@@ -82,6 +82,7 @@ public class PedidoModel {
         this.obsEntrega = obsEntrega;
         this.produtos = produtos;
         this.cep = cep;
+        this.idAgente = idAgente;
 
     }
 

@@ -94,6 +94,7 @@ public class AdapterUsuarios extends RecyclerView.Adapter<AdapterUsuarios.MyView
 
 
         holder.itemView.getRootView().setClickable(false);
+
         holder.btn_ver_pedidos_vendedores.setOnClickListener(view -> {
             Intent t = new Intent(c, PedidoVendedorActivity.class);
             t.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

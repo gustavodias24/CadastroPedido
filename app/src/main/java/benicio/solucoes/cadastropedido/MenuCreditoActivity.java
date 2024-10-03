@@ -194,7 +194,7 @@ public class MenuCreditoActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ResponseModelListPedidoCredito> call, Throwable t) {
                 loadingDialog.dismiss();
-
+                configurarListener("", false);
             }
         });
     }

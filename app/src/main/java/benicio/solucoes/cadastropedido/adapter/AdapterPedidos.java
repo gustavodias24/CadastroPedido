@@ -24,8 +24,12 @@ import benicio.solucoes.cadastropedido.PedidoVendedorActivity;
 import benicio.solucoes.cadastropedido.R;
 import benicio.solucoes.cadastropedido.databinding.LayoutAlterarStatusBinding;
 import benicio.solucoes.cadastropedido.model.PedidoModel;
+import benicio.solucoes.cadastropedido.model.ResponseModel;
 import benicio.solucoes.cadastropedido.service.ApiServices;
 import benicio.solucoes.cadastropedido.util.RetrofitApiApp;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AdapterPedidos extends RecyclerView.Adapter<AdapterPedidos.MyViewHolde> {
 
@@ -114,37 +118,97 @@ public class AdapterPedidos extends RecyclerView.Adapter<AdapterPedidos.MyViewHo
 
                 alterarStatusBinding.radioPendente.setOnClickListener(view1 -> {
                     pedidoModel.setStatus("pendente");
-                    apiServices.atualizarPedidoProduto(pedidoModel);
+                    apiServices.atualizarPedidoProduto(pedidoModel).enqueue(new Callback<ResponseModel>() {
+                        @Override
+                        public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseModel> call, Throwable t) {
+
+                        }
+                    });
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioEmProcesso.setOnClickListener(view1 -> {
                     pedidoModel.setStatus("em processo");
-                    apiServices.atualizarPedidoProduto(pedidoModel);
+                    apiServices.atualizarPedidoProduto(pedidoModel).enqueue(new Callback<ResponseModel>() {
+                        @Override
+                        public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseModel> call, Throwable t) {
+
+                        }
+                    });
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioCompleto.setOnClickListener(view1 -> {
                     pedidoModel.setStatus("completo");
-                    apiServices.atualizarPedidoProduto(pedidoModel);
+                    apiServices.atualizarPedidoProduto(pedidoModel).enqueue(new Callback<ResponseModel>() {
+                        @Override
+                        public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseModel> call, Throwable t) {
+
+                        }
+                    });
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioPagamentoPendente.setOnClickListener(view1 -> {
                     pedidoModel.setStatus("pagamento pendente");
-                    apiServices.atualizarPedidoProduto(pedidoModel);
+                    apiServices.atualizarPedidoProduto(pedidoModel).enqueue(new Callback<ResponseModel>() {
+                        @Override
+                        public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseModel> call, Throwable t) {
+
+                        }
+                    });
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioCancelado.setOnClickListener(view1 -> {
                     pedidoModel.setStatus("cancelado");
-                    apiServices.atualizarPedidoProduto(pedidoModel);
+                    apiServices.atualizarPedidoProduto(pedidoModel).enqueue(new Callback<ResponseModel>() {
+                        @Override
+                        public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseModel> call, Throwable t) {
+
+                        }
+                    });
                     this.notifyDataSetChanged();
                 });
 
                 alterarStatusBinding.radioFechado.setOnClickListener(view1 -> {
                     pedidoModel.setStatus("fechado");
-                    apiServices.atualizarPedidoProduto(pedidoModel);
+                    apiServices.atualizarPedidoProduto(pedidoModel).enqueue(new Callback<ResponseModel>() {
+                        @Override
+                        public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseModel> call, Throwable t) {
+
+                        }
+                    });
                     this.notifyDataSetChanged();
                 });
 

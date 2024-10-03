@@ -47,11 +47,10 @@ import retrofit2.Response;
 
 public class InfosActivity extends AppCompatActivity {
 
-    private ApiServices apiServices;
 
     private SharedPreferences user_prefs;
+    private SharedPreferences.Editor editor;
 
-    private UserModel usuarioAtual;
     private ActivityInfosBinding mainBinding;
     private List<ClienteModel> clientes = new ArrayList<>();
     private List<String> nomesEstabelecimentos = new ArrayList<>();
@@ -67,11 +66,8 @@ public class InfosActivity extends AppCompatActivity {
         setContentView(mainBinding.getRoot());
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
-        apiServices = RetrofitApiApp.criarService(
-                RetrofitApiApp.criarRetrofit()
-        );
-
         user_prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        editor = user_prefs.edit();
         Objects.requireNonNull(getSupportActionBar()).setTitle("Pedido");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -80,7 +76,7 @@ public class InfosActivity extends AppCompatActivity {
                 new SimpleDateFormat("dd/MM/yyyy").format(new Date())
         );
 
-        encontrarUsuarioAtual();
+        mainBinding.edtAgente.setText(user_prefs.getString("idAgente", ""));
 
         new Thread() {
             @Override
@@ -91,6 +87,9 @@ public class InfosActivity extends AppCompatActivity {
         }.start();
 
         mainBinding.btnProdutos.setOnClickListener(view -> {
+
+            editor.putString("idAgente", mainBinding.edtAgente.getText().toString()).apply();
+
             Intent i = new Intent(this, ProdutosActivity.class);
 
             Gson gson = new Gson();
@@ -129,7 +128,8 @@ public class InfosActivity extends AppCompatActivity {
                                 mainBinding.edtEnderecoEntrega.getText().toString(),
                                 mainBinding.edtObsEntrega.getText().toString(),
                                 new ArrayList<>(),
-                                mainBinding.edtCep.getText().toString()
+                                mainBinding.edtCep.getText().toString(),
+                                mainBinding.edtAgente.getText().toString()
                         )
                 );
 
@@ -265,26 +265,26 @@ public class InfosActivity extends AppCompatActivity {
         runOnUiThread(() -> mainBinding.layoutCarregando.setVisibility(View.GONE));
     }
 
-    private void encontrarUsuarioAtual() {
-        mainBinding.layoutCarregando.setVisibility(View.VISIBLE);
-
-        apiServices.getUser(new UserModel(user_prefs.getString("email", ""))).enqueue(new Callback<ResponseModelUser>() {
-            @Override
-            public void onResponse(@NonNull Call<ResponseModelUser> call, @NonNull Response<ResponseModelUser> response) {
-                if (response.isSuccessful()) {
-                    mainBinding.progressBarIdAgente.setVisibility(View.GONE);
-                    assert response.body() != null;
-                    usuarioAtual = response.body().getMsg();
-                    mainBinding.edtAgente.setText(usuarioAtual.getIdAgente());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ResponseModelUser> call, @NonNull Throwable t) {
-                mainBinding.progressBarIdAgente.setVisibility(View.GONE);
-            }
-        });
-    }
+//    private void encontrarUsuarioAtual() {
+//        mainBinding.layoutCarregando.setVisibility(View.VISIBLE);
+//
+//        apiServices.getUser(new UserModel(user_prefs.getString("email", ""))).enqueue(new Callback<ResponseModelUser>() {
+//            @Override
+//            public void onResponse(@NonNull Call<ResponseModelUser> call, @NonNull Response<ResponseModelUser> response) {
+//                if (response.isSuccessful()) {
+//                    mainBinding.progressBarIdAgente.setVisibility(View.GONE);
+//                    assert response.body() != null;
+//                    usuarioAtual = response.body().getMsg();
+//                    mainBinding.edtAgente.setText(usuarioAtual.getIdAgente());
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<ResponseModelUser> call, @NonNull Throwable t) {
+//                mainBinding.progressBarIdAgente.setVisibility(View.GONE);
+//            }
+//        });
+//    }
 
 
     @Override

@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(Call<List<ClienteModel>> call, Throwable t) {
                     runOnUiThread(() -> {
                         mainBinding.progressBarClientes.setVisibility(View.GONE);
+                        Log.d("mayara", "onFailure: " + t.getMessage());
                         Toast.makeText(MainActivity.this, "Problema de conexão!", Toast.LENGTH_SHORT).show();
                     });
                 }
@@ -346,7 +347,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<ResponseModelListPedidoProduto> call, @NonNull Throwable t) {
-
+                configurarListener("", false);
+                Log.d("mayara", "onFailure: " + t.getMessage());
             }
         });
     }
