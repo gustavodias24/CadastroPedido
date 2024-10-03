@@ -44,17 +44,16 @@ import retrofit2.Response;
 
 public class PedidoVendedorActivity extends AppCompatActivity {
 
-    public static ApiServices apiServices;
+    private  ApiServices apiServices;
 
-    public static AdapterPedidos adapterPedidos;
-    public static AdapterCredito adapterCredito;
-    public static List<PedidoModel> listaPedidos = new ArrayList<>();
-    public static List<CreditoModel> listaCreditos = new ArrayList<>();
-    public static ActivityPedidoVendedorBinding mainBinding;
+    private  AdapterPedidos adapterPedidos;
+    private  AdapterCredito adapterCredito;
+    private  List<PedidoModel> listaPedidos = new ArrayList<>();
+    private  List<CreditoModel> listaCreditos = new ArrayList<>();
+    private  ActivityPedidoVendedorBinding mainBinding;
     private RecyclerView recyclerPedidos;
-    public static String idUsuario;
-    public static Bundle b;
-    static boolean isCredito = false;
+    private  Bundle b;
+    private boolean isCredito = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,12 +64,11 @@ public class PedidoVendedorActivity extends AppCompatActivity {
 
         apiServices = RetrofitApiApp.criarService(RetrofitApiApp.criarRetrofit());
 
-        getSupportActionBar().setTitle("Pedidos");
+        getSupportActionBar().setTitle("Pedidos Vendedor");
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         b = getIntent().getExtras();
-        idUsuario = b.getString("idUsuario", "");
 
         isCredito = b.getBoolean("credito", false);
 
@@ -101,11 +99,11 @@ public class PedidoVendedorActivity extends AppCompatActivity {
             recyclerPedidos.setAdapter(adapterPedidos);
         }
 
-        configurarListener("", this);
+        configurarListener();
 
     }
 
-    public static void configurarListener(String query, Context c) {
+    private void configurarListener() {
         mainBinding.carregandoLayout.setVisibility(View.VISIBLE);
 
         if (isCredito) {
@@ -117,32 +115,7 @@ public class PedidoVendedorActivity extends AppCompatActivity {
 
                     if (response.isSuccessful()) {
                         listaCreditos.clear();
-
-                        if (query.isEmpty()) {
-                            listaCreditos.addAll(response.body().getMsg());
-                        } else {
-                            for (CreditoModel creditoModel : response.body().getMsg()) {
-                                if (creditoModel.getIdVendedor() != null && creditoModel.getIdVendedor().equals(idUsuario)) {
-                                    if (query.isEmpty()) {
-                                        listaCreditos.add(creditoModel);
-                                    } else {
-                                        if (
-                                                creditoModel.getDistribuidor().toLowerCase().trim().contains(query) ||
-                                                        creditoModel.getStatus().toLowerCase().trim().contains(query) ||
-                                                        creditoModel.getValorSolicitado().toLowerCase().trim().contains(query) ||
-                                                        creditoModel.getNome().toLowerCase().trim().contains(query) ||
-                                                        creditoModel.getRazaoSocial().toLowerCase().trim().contains(query) ||
-                                                        creditoModel.getEmail().toLowerCase().trim().contains(query) ||
-                                                        creditoModel.getTelefone().toLowerCase().trim().contains(query) ||
-                                                        creditoModel.getCnpj().toLowerCase().trim().contains(query) ||
-                                                        creditoModel.getPrazoSocilitado().toLowerCase().trim().contains(query)
-                                        ) {
-                                            listaCreditos.add(creditoModel);
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        listaCreditos.addAll(response.body().getMsg());
 
                         adapterCredito.notifyDataSetChanged();
 
@@ -152,7 +125,6 @@ public class PedidoVendedorActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<ResponseModelListPedidoCredito> call, Throwable t) {
                     mainBinding.carregandoLayout.setVisibility(View.GONE);
-
                 }
             });
         } else {
@@ -163,25 +135,11 @@ public class PedidoVendedorActivity extends AppCompatActivity {
                 public void onResponse(Call<ResponseModelListPedidoProduto> call, Response<ResponseModelListPedidoProduto> response) {
                     mainBinding.carregandoLayout.setVisibility(View.GONE);
 
-                    if (query.isEmpty()) {
+                    if  (response.isSuccessful()){
+                        listaPedidos.clear();
                         listaPedidos.addAll(response.body().getMsg());
-                    } else {
-                        for (PedidoModel pedidoModel : response.body().getMsg()) {
-                            if (
-                                    pedidoModel.getLojaVendedor().toLowerCase().trim().contains(query) ||
-                                            pedidoModel.getData().toLowerCase().trim().contains(query) ||
-                                            pedidoModel.getIdAgente().toLowerCase().trim().contains(query) ||
-                                            pedidoModel.getNomeEstabelecimento().toLowerCase().trim().contains(query) ||
-                                            pedidoModel.getNomeComprador().toLowerCase().trim().contains(query) ||
-                                            pedidoModel.getEmail().toLowerCase().trim().contains(query) ||
-                                            pedidoModel.getTele().toLowerCase().trim().contains(query) ||
-                                            pedidoModel.getCnpj().toLowerCase().trim().contains(query) ||
-                                            pedidoModel.getObsEntrega().toLowerCase().trim().contains(query)
-                            ) {
-                                listaPedidos.add(pedidoModel);
-                            }
-                        }
                     }
+
                     adapterPedidos.notifyDataSetChanged();
                 }
 
