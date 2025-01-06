@@ -2,7 +2,11 @@
     <string name="app_name">RedCloud - Pedidos</string>
     <string name="action_import_xlxs">Import .XLXS</string>
     <string name="action_import_xls">Import .XLS</string>
+<<<<<<< HEAD
     <string name="versao">Versão 9.1</string>
+=======
+    <string name="versao">Versão 9.0</string>
+>>>>>>> 4a0fd3200bb40d9db9acc547e08974e845c1d9a8
 
     <string name="storage_access_required">This app requires your memory access to read excel-sheet files</string>
     <string name="storage_access_denied">Please goto app settings and grant memory permission. </string>
